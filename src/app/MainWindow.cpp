@@ -2078,7 +2078,7 @@ void MainWindow::execGotoPageDialog() {
 
   bool ok;
   const PageSequence pageSequence = m_thumbSequence->toPageSequence();
-  const PageId& selectionLeader = m_thumbSequence->selectionLeader().id();
+  const auto selectionLeader = m_thumbSequence->selectionLeader().id();
   int pageNumber = QInputDialog::getInt(this, tr("Go To Page"), tr("Enter the page number:"),
                                         pageSequence.pageNo(selectionLeader) + 1, 1, pageSequence.numPages(), 1, &ok);
   if (ok) {

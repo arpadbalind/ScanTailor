@@ -6,9 +6,9 @@
 
 #include <QCoreApplication>
 #include <QPointF>
-#include <boost/function.hpp>
 #include <boost/scoped_array.hpp>
 #include <cstddef>
+#include <functional>
 
 #include "DraggablePoint.h"
 #include "InteractionState.h"
@@ -22,9 +22,9 @@ class QShortcut;
 class InteractiveXSpline : public InteractionHandler {
   Q_DECLARE_TR_FUNCTIONS(InteractiveXSpline)
  public:
-  using Transform = boost::function<QPointF(const QPointF&)>;
-  using ModifiedCallback = boost::function<void()>;
-  using DragFinishedCallback = boost::function<void()>;
+  using Transform = std::function<QPointF(const QPointF&)>;
+  using ModifiedCallback = std::function<void()>;
+  using DragFinishedCallback = std::function<void()>;
 
   explicit InteractiveXSpline(ImageViewBase& imageView);
 
