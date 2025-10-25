@@ -4,11 +4,8 @@
 #ifndef SCANTAILOR_INTERACTION_DRAGHANDLER_H_
 #define SCANTAILOR_INTERACTION_DRAGHANDLER_H_
 
-#define BOOST_SIGNALS_NAMESPACE signal
-
 #include <QCoreApplication>
 #include <QPoint>
-#include <boost/function.hpp>
 
 #include "InteractionHandler.h"
 #include "InteractionState.h"
@@ -21,7 +18,7 @@ class DragHandler : public InteractionHandler {
   explicit DragHandler(ImageViewBase& imageView);
 
   DragHandler(ImageViewBase& imageView,
-              const boost::function<bool(const InteractionState&)>& explicitInteractionPermitter);
+              const std::function<bool(const InteractionState&)>& explicitInteractionPermitter);
 
   bool isActive() const;
 
@@ -38,7 +35,7 @@ class DragHandler : public InteractionHandler {
   ImageViewBase& m_imageView;
   InteractionState::Captor m_interaction;
   QPoint m_lastMousePos;
-  boost::function<bool(const InteractionState&)> m_interactionPermitter;
+  std::function<bool(const InteractionState&)> m_interactionPermitter;
 };
 
 

@@ -15,7 +15,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QMessageBox>
 #include <boost/foreach.hpp>
-#include <boost/function.hpp>
+#include <functional>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/multi_index/hashed_index.hpp>
@@ -59,7 +59,7 @@ class ThumbnailSequence::Item {
 
 class ThumbnailSequence::GraphicsScene : public QGraphicsScene {
  public:
-  using ContextMenuEventCallback = boost::function<void(QGraphicsSceneContextMenuEvent*)>;
+  using ContextMenuEventCallback = std::function<void(QGraphicsSceneContextMenuEvent*)>;
 
   void setContextMenuEventCallback(ContextMenuEventCallback callback) { m_contextMenuEventCallback = callback; }
 
