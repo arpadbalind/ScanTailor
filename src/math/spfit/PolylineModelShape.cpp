@@ -107,7 +107,7 @@ SqDistApproximant PolylineModelShape::localSqDistApproximant(const QPointF& pt,
 
 SqDistApproximant PolylineModelShape::calcApproximant(const QPointF& pt,
                                                       const FittableSpline::SampleFlags sampleFlags,
-                                                      const Flags polylineFlags,
+                                                      [[maybe_unused]] const Flags polylineFlags,
                                                       const FrenetFrame& frenetFrame,
                                                       const double signedCurvature) const {
   if (sampleFlags & (FittableSpline::HEAD_SAMPLE | FittableSpline::TAIL_SAMPLE)) {

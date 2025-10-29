@@ -265,7 +265,7 @@ void ProjectFilesDialog::inpDirEdited(const QString& text) {
   setInputDir(sanitizePath(text), /* autoAddFiles= */ false);
 }
 
-void ProjectFilesDialog::outDirEdited(const QString& text) {
+void ProjectFilesDialog::outDirEdited([[maybe_unused]] const QString& text) {
   m_autoOutDir = false;
 }
 

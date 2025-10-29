@@ -32,18 +32,11 @@ ColorMode ColorParams::parseColorMode(const QString& str) {
 }
 
 QString ColorParams::formatColorMode(const ColorMode mode) {
-  const char* str = "";
   switch (mode) {
-    case BLACK_AND_WHITE:
-      str = "bw";
-      break;
-    case COLOR_GRAYSCALE:
-      str = "colorOrGray";
-      break;
-    case MIXED:
-      str = "mixed";
-      break;
+    case BLACK_AND_WHITE:   return QStringLiteral("bw");
+    case COLOR_GRAYSCALE:   return QStringLiteral("colorOrGray");
+    case MIXED:             return QStringLiteral("mixed");
   }
-  return QString::fromLatin1(str);
+  return QString();
 }
 }  // namespace output

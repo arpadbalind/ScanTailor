@@ -705,7 +705,13 @@ void MainWindow::setOptionsWidget(FilterOptionsWidget* widget, const Ownership o
   connect(widget, SIGNAL(goToPage(const PageId&)), this, SLOT(goToPage(const PageId&)));
 }  // MainWindow::setOptionsWidget
 
-void MainWindow::setImageWidget(QWidget* widget, const Ownership ownership, DebugImages* debugImages, bool overlay) {
+// Non-virtual helper with the actual implementation.
+// without this during construction bypasses virtual dispatch
+void MainWindow::applyImageWidget(QWidget* widget,
+                                  Ownership ownership,
+                                  DebugImages* debugImages,
+                                  bool overlay)
+{
   if (isBatchProcessingInProgress() && (widget != m_batchProcessingWidget.get())) {
     if (ownership == TRANSFER_OWNERSHIP) {
       delete widget;
@@ -739,6 +745,16 @@ void MainWindow::setImageWidget(QWidget* widget, const Ownership ownership, Debu
     }
     m_imageFrameLayout->addWidget(m_tabbedDebugImages.get());
   }
+}
+
+// Virtual override that forwards to the non-virtual helper.
+// Keeps the public contract for callers and allows derived classes to override if needed.
+void MainWindow::setImageWidget(QWidget* widget,
+                                Ownership ownership,
+                                DebugImages* debugImages,
+                                bool overlay)
+{
+    applyImageWidget(widget, ownership, debugImages, overlay);
 }
 
 void MainWindow::removeImageWidget() {
@@ -1343,10 +1359,19 @@ void MainWindow::newProject() {
     return;
   }
 
-  // It will delete itself when it's done.
-  auto* context = new ProjectCreationContext(this);
-  connect(context, SIGNAL(done(ProjectCreationContext*)), this, SLOT(newProjectCreated(ProjectCreationContext*)));
+  auto context = QSharedPointer<ProjectCreationContext>(new ProjectCreationContext(this), [](ProjectCreationContext* p) { p->deleteLater(); });
+
+  ProjectCreationContext* contextPtr = context.data();
+
+  // Capture the QSharedPointer by value to keep the object alive until the lambda runs.
+  connect(contextPtr, &ProjectCreationContext::done, this,
+          [this, context](ProjectCreationContext* ctx) {
+            newProjectCreated(ctx);
+            // When this lambda returns the captured `context` is destroyed and
+            // its deleter schedules ctx->deleteLater().
+          });
 }
+
 
 void MainWindow::newProjectCreated(ProjectCreationContext* context) {
   auto pages = std::make_shared<ProjectPages>(context->files(), ProjectPages::AUTO_PAGES, context->layoutDirection());
@@ -1966,11 +1991,10 @@ BackgroundTaskPtr MainWindow::createCompositeTask(const PageInfo& page,
   }
   if (lastFilterIdx >= m_stages->pageSplitFilterIdx()) {
     pageSplitTask = m_stages->pageSplitFilter()->createTask(page, deskewTask, batch, debug);
-    debug = false;
   }
+  
   if (lastFilterIdx >= m_stages->fixOrientationFilterIdx()) {
     fixOrientationTask = m_stages->fixOrientationFilter()->createTask(page.id(), pageSplitTask, batch);
-    debug = false;
   }
   assert(fixOrientationTask);
   return std::make_shared<LoadFileTask>(batch ? BackgroundTask::BATCH : BackgroundTask::INTERACTIVE, page,

@@ -11,9 +11,11 @@
 #include <QScrollBar>
 #include <QStyle>
 #include <QWheelEvent>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "ImagePresentation.h"
+
+using namespace boost::placeholders;
 
 namespace deskew {
 const double ImageView::m_maxRotationDeg = 45.0;
@@ -85,7 +87,7 @@ void ImageView::manualDeskewAngleSetExternally(const double degrees) {
   updateTransform(ImagePresentation(m_xform.transform(), m_xform.resultingPreCropArea()));
 }
 
-void ImageView::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ImageView::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   painter.setWorldMatrixEnabled(false);
   painter.setRenderHints(QPainter::Antialiasing, false);
 
@@ -155,7 +157,7 @@ void ImageView::onWheelEvent(QWheelEvent* event, InteractionState& interaction) 
   }
 
   event->accept();
-  const double delta = degreeFraction * event->delta() / 120;
+  const double delta = degreeFraction * event->angleDelta().y() / 120;
   double angleDeg = m_xform.postRotation() - delta;
   angleDeg = qBound(-m_maxRotationDeg, angleDeg, m_maxRotationDeg);
   if (angleDeg == m_xform.postRotation()) {

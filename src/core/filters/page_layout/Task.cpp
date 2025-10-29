@@ -49,13 +49,12 @@ class Task::UiUpdater : public FilterResult {
   bool m_batchProcessing;
 };
 
-
 Task::Task(std::shared_ptr<Filter> filter,
            std::shared_ptr<output::Task> nextTask,
            std::shared_ptr<Settings> settings,
            const PageId& pageId,
            bool batch,
-           bool debug)
+           [[maybe_unused]] bool debug)
     : m_filter(std::move(filter)),
       m_nextTask(std::move(nextTask)),
       m_settings(std::move(settings)),

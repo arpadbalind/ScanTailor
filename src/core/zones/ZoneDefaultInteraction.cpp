@@ -244,18 +244,18 @@ void ZoneDefaultInteraction::onMouseReleaseEvent(QMouseEvent* event, Interaction
   event->accept();
 }
 
-void ZoneDefaultInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction) {
+void ZoneDefaultInteraction::onMouseMoveEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   const QTransform toScreen(m_context.imageView().imageToWidget());
 
   m_screenMousePos = toScreen.map(event->pos() + QPointF(0.5, 0.5));
   m_context.imageView().update();
 }
 
-void ZoneDefaultInteraction::onKeyPressEvent(QKeyEvent* event, InteractionState& interaction) {
+void ZoneDefaultInteraction::onKeyPressEvent(QKeyEvent* event, [[maybe_unused]] InteractionState& interaction) {
   m_activeKeyboardModifiers = event->modifiers();
 }
 
-void ZoneDefaultInteraction::onKeyReleaseEvent(QKeyEvent* event, InteractionState& interaction) {
+void ZoneDefaultInteraction::onKeyReleaseEvent(QKeyEvent* event, [[maybe_unused]] InteractionState& interaction) {
   m_activeKeyboardModifiers = event->modifiers();
 }
 

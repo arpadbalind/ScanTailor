@@ -57,15 +57,15 @@ class ThumbnailBase : public QGraphicsItem {
    * restricted to this->boundingRect().  Note that it's not necessary
    * for subclasses to restore the painter state.
    */
-  virtual void paintOverImage(QPainter& painter, const QTransform& imageToDisplay, const QTransform& thumbToDisplay) {}
+  virtual void paintOverImage([[maybe_unused]] QPainter& painter, [[maybe_unused]] const QTransform& imageToDisplay, [[maybe_unused]] const QTransform& thumbToDisplay) {}
 
   /**
    * \brief This is the same as paintOverImage().
    *        The only difference is that the painted content will be cropped with the image.
    */
-  virtual void prePaintOverImage(QPainter& painter,
-                                 const QTransform& imageToDisplay,
-                                 const QTransform& thumbToDisplay) {}
+  virtual void prePaintOverImage([[maybe_unused]] QPainter& painter,
+                                 [[maybe_unused]] const QTransform& imageToDisplay,
+                                 [[maybe_unused]] const QTransform& thumbToDisplay) {}
 
   virtual void paintDeviant(QPainter& painter);
 

@@ -26,7 +26,7 @@ Thumbnail::Thumbnail(std::shared_ptr<ThumbnailPixmapCache> thumbnailCache,
       m_virtOuterRect(xform.resultingRect()),
       m_deviant(deviant) {}
 
-void Thumbnail::paintOverImage(QPainter& painter, const QTransform& imageToDisplay, const QTransform& thumbToDisplay) {
+void Thumbnail::paintOverImage(QPainter& painter, [[maybe_unused]] const QTransform& imageToDisplay, const QTransform& thumbToDisplay) {
   // We work in display coordinates because we want to be
   // pixel-accurate with what we draw.
   painter.setWorldTransform(QTransform());

@@ -3,13 +3,15 @@
 
 #include "ZoneInteractionContext.h"
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "ZoneContextMenuInteraction.h"
 #include "ZoneCreationInteraction.h"
 #include "ZoneDefaultInteraction.h"
 #include "ZoneDragInteraction.h"
 #include "ZoneVertexDragInteraction.h"
+
+using namespace boost::placeholders;
 
 ZoneInteractionContext::ZoneInteractionContext(ImageViewBase& imageView, EditableZoneSet& zones)
     : m_imageView(imageView),

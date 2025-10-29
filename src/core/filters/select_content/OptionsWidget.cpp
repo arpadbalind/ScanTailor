@@ -5,11 +5,13 @@
 
 #include <UnitsProvider.h>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "ApplyDialog.h"
 #include "Settings.h"
+
+using namespace boost::placeholders;
 
 namespace select_content {
 OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelectionAccessor& pageSelectionAccessor)

@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QImage>
 #include <QPainter>
+#include <QRandomGenerator>
 #include <boost/foreach.hpp>
 
 #include "CylindricalSurfaceDewarper.h"
@@ -156,11 +157,11 @@ DistortionModel DistortionModelBuilder::tryBuildModel(DebugImages* dbg, const QI
     }
   }
   // Continue by throwing in some random pairs of lines.
-  qsrand(0);  // Repeatablity is important.
+  QRandomGenerator generator(0);   // Repeatablity is important.
   int randomPairsRemaining = 10;
   while (randomPairsRemaining-- > 0) {
-    int i = qrand() % numCurves;
-    int j = qrand() % numCurves;
+    int i = generator.bounded(numCurves);
+    int j = generator.bounded(numCurves);
     if (i > j) {
       std::swap(i, j);
     }
@@ -284,7 +285,7 @@ void DistortionModelBuilder::intersectFront(std::deque<QPointF>& polyline, const
 
   const QLineF frontSegment(polyline.front(), polyline[1]);
   QPointF intersection;
-  if (bound.intersect(frontSegment, &intersection) != QLineF::NoIntersection) {
+  if (bound.intersects(frontSegment, &intersection) != QLineF::NoIntersection) {
     polyline.front() = intersection;
   }
 }
@@ -294,13 +295,13 @@ void DistortionModelBuilder::intersectBack(std::deque<QPointF>& polyline, const 
 
   const QLineF backSegment(polyline[polyline.size() - 2], polyline.back());
   QPointF intersection;
-  if (bound.intersect(backSegment, &intersection) != QLineF::NoIntersection) {
+  if (bound.intersects(backSegment, &intersection) != QLineF::NoIntersection) {
     polyline.back() = intersection;
   }
 }
 
 XSpline DistortionModelBuilder::fitExtendedSpline(const std::vector<QPointF>& polyline,
-                                                  const Vec2d& centroid,
+                                                  [[maybe_unused]] const Vec2d& centroid,
                                                   const std::pair<QLineF, QLineF>& bounds) {
   using namespace spfit;
 

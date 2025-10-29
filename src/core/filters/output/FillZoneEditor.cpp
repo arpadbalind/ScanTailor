@@ -5,7 +5,7 @@
 
 #include <QPainter>
 #include <QPointer>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "ImagePresentation.h"
@@ -30,6 +30,7 @@ class FillZoneEditor::MenuCustomizer {
   FillZoneEditor* m_editor;
 };
 
+using namespace boost::placeholders;
 
 FillZoneEditor::FillZoneEditor(const QImage& image,
                                const ImagePixmapUnion& downscaledVersion,

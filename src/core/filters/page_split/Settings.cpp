@@ -56,7 +56,7 @@ void Settings::setLayoutTypeForAllPages(const LayoutType layoutType) {
   m_defaultLayoutType = layoutType;
 }
 
-void Settings::setLayoutTypeFor(const LayoutType layoutType, const std::set<PageId>& pages) {
+void Settings::setLayoutTypeFor([[maybe_unused]] const LayoutType layoutType, const std::set<PageId>& pages) {
   QMutexLocker locker(&m_mutex);
 
   UpdateAction action;

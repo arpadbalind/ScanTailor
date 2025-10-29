@@ -1540,8 +1540,8 @@ QRectF ThumbnailSequence::CompositeItem::boundingRect() const {
 }
 
 void ThumbnailSequence::CompositeItem::paint(QPainter* painter,
-                                             const QStyleOptionGraphicsItem* option,
-                                             QWidget* widget) {
+                                             [[maybe_unused]] const QStyleOptionGraphicsItem* option,
+                                             [[maybe_unused]] QWidget* widget) {
   const QBrush selectedItemBackgroundColor = ColorSchemeManager::instance().getColorParam(
       "ThumbnailSequenceSelectedItemBackground", QApplication::palette().color(QPalette::Highlight));
   const QBrush selectionLeaderBackgroundColor = ColorSchemeManager::instance().getColorParam(

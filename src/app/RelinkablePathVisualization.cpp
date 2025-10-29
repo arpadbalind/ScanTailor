@@ -9,7 +9,7 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QStylePainter>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "ColorSchemeManager.h"
 #include "RelinkablePath.h"
@@ -53,8 +53,8 @@ void RelinkablePathVisualization::clear() {
 
 void RelinkablePathVisualization::setPath(const RelinkablePath& path, bool clickable) {
   clear();
-
-  QStringList components(path.normalizedPath().split(QChar('/'), QString::SkipEmptyParts));
+  using namespace boost::placeholders;
+  QStringList components(path.normalizedPath().split(QChar('/'), Qt::SkipEmptyParts));
   if (components.empty()) {
     return;
   }
@@ -155,7 +155,7 @@ void RelinkablePathVisualization::stylePathComponentButton(QAbstractButton* btn,
   btn->setStyleSheet(style);
 }  // RelinkablePathVisualization::stylePathComponentButton
 
-void RelinkablePathVisualization::paintEvent(QPaintEvent* evt) {
+void RelinkablePathVisualization::paintEvent([[maybe_unused]] QPaintEvent* evt) {
   const int totalItems = m_layout->count();  // Note that there is an extra stretch item.
   for (int i = 0; i < totalItems; ++i) {
     QWidget* widget = m_layout->itemAt(i)->widget();
@@ -255,7 +255,7 @@ void RelinkablePathVisualization::checkForExistence(std::vector<PathComponent>& 
 }  // RelinkablePathVisualization::checkForExistence
 /*============================ ComponentButton ============================*/
 
-void RelinkablePathVisualization::ComponentButton::paintEvent(QPaintEvent* evt) {
+void RelinkablePathVisualization::ComponentButton::paintEvent([[maybe_unused]] QPaintEvent* evt) {
   QStyleOptionButton option;
   option.initFrom(this);
   option.text = text();

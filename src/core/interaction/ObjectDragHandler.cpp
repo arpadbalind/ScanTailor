@@ -82,10 +82,10 @@ void ObjectDragHandler::setKeyboardModifiers(const std::set<Qt::KeyboardModifier
   m_keyboardModifiersSet = modifiersSet;
 }
 
-void ObjectDragHandler::onKeyPressEvent(QKeyEvent* event, InteractionState& interaction) {
+void ObjectDragHandler::onKeyPressEvent(QKeyEvent* event, [[maybe_unused]] InteractionState& interaction) {
   m_activeKeyboardModifiers = event->modifiers();
 }
 
-void ObjectDragHandler::onKeyReleaseEvent(QKeyEvent* event, InteractionState& interaction) {
+void ObjectDragHandler::onKeyReleaseEvent(QKeyEvent* event, [[maybe_unused]] InteractionState& interaction) {
   m_activeKeyboardModifiers = event->modifiers();
 }

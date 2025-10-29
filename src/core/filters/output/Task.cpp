@@ -9,7 +9,7 @@
 #include <core/TiffWriter.h>
 
 #include <QDir>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "DebugImagesImpl.h"
@@ -42,6 +42,7 @@
 
 using namespace imageproc;
 using namespace dewarping;
+using namespace boost::placeholders;
 
 namespace output {
 class Task::UiUpdater : public FilterResult {
@@ -506,10 +507,16 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
   const QPixmap downscaledOutputPixmap(imageView->downscaledPixmap());
   tabImageRectMap->insert(std::pair<ImageViewTab, QRectF>(TAB_OUTPUT, m_xform.resultingRect()));
 
+  auto preCropArea = m_xform.resultingPreCropArea();
+  std::vector<QPointF> preCropAreaStdVector(preCropArea.constBegin(), preCropArea.constEnd());
+
   auto dewarpingView = std::make_unique<DewarpingView>(
       m_origImage, m_downscaledOrigImage, m_xform.transform(),
-      PolygonUtils::convexHull(m_xform.resultingPreCropArea().toStdVector()), m_virtContentRect, m_pageId,
+      PolygonUtils::convexHull(preCropAreaStdVector), m_virtContentRect, m_pageId,
       m_params.dewarpingOptions(), m_params.distortionModel(), optWidget->depthPerception());
+
+
+
   const QPixmap downscaledOrigPixmap(dewarpingView->downscaledPixmap());
   QObject::connect(optWidget, SIGNAL(depthPerceptionChanged(double)), dewarpingView.get(),
                    SLOT(depthPerceptionChanged(double)));

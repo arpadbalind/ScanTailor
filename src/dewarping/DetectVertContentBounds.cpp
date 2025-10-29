@@ -8,6 +8,7 @@
 
 #include <QImage>
 #include <QPainter>
+#include <QRandomGenerator>
 #include <boost/foreach.hpp>
 #include <boost/lambda/bind.hpp>
 #include <boost/lambda/lambda.hpp>
@@ -244,7 +245,7 @@ QLineF SequentialColumnProcessor::approximateWithLine(std::vector<Segment>* dbgS
   // Run RANSAC on the segments.
 
   RansacAlgo ransac(segments);
-  qsrand(0);  // Repeatablity is important.
+  QRandomGenerator generator(0);   // Repeatablity is important.
 
   // We want to make sure we do pick a few segments closest
   // to the edge, so let's sort segments appropriately
@@ -259,7 +260,8 @@ QLineF SequentialColumnProcessor::approximateWithLine(std::vector<Segment>* dbgS
   // Continue with random samples.
   const int ransacIterations = segments.empty() ? 0 : 200;
   for (int i = 0; i < ransacIterations; ++i) {
-    ransac.buildAndAssessModel(segments[qrand() % segments.size()]);
+    const auto segmentSize = static_cast<int>(segments.size());
+    ransac.buildAndAssessModel(segments[generator.bounded(segmentSize)]);
   }
 
   if (ransac.bestModel().segments.empty()) {
@@ -392,8 +394,8 @@ QLineF extendLine(const QLineF& line, int height) {
   const QLineF topLine(QPointF(0, 0), QPointF(1, 0));
   const QLineF bottomLine(QPointF(0, height), QPointF(1, height));
 
-  line.intersect(topLine, &topIntersection);
-  line.intersect(bottomLine, &bottomIntersection);
+  line.intersects(topLine, &topIntersection);
+  line.intersects(bottomLine, &bottomIntersection);
   return QLineF(topIntersection, bottomIntersection);
 }
 }  // namespace

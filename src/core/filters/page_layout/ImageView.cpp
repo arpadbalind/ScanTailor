@@ -12,7 +12,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
 #include "ImagePresentation.h"
@@ -22,6 +22,7 @@
 #include "Utils.h"
 
 using namespace imageproc;
+using namespace boost::placeholders;
 
 namespace page_layout {
 ImageView::ImageView(const std::shared_ptr<Settings>& settings,
@@ -227,7 +228,7 @@ void ImageView::aggregateHardSizeChanged() {
   updatePresentationTransform(FIT);
 }
 
-void ImageView::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ImageView::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   QColor bgColor;
   QColor fgColor;
   if (m_alignment.isNull()) {
@@ -936,7 +937,7 @@ Proximity ImageView::rectProximity(const QRectF& box, const QPointF& mousePos) c
   return Proximity::fromSqDist(value);
 }
 
-void ImageView::onMouseDoubleClickEvent(QMouseEvent* event, InteractionState& interaction) {
+void ImageView::onMouseDoubleClickEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   if (event->button() == Qt::LeftButton) {
     if (!m_alignment.isNull() && !m_guides.empty()) {
       attachContentToNearestGuide(QPointF(0.5, 0.5) + event->pos(), event->modifiers());

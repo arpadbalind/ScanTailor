@@ -44,7 +44,7 @@ class EditableSpline {
 
   bool bridged() const { return m_sentinel->bridged(); }
 
-  void setBridged(bool bridged) { m_sentinel->setBridged(true); }
+  void setBridged(bool bridged) { m_sentinel->setBridged(bridged); }
 
   QPolygonF toPolygon() const;
 

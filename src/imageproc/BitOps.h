@@ -95,7 +95,7 @@ struct MostSignificantZeroes {
 
 template <typename T>
 struct MostSignificantZeroes<T, 0> {
-  static int reduce(T val, int count) { return count - 1; }
+  static int reduce([[maybe_unused]] T val, int count) { return count - 1; }
 };
 
 
@@ -112,7 +112,7 @@ struct LeastSignificantZeroes {
 
 template <typename T>
 struct LeastSignificantZeroes<T, 0> {
-  static int reduce(T val, int count) { return count - 1; }
+  static int reduce([[maybe_unused]] T val, int count) { return count - 1; }
 };
 }  // namespace detail
 

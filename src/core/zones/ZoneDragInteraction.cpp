@@ -23,7 +23,7 @@ ZoneDragInteraction::ZoneDragInteraction(ZoneInteractionContext& context,
   interaction.capture(m_interaction);
 }
 
-void ZoneDragInteraction::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ZoneDragInteraction::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   painter.setWorldMatrixEnabled(false);
   painter.setRenderHint(QPainter::Antialiasing);
 
@@ -49,9 +49,9 @@ void ZoneDragInteraction::onPaint(QPainter& painter, const InteractionState& int
 
     m_visualizer.drawSpline(painter, toScreen, spline);
   }
-}  // ZoneDragInteraction::onPaint
+} 
 
-void ZoneDragInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction) {
+void ZoneDragInteraction::onMouseReleaseEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   if (event->button() == Qt::LeftButton) {
     m_context.zones().commit();
     makePeerPreceeder(*m_context.createDefaultInteraction());
@@ -59,7 +59,7 @@ void ZoneDragInteraction::onMouseReleaseEvent(QMouseEvent* event, InteractionSta
   }
 }
 
-void ZoneDragInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction) {
+void ZoneDragInteraction::onMouseMoveEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   const QTransform toScreen(m_context.imageView().imageToWidget());
   const QTransform fromScreen(m_context.imageView().widgetToImage());
   const QPointF shift = (event->pos() + QPointF(0.5, 0.5)) - m_initialMousePos;
@@ -71,4 +71,4 @@ void ZoneDragInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState&
   } while (vertex = vertex->next(SplineVertex::LOOP), vertex != m_spline->firstVertex());
 
   m_context.imageView().update();
-}  // ZoneDragInteraction::onMouseMoveEvent
+}
