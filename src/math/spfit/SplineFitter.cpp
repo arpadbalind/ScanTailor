@@ -25,7 +25,7 @@ void SplineFitter::setSamplingParams(const FittableSpline::SamplingParams& param
   m_samplingParams = params;
 }
 
-void SplineFitter::addAttractionForce(const Vec2d& splinePoint,
+void SplineFitter::addAttractionForce([[maybe_unused]] const Vec2d& splinePoint,
                                       const std::vector<FittableSpline::LinearCoefficient>& coeffs,
                                       const SqDistApproximant& sqdistApprox) {
   const auto numCoeffs = static_cast<int>(coeffs.size());

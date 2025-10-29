@@ -21,7 +21,7 @@ Thumbnail::Thumbnail(std::shared_ptr<ThumbnailPixmapCache> thumbnailCache,
       m_pageRectEnabled(pageRectEnabled),
       m_deviant(deviant) {}
 
-void Thumbnail::paintOverImage(QPainter& painter, const QTransform& imageToDisplay, const QTransform& thumbToDisplay) {
+void Thumbnail::paintOverImage(QPainter& painter, [[maybe_unused]] const QTransform& imageToDisplay, [[maybe_unused]] const QTransform& thumbToDisplay) {
   if (!m_contentRect.isNull()) {
     QRectF pageRect(virtToThumb().mapRect(m_pageRect));
 

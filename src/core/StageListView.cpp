@@ -314,11 +314,11 @@ void StageListView::Model::disableBatchProcessingAnimation() {
   emit dataChanged(index(0, 1), index(m_curSelectedRow, 1));
 }
 
-int StageListView::Model::columnCount(const QModelIndex& parent) const {
+int StageListView::Model::columnCount([[maybe_unused]] const QModelIndex& parent) const {
   return 2;
 }
 
-int StageListView::Model::rowCount(const QModelIndex& parent) const {
+int StageListView::Model::rowCount([[maybe_unused]] const QModelIndex& parent) const {
   return m_stages->count();
 }
 

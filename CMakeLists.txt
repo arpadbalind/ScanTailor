@@ -15,7 +15,15 @@ endif()
 project("ScanTailor Advanced")
 
 # Set compiler flags.
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_custom_target(
+    quality
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/clang-tidy.sh ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "🔍 Running clang-tidy code quality checks"
+)
 
 if (NOT DEFAULT_COMPILER_FLAGS_IS_SET)
   if (MSVC)

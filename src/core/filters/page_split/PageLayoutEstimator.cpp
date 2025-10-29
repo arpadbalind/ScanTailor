@@ -65,9 +65,9 @@ struct CenterComparator {
 std::unique_ptr<PageLayout> autoDetectSinglePageLayout(const LayoutType layoutType,
                                                        const std::vector<QLineF>& ltrLines,
                                                        const QRectF& virtualImageRect,
-                                                       const GrayImage& grayDownscaled,
-                                                       const QTransform& outToDownscaled,
-                                                       DebugImages* dbg) {
+                                                       [[maybe_unused]] const GrayImage& grayDownscaled,
+                                                       [[maybe_unused]] const QTransform& outToDownscaled,
+                                                       [[maybe_unused]] DebugImages* dbg) {
   const double imageCenter = virtualImageRect.center().x();
 
   // A loop just to be able to break from it.

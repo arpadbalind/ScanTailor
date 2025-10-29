@@ -8,7 +8,7 @@
 #include <QDebug>
 #include <QPainter>
 #include <QtWidgets/QShortcut>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "ImagePresentation.h"
 #include "ToLineProjector.h"
@@ -16,6 +16,8 @@
 #include "spfit/LinearForceBalancer.h"
 #include "spfit/PolylineModelShape.h"
 #include "spfit/SplineFitter.h"
+
+using namespace boost::placeholders;
 
 namespace output {
 DewarpingView::DewarpingView(const QImage& image,
@@ -214,8 +216,12 @@ void DewarpingView::onPaint(QPainter& painter, const InteractionState& interacti
     const dewarping::Curve& bottomCurve = m_distortionModel.bottomCurve();
     painter.drawLine(topCurve.polyline().front(), bottomCurve.polyline().front());
     painter.drawLine(topCurve.polyline().back(), bottomCurve.polyline().back());
-    painter.drawPolyline(QVector<QPointF>::fromStdVector(topCurve.polyline()));
-    painter.drawPolyline(QVector<QPointF>::fromStdVector(bottomCurve.polyline()));
+    const auto topCurvePts = topCurve.polyline();
+    const auto bottomCurvePts = bottomCurve.polyline();
+    const QVector<QPointF> v1(topCurvePts.cbegin(), topCurvePts.cend());
+    const QVector<QPointF> v2(bottomCurvePts.cbegin(), bottomCurvePts.cend());
+    painter.drawPolyline(v1);
+    painter.drawPolyline(v2);
   }
 
   paintXSpline(painter, interaction, m_topSpline);

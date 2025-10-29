@@ -4,13 +4,15 @@
 #include "ProjectReader.h"
 
 #include <QDir>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "AbstractFilter.h"
 #include "FileNameDisambiguator.h"
 #include "ProjectPages.h"
 #include "XmlUnmarshaller.h"
 #include "version.h"
+
+using namespace boost::placeholders;
 
 ProjectReader::ProjectReader(const QDomDocument& doc)
     : m_doc(doc), m_disambiguator(std::make_shared<FileNameDisambiguator>()) {

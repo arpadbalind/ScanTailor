@@ -84,7 +84,7 @@ JpegSourceManager::JpegSourceManager(QIODevice& ioDevice) : jpeg_source_mgr(), m
   next_input_byte = m_buf;
 }
 
-void JpegSourceManager::initSource(j_decompress_ptr cinfo) {
+void JpegSourceManager::initSource([[maybe_unused]] j_decompress_ptr cinfo) {
   // No-op.
 }
 
@@ -123,7 +123,7 @@ void JpegSourceManager::skipInputDataImpl(long numBytes) {
   bytes_in_buffer -= numBytes;
 }
 
-void JpegSourceManager::termSource(j_decompress_ptr cinfo) {
+void JpegSourceManager::termSource([[maybe_unused]] j_decompress_ptr cinfo) {
   // No-op.
 }
 

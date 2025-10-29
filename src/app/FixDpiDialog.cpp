@@ -523,7 +523,7 @@ void FixDpiDialog::TreeModel::applyDpiToSelection(const Scope scope, const Dpi& 
   }
 }
 
-int FixDpiDialog::TreeModel::columnCount(const QModelIndex& parent) const {
+int FixDpiDialog::TreeModel::columnCount([[maybe_unused]] const QModelIndex& parent) const {
   return 1;
 }
 

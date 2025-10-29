@@ -59,25 +59,25 @@ class InteractionHandler
   void makeLastFollower(InteractionHandler& handler);
 
  protected:
-  virtual void onPaint(QPainter& painter, const InteractionState& interaction) {}
+  virtual void onPaint([[maybe_unused]] QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {}
 
-  virtual void onProximityUpdate(const QPointF& screenMousePos, InteractionState& interaction) {}
+  virtual void onProximityUpdate([[maybe_unused]] const QPointF& screenMousePos, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onKeyPressEvent(QKeyEvent* event, InteractionState& interaction) {}
+  virtual void onKeyPressEvent([[maybe_unused]] QKeyEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onKeyReleaseEvent(QKeyEvent* event, InteractionState& interaction) {}
+  virtual void onKeyReleaseEvent([[maybe_unused]] QKeyEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onMousePressEvent(QMouseEvent* event, InteractionState& interaction) {}
+  virtual void onMousePressEvent([[maybe_unused]] QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onMouseReleaseEvent(QMouseEvent* event, InteractionState& interaction) {}
+  virtual void onMouseReleaseEvent([[maybe_unused]] QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onMouseDoubleClickEvent(QMouseEvent* event, InteractionState& interaction) {}
+  virtual void onMouseDoubleClickEvent([[maybe_unused]] QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction) {}
+  virtual void onMouseMoveEvent([[maybe_unused]] QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onWheelEvent(QWheelEvent* event, InteractionState& interaction) {}
+  virtual void onWheelEvent([[maybe_unused]] QWheelEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
-  virtual void onContextMenuEvent(QContextMenuEvent* event, InteractionState& interaction) {}
+  virtual void onContextMenuEvent([[maybe_unused]] QContextMenuEvent* event, [[maybe_unused]] InteractionState& interaction) {}
 
   static bool defaultInteractionPermitter(const InteractionState& interaction);
 

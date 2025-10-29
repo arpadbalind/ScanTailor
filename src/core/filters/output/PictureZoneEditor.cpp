@@ -9,7 +9,7 @@
 
 #include <QPainter>
 #include <QPointer>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "BackgroundExecutor.h"
@@ -22,6 +22,8 @@
 #include "Settings.h"
 #include "Zone.h"
 #include "ZoneSet.h"
+
+using namespace boost::placeholders;
 
 namespace output {
 static const QRgb maskColor = 0xff587ff4;
@@ -122,7 +124,7 @@ PictureZoneEditor::~PictureZoneEditor() {
   m_settings->setDefaultPictureZoneProperties(zones().defaultProperties());
 }
 
-void PictureZoneEditor::onPaint(QPainter& painter, const InteractionState& interaction) {
+void PictureZoneEditor::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   painter.setWorldTransform(QTransform());
   painter.setRenderHint(QPainter::Antialiasing);
 

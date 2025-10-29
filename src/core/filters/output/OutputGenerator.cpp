@@ -46,7 +46,7 @@
 #include <QPolygonF>
 #include <QSize>
 #include <QTransform>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <cmath>
 #include <functional>
 
@@ -71,6 +71,7 @@
 
 using namespace imageproc;
 using namespace dewarping;
+using namespace boost::placeholders;
 
 namespace output {
 OutputGenerator::OutputGenerator(const ImageTransformation& xform, const QPolygonF& contentRectPhys)

@@ -562,7 +562,6 @@ QuadraticFunction XSpline::junctionPointsAttractionForce(int segBegin, int segEn
   Function<2> force(sparseMap);
 
   if (segBegin != segEnd) {
-    QPointF pt(pointAt(controlPointIndexToT(segBegin)));
     std::vector<LinearCoefficient> coeffs;
     Function<2> prevX(0);
     Function<2> prevY(0);

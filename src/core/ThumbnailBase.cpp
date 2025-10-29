@@ -55,7 +55,7 @@ QRectF ThumbnailBase::boundingRect() const {
   return m_boundingRect;
 }
 
-void ThumbnailBase::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) {
+void ThumbnailBase::paint(QPainter* painter, [[maybe_unused]] const QStyleOptionGraphicsItem* option, [[maybe_unused]] QWidget* widget) {
   QPixmap pixmap;
 
   if (!m_completionHandler) {

@@ -31,7 +31,7 @@ PictureZonePropDialog::PictureZonePropDialog(std::shared_ptr<PropertySet> props,
   connect(ui.eraser3, SIGNAL(toggled(bool)), SLOT(itemToggled(bool)));
 }
 
-void PictureZonePropDialog::itemToggled(bool selected) {
+void PictureZonePropDialog::itemToggled([[maybe_unused]] bool selected) {
   PictureLayerProperty::Layer layer = PictureLayerProperty::NO_OP;
 
   QObject* const obj = sender();

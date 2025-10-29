@@ -141,7 +141,6 @@ std::vector<HoughLine> HoughLineDetector::findLines(const unsigned qualityLowerB
 
   std::vector<HoughLine> lines;
 
-  const QRect peaksRect(peaks.rect());
   ConnCompEraser eraser(peaks.release(), CONN8);
   ConnComp cc;
   while (!(cc = eraser.nextConnComp()).isNull()) {

@@ -9,13 +9,14 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <cmath>
 #include <map>
 
 #include "ImagePresentation.h"
 #include "ImageTransformation.h"
 
+using namespace boost::placeholders;
 using namespace imageproc;
 
 namespace select_content {
@@ -192,7 +193,7 @@ void ImageView::removeContentBox() {
   emit manualContentRectSet(m_contentRect);
 }
 
-void ImageView::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ImageView::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   if (m_contentRect.isNull() && !m_pageRectEnabled) {
     return;
   }
@@ -479,7 +480,7 @@ void ImageView::pageRectSetExternally(const QRectF& pageRect) {
   update();
 }
 
-void ImageView::onMouseDoubleClickEvent(QMouseEvent* event, InteractionState& interaction) {
+void ImageView::onMouseDoubleClickEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   if (event->button() == Qt::LeftButton) {
     if (!m_contentRect.isEmpty() && !m_contentMask.isNull()) {
       correctContentBox(QPointF(0.5, 0.5) + event->pos(), event->modifiers());

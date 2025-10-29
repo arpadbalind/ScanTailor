@@ -408,7 +408,7 @@ std::vector<PageInfo> ProjectPages::insertImageImpl(const ImageInfo& newImage,
                                                     BeforeOrAfter beforeOrAfter,
                                                     const ImageId& existing,
                                                     const PageView view,
-                                                    bool& modified) {
+                                                    [[maybe_unused]] bool& modified) {
   std::vector<PageInfo> logicalPages;
 
   auto it(m_images.begin());
@@ -496,7 +496,7 @@ void ProjectPages::removePagesImpl(const std::set<PageId>& toRemove, bool& modif
   newImages.swap(m_images);
 }  // ProjectPages::removePagesImpl
 
-PageInfo ProjectPages::unremovePageImpl(const PageId& pageId, bool& modified) {
+PageInfo ProjectPages::unremovePageImpl(const PageId& pageId, [[maybe_unused]] bool& modified) {
   if (pageId.subPage() == PageId::SINGLE_PAGE) {
     // These can't be unremoved.
     return PageInfo();

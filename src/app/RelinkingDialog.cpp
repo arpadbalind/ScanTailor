@@ -33,7 +33,7 @@ RelinkingDialog::RelinkingDialog(const QString& projectFilePath, QWidget* parent
   connect(ui.buttonBox, SIGNAL(accepted()), SLOT(commitChanges()));
 }
 
-void RelinkingDialog::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) {
+void RelinkingDialog::selectionChanged(const QItemSelection& selected, [[maybe_unused]] const QItemSelection& deselected) {
   if (selected.isEmpty()) {
     ui.pathVisualization->clear();
     ui.pathVisualization->setVisible(false);

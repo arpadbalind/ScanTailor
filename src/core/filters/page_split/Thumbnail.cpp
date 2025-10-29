@@ -27,7 +27,7 @@ Thumbnail::Thumbnail(std::shared_ptr<ThumbnailPixmapCache> thumbnailCache,
 
 void Thumbnail::prePaintOverImage(QPainter& painter,
                                   const QTransform& imageToDisplay,
-                                  const QTransform& thumbToDisplay) {
+                                  [[maybe_unused]] const QTransform& thumbToDisplay) {
   const QRectF canvasRect(imageXform().resultingRect());
 
   painter.setRenderHint(QPainter::Antialiasing, false);

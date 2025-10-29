@@ -205,9 +205,9 @@ Mat<T> Mat<T>::trans() const {
 
 template <typename T>
 Mat<T> Mat<T>::write(T* buf) const {
-  const int todo = rows * cols;
-  for (int i = 0; i < todo; ++i) {
-    buf[i] = data[i];
+  if (data && buf) {
+    const size_t size = static_cast<size_t>(rows * cols);
+    std::copy(data, data + size, buf);
   }
   return *this;
 }
@@ -215,7 +215,7 @@ Mat<T> Mat<T>::write(T* buf) const {
 template <typename T>
 template <size_t N>
 Mat<T> Mat<T>::write(VecNT<N, T>& vec) const {
-  assert(N >= size_t(rows * cols));
+  assert(N >= static_cast<size_t>(rows * cols));
   return write(vec.data());
 }
 

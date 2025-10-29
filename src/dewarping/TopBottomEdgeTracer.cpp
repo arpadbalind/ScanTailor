@@ -847,7 +847,6 @@ void TopBottomEdgeTracer::upTheHillSnake(std::vector<QPointF>& snake, const Grid
 
     for (size_t nodeIdx = 0; nodeIdx < numNodes; ++nodeIdx) {
       const Vec2f pt(snake[nodeIdx]);
-      const float curExternalEnergy = -interpolatedGridValue(grid, bind<float>(&GridNode::absDirDeriv, _1), pt, 1000);
 
       for (int displacementIdx = 0; displacementIdx < numDisplacements; ++displacementIdx) {
         Step step;
@@ -1073,8 +1072,6 @@ QImage TopBottomEdgeTracer::visualizePaths(const QImage& background,
   auto* const canvasData = (uint32_t*) canvas.bits();
   const int canvasStride = canvas.bytesPerLine() / 4;
 
-  const int width = grid.width();
-  const int height = grid.height();
   const int gridStride = grid.stride();
   const GridNode* const gridData = grid.data();
 

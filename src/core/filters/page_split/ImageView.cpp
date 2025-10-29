@@ -7,13 +7,15 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/foreach.hpp>
 #include <utility>
 
 #include "ImagePresentation.h"
 #include "ImageTransformation.h"
 #include "ProjectPages.h"
+
+using namespace boost::placeholders;
 
 namespace page_split {
 ImageView::ImageView(const QImage& image,
@@ -100,7 +102,7 @@ void ImageView::pageLayoutSetExternally(const PageLayout& layout) {
   update();
 }
 
-void ImageView::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ImageView::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   painter.setRenderHint(QPainter::Antialiasing, false);
   painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 
@@ -207,8 +209,11 @@ QLineF ImageView::customInscribedCutterLine(const QLineF& line, const QRectF& re
   QPointF topPt;
   QPointF bottomPt;
 
-  line.intersect(QLineF(rect.topLeft(), rect.topRight()), &topPt);
-  line.intersect(QLineF(rect.bottomLeft(), rect.bottomRight()), &bottomPt);
+  QLineF topLine(rect.topLeft(), rect.topRight());
+  line.intersects(topLine, &topPt);
+
+  QLineF bottomLine(rect.bottomLeft(), rect.bottomRight());
+  line.intersects(bottomLine, &bottomPt);
 
   const double topX = qBound(rect.left(), topPt.x(), rect.right());
   const double bottomX = qBound(rect.left(), bottomPt.x(), rect.right());
@@ -234,8 +239,8 @@ void ImageView::handleMoveRequest(int lineIdx, int handleIdx, const QPointF& pos
       QPointF pTopI;
       QPointF pBottomI;
       QLineF anotherLine = virtualToWidget().map(m_virtLayout.cutterLine(i));
-      anotherLine.intersect(QLineF(validArea.topLeft(), validArea.topRight()), &pTopI);
-      anotherLine.intersect(QLineF(validArea.bottomLeft(), validArea.bottomRight()), &pBottomI);
+      anotherLine.intersects(QLineF(validArea.topLeft(), validArea.topRight()), &pTopI);
+      anotherLine.intersects(QLineF(validArea.bottomLeft(), validArea.bottomRight()), &pBottomI);
 
       if ((pTopI.x() < minXTop) || (pTopI.x() > maxXTop) || (pBottomI.x() < minXBottom)
           || (pBottomI.x() > maxXBottom)) {
@@ -274,8 +279,8 @@ void ImageView::lineMoveRequest(int lineIdx, QLineF line) {
   const QRectF validArea(getOccupiedWidgetRect());
   QPointF pTop;
   QPointF pBottom;
-  line.intersect(QLineF(validArea.topLeft(), validArea.topRight()), &pTop);
-  line.intersect(QLineF(validArea.bottomLeft(), validArea.bottomRight()), &pBottom);
+  line.intersects(QLineF(validArea.topLeft(), validArea.topRight()), &pTop);
+  line.intersects(QLineF(validArea.bottomLeft(), validArea.bottomRight()), &pBottom);
 
   qreal minXTop = validArea.left();
   qreal maxXTop = validArea.right();
@@ -288,8 +293,8 @@ void ImageView::lineMoveRequest(int lineIdx, QLineF line) {
       QPointF pTopI;
       QPointF pBottomI;
       QLineF anotherLine = virtualToWidget().map(m_virtLayout.cutterLine(i));
-      anotherLine.intersect(QLineF(validArea.topLeft(), validArea.topRight()), &pTopI);
-      anotherLine.intersect(QLineF(validArea.bottomLeft(), validArea.bottomRight()), &pBottomI);
+      anotherLine.intersects(QLineF(validArea.topLeft(), validArea.topRight()), &pTopI);
+      anotherLine.intersects(QLineF(validArea.bottomLeft(), validArea.bottomRight()), &pBottomI);
 
       if ((pTopI.x() < minXTop) || (pTopI.x() > maxXTop) || (pBottomI.x() < minXBottom)
           || (pBottomI.x() > maxXBottom)) {

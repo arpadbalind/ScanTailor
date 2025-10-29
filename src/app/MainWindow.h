@@ -197,7 +197,12 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
 
   void setOptionsWidget(FilterOptionsWidget* widget, Ownership ownership) override;
 
-  void setImageWidget(QWidget* widget,
+  void applyImageWidget(QWidget* widget,
+                        Ownership ownership,
+                        DebugImages* debugImages = nullptr,
+                        bool overlay = false);
+
+  virtual void setImageWidget(QWidget* widget,
                       Ownership ownership,
                       DebugImages* debugImages = nullptr,
                       bool overlay = false) override;

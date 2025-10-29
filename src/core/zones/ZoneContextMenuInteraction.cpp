@@ -8,10 +8,12 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 
 #include "ImageViewBase.h"
 #include "ZoneInteractionContext.h"
+
+using namespace boost::placeholders;
 
 class ZoneContextMenuInteraction::OrderByArea {
  public:
@@ -199,7 +201,7 @@ void ZoneContextMenuInteraction::highlightItem(const int zoneIdx) {
   m_context.imageView().update();
 }
 
-std::vector<ZoneContextMenuItem> ZoneContextMenuInteraction::defaultMenuCustomizer(const EditableZoneSet::Zone& zone,
+std::vector<ZoneContextMenuItem> ZoneContextMenuInteraction::defaultMenuCustomizer([[maybe_unused]] const EditableZoneSet::Zone& zone,
                                                                                    const StandardMenuItems& stdItems) {
   std::vector<ZoneContextMenuItem> items;
   items.reserve(2);

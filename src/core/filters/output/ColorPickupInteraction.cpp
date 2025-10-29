@@ -36,7 +36,7 @@ bool ColorPickupInteraction::isActive(const InteractionState& interaction) const
   return interaction.capturedBy(m_interaction);
 }
 
-void ColorPickupInteraction::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ColorPickupInteraction::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   if (m_dontDrawCircle) {
     return;
   }
@@ -51,7 +51,7 @@ void ColorPickupInteraction::onPaint(QPainter& painter, const InteractionState& 
   painter.drawEllipse(targetBoundingRect());
 }
 
-void ColorPickupInteraction::onMousePressEvent(QMouseEvent* event, InteractionState& interaction) {
+void ColorPickupInteraction::onMousePressEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   if (event->buttons() == Qt::LeftButton) {  // Left and only left button.
     event->accept();
     takeColor();
@@ -59,7 +59,7 @@ void ColorPickupInteraction::onMousePressEvent(QMouseEvent* event, InteractionSt
   }
 }
 
-void ColorPickupInteraction::onMouseMoveEvent(QMouseEvent* event, InteractionState& interaction) {
+void ColorPickupInteraction::onMouseMoveEvent([[maybe_unused]] QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   m_context.imageView().update();
 }
 

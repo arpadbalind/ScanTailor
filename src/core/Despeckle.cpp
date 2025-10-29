@@ -338,7 +338,9 @@ void voronoi(ConnectivityMap& cmap, std::vector<Distance>& dist) {
 
   Distance* distLine = &dist[0];
   uint32_t* cmapLine = cmap.paddedData();
-
+  if(!cmapLine){
+    return;
+  }
   distLine[0].reset(0);
   prevSqdistLine[0] = distLine[0].sqdist();
   for (int x = 1; x < width; ++x) {
@@ -653,7 +655,7 @@ void voronoiDistances(const ConnectivityMap& cmap,
 }  // voronoiDistances
 
 void despeckleImpl(BinaryImage& image,
-                   const Dpi& dpi,
+                   [[maybe_unused]] const Dpi& dpi,
                    const Settings& settings,
                    const TaskStatus& status,
                    DebugImages* const dbg) {

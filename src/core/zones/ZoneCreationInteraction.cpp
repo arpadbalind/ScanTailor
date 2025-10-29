@@ -7,11 +7,13 @@
 #include <QKeyEvent>
 #include <QPainter>
 #include <QtWidgets/QShortcut>
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/lambda/lambda.hpp>
 
 #include "ImageViewBase.h"
 #include "ZoneInteractionContext.h"
+
+using namespace boost::placeholders;
 
 ZoneCreationInteraction::ZoneCreationInteraction(ZoneInteractionContext& context, InteractionState& interaction)
     : m_context(context),
@@ -44,12 +46,11 @@ ZoneCreationInteraction::ZoneCreationInteraction(ZoneInteractionContext& context
                    std::bind(&ZoneCreationInteraction::cancel, this));
 }
 
-void ZoneCreationInteraction::onPaint(QPainter& painter, const InteractionState& interaction) {
+void ZoneCreationInteraction::onPaint(QPainter& painter, [[maybe_unused]] const InteractionState& interaction) {
   painter.setWorldMatrixEnabled(false);
   painter.setRenderHint(QPainter::Antialiasing);
 
   const QTransform toScreen(m_context.imageView().imageToWidget());
-  const QTransform fromScreen(m_context.imageView().widgetToImage());
 
   m_visualizer.drawSplines(painter, toScreen, m_context.zones());
 
@@ -153,7 +154,7 @@ void ZoneCreationInteraction::cancel() {
   delete this;
 }
 
-void ZoneCreationInteraction::onMousePressEvent(QMouseEvent* event, InteractionState& interaction) {
+void ZoneCreationInteraction::onMousePressEvent(QMouseEvent* event, [[maybe_unused]] InteractionState& interaction) {
   if (event->button() != Qt::LeftButton) {
     return;
   }
@@ -173,7 +174,6 @@ void ZoneCreationInteraction::onMouseReleaseEvent(QMouseEvent* event, Interactio
     return;
   }
 
-  const QTransform toScreen(m_context.imageView().imageToWidget());
   const QTransform fromScreen(m_context.imageView().widgetToImage());
   const QPointF screenMousePos(event->pos() + QPointF(0.5, 0.5));
   const QPointF imageMousePos(fromScreen.map(screenMousePos));

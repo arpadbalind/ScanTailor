@@ -15,8 +15,8 @@ Thumbnail::Thumbnail(std::shared_ptr<ThumbnailPixmapCache> thumbnailCache,
     : ThumbnailBase(std::move(thumbnailCache), maxSize, imageId, xform), m_deviant(deviant) {}
 
 void Thumbnail::prePaintOverImage(QPainter& painter,
-                                  const QTransform& imageToDisplay,
-                                  const QTransform& thumbToDisplay) {
+                                  [[maybe_unused]] const QTransform& imageToDisplay,
+                                  [[maybe_unused]] const QTransform& thumbToDisplay) {
   painter.setRenderHint(QPainter::Antialiasing, false);
 
   QPen pen(QColor(0, 0, 0xd1, 70));
@@ -36,18 +36,35 @@ void Thumbnail::prePaintOverImage(QPainter& painter,
 
   const QPointF center(boundingRect.center());
   QVector<QLineF> lines;
-  for (double y = center.y(); y > 0.0; y -= cellSize) {
+
+  // Horizontal lines going down from the center
+  const int y_down_steps = static_cast<int>(center.y() / cellSize);
+  for (int i = 1; i <= y_down_steps; ++i) {
+    const double y = center.y() - (i * cellSize);
     lines.push_back(QLineF(left, y, right, y));
   }
-  for (double y = center.y(); (y += cellSize) < h;) {
+
+  // Horizontal lines going up from the center
+  const int y_up_steps = static_cast<int>((h - center.y()) / cellSize);
+  for (int i = 1; i <= y_up_steps; ++i) {
+    const double y = center.y() + (i * cellSize);
     lines.push_back(QLineF(left, y, right, y));
   }
-  for (double x = center.x(); x > 0.0; x -= cellSize) {
+
+  // Vertical lines going left from the center
+  const int x_left_steps = static_cast<int>(center.x() / cellSize);
+  for (int i = 1; i <= x_left_steps; ++i) {
+    const double x = center.x() - (i * cellSize);
     lines.push_back(QLineF(x, top, x, bottom));
   }
-  for (double x = center.x(); (x += cellSize) < w;) {
+
+  // Vertical lines going right from the center
+  const int x_right_steps = static_cast<int>((w - center.x()) / cellSize);
+  for (int i = 1; i <= x_right_steps; ++i) {
+    const double x = center.x() + (i * cellSize);
     lines.push_back(QLineF(x, top, x, bottom));
   }
+
   painter.drawLines(lines);
 
   if (m_deviant) {

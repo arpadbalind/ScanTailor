@@ -98,7 +98,11 @@ Skew SkewFinder::findSkew(const BinaryImage& image) const {
   double sumCoarseScores = 0.0;
   double bestCoarseScore = 0.0;
   double bestCoarseAngle = -m_maxAngle;
-  for (double angle = -m_maxAngle; angle <= m_maxAngle; angle += coarseStep) {
+
+  const auto numCoarseSteps = static_cast<int>((m_maxAngle * 2.0) / coarseStep);
+
+  for (int i = 0; i <= numCoarseSteps; ++i) {
+    const double angle = -m_maxAngle + (i * coarseStep);
     const double score = process(coarseReduced, skewed, angle);
     sumCoarseScores += score;
     ++numCoarseScores;

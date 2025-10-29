@@ -80,7 +80,7 @@ void IncompleteThumbnail::drawQuestionMark(QPainter& painter, const QRectF& boun
 }  // IncompleteThumbnail::drawQuestionMark
 
 void IncompleteThumbnail::paintOverImage(QPainter& painter,
-                                         const QTransform& imageToDisplay,
-                                         const QTransform& thumbToDisplay) {
+                                         [[maybe_unused]] const QTransform& imageToDisplay,
+                                         [[maybe_unused]] const QTransform& thumbToDisplay) {
   drawQuestionMark(painter, boundingRect());
 }
