@@ -1,18 +1,17 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_LINEARSOLVER_H_
-#define SCANTAILOR_MATH_LINEARSOLVER_H_
+#pragma once
 
 #include <NonCopyable.h>
 
-#include <boost/scoped_array.hpp>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "StaticPool.h"
 
@@ -198,10 +197,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
 
 template <typename T>
 void LinearSolver::solve(const T* A, T* X, const T* B) const {
-  boost::scoped_array<T> tbuffer(new T[m_colsArowsX * (m_rowsAB + m_colsBX)]);
-  boost::scoped_array<size_t> pbuffer(new size_t[m_rowsAB]);
-
-  solve(A, X, B, tbuffer.get(), pbuffer.get());
+  std::vector<T> tbuffer(m_colsArowsX * (m_rowsAB + m_colsBX));
+  std::vector<size_t> pbuffer(m_rowsAB);
+  solve(A, X, B, tbuffer.data(), pbuffer.data());
 }
-
-#endif  // ifndef SCANTAILOR_MATH_LINEARSOLVER_H_

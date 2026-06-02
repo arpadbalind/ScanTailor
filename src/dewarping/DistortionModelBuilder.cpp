@@ -436,11 +436,11 @@ void DistortionModelBuilder::RansacAlgo::buildAndAssessModel(const TracedCurve* 
     DynamicMatrixCalc<double> mc;
 
     // A = Att
-    boost::scoped_array<double> A(new double[polylineSize * 2]);
+    std::vector<double> A(polylineSize * 2);
     mc(&At[0], 2, (int) polylineSize).transWrite(&A[0]);
 
     try {
-      boost::scoped_array<double> errvec(new double[polylineSize]);
+      std::vector<double> errvec(polylineSize);
       double ab[2];  // As in "y = ax + b".
 
       // errvec = B - A * (At*A)-1 * At * B

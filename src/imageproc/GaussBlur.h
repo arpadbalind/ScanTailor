@@ -2,13 +2,12 @@
 // Copyright (C) 1995 Spencer Kimball and Peter Mattis
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_GAUSSBLUR_H_
-#define SCANTAILOR_IMAGEPROC_GAUSSBLUR_H_
+#pragma once
 
 #include <QSize>
-#include <boost/scoped_array.hpp>
 #include <cstring>
 #include <iterator>
+#include <vector>
 
 #include "ValueConv.h"
 
@@ -115,9 +114,9 @@ void gaussBlurGeneric(const QSize size,
   const int height = size.height();
   const int widthHeightMax = width > height ? width : height;
 
-  boost::scoped_array<float> valP(new float[widthHeightMax]);
-  boost::scoped_array<float> valM(new float[widthHeightMax]);
-  boost::scoped_array<float> intermediateImage(new float[width * height]);
+  std::vector<float> valP(widthHeightMax);
+  std::vector<float> valM(widthHeightMax);
+  std::vector<float> intermediateImage(width * height);
   const int intermediateStride = width;
 
   // IIR parameters.
@@ -195,4 +194,3 @@ void gaussBlurGeneric(const QSize size,
   }
 }  // gaussBlurGeneric
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_GAUSSBLUR_H_

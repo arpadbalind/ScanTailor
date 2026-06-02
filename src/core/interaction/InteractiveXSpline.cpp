@@ -42,7 +42,7 @@ void InteractiveXSpline::setSpline(const XSpline& spline) {
   const int numControlPoints = spline.numControlPoints();
 
   XSpline newSpline(spline);
-  boost::scoped_array<ControlPoint> newControlPoints(new ControlPoint[numControlPoints]);
+  std::vector<ControlPoint> newControlPoints(numControlPoints);
 
   for (int i = 0; i < numControlPoints; ++i) {
     newControlPoints[i].point.setPositionCallback(boost::bind(&InteractiveXSpline::controlPointPosition, this, i));
