@@ -10,8 +10,6 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <cmath>
 
 #include "DebugImages.h"
@@ -650,10 +648,13 @@ std::vector<QPointF> TopBottomEdgeTracer::pathToSnake(const Grid<GridNode>& grid
 }  // TopBottomEdgeTracer::pathToSnake
 
 void TopBottomEdgeTracer::gaussBlurGradient(Grid<GridNode>& grid) {
-  using namespace boost::lambda;
-
   gaussBlurGeneric(QSize(grid.width(), grid.height()), 2.0f, 2.0f, grid.data(), grid.stride(),
-                   bind(&GridNode::absDirDeriv, _1), grid.data(), grid.stride(), bind(&GridNode::blurred, _1) = _2);
+      [](const auto& node) { return node.absDirDeriv(); },
+      grid.data(),
+      grid.stride(),
+      [](auto& node, const auto& value) {
+        node.blurred = value;
+      });
 }
 
 Vec2f TopBottomEdgeTracer::downTheHillDirection(const QRectF& pageRect,
@@ -681,8 +682,6 @@ Vec2f TopBottomEdgeTracer::downTheHillDirection(const QRectF& pageRect,
 }
 
 void TopBottomEdgeTracer::downTheHillSnake(std::vector<QPointF>& snake, const Grid<GridNode>& grid, const Vec2f dir) {
-  using namespace boost::lambda;
-
   const size_t numNodes = snake.size();
   if (numNodes <= 1) {
     return;
@@ -714,8 +713,7 @@ void TopBottomEdgeTracer::downTheHillSnake(std::vector<QPointF>& snake, const Gr
 
     for (size_t nodeIdx = 0; nodeIdx < numNodes; ++nodeIdx) {
       const Vec2f pt(snake[nodeIdx]);
-      const float curExternalEnergy = interpolatedGridValue(grid, bind<float>(&GridNode::blurred, _1), pt, 1000);
-
+      const float curExternalEnergy = interpolatedGridValue(grid, [](const auto& node) { return node.blurred; }, pt, 1000);
       for (int displacementIdx = 0; displacementIdx < numDisplacements; ++displacementIdx) {
         Step step;
         step.prevStepIdx = ~uint32_t(0);
@@ -723,7 +721,7 @@ void TopBottomEdgeTracer::downTheHillSnake(std::vector<QPointF>& snake, const Gr
         step.pathCost = 0;
 
         const float adjustedExternalEnergy
-            = interpolatedGridValue(grid, bind<float>(&GridNode::blurred, _1), step.pt, 1000);
+            = interpolatedGridValue(grid, [](const auto& node) { return node.blurred; }, step.pt, 1000);
         if (displacementIdx == 0) {
           step.pathCost += 100;
         } else if (curExternalEnergy < 0.01) {
@@ -809,8 +807,6 @@ void TopBottomEdgeTracer::downTheHillSnake(std::vector<QPointF>& snake, const Gr
 }  // TopBottomEdgeTracer::downTheHillSnake
 
 void TopBottomEdgeTracer::upTheHillSnake(std::vector<QPointF>& snake, const Grid<GridNode>& grid, const Vec2f dir) {
-  using namespace boost::lambda;
-
   const size_t numNodes = snake.size();
   if (numNodes <= 1) {
     return;
@@ -854,7 +850,7 @@ void TopBottomEdgeTracer::upTheHillSnake(std::vector<QPointF>& snake, const Grid
         step.pathCost = 0;
 
         const float adjustedExternalEnergy
-            = -interpolatedGridValue(grid, bind<float>(&GridNode::absDirDeriv, _1), step.pt, 1000);
+            = -interpolatedGridValue(grid, [](const auto& node) { return node.absDirDeriv(); }, step.pt, 1000);
         if ((displacementIdx == 0) && (adjustedExternalEnergy > -0.02)) {
           // Discorage staying on the spot if the gradient magnitude is too
           // small at that point.

@@ -4,9 +4,7 @@
 #include "FixDpiDialog.h"
 
 #include <QSortFilterProxyModel>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/lambda.hpp>
-
+#include <ranges>
 #include "ColorSchemeManager.h"
 
 // To be able to use it in QVariant
@@ -704,9 +702,12 @@ void FixDpiDialog::TreeModel::emitItemChanged(const QModelIndex& idx) {
 }
 
 FixDpiDialog::SizeGroup& FixDpiDialog::TreeModel::sizeGroupFor(const QSize size) {
-  using namespace boost::lambda;
-
-  const auto it(std::find_if(m_sizes.begin(), m_sizes.end(), bind(&SizeGroup::size, _1) == size));
+  const auto it = std::ranges::find_if(
+      m_sizes,
+      [size](const SizeGroup& g)
+      {
+        return g.size() == size;
+      });
   if (it != m_sizes.end()) {
     return *it;
   } else {

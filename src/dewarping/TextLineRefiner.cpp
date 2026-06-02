@@ -8,8 +8,6 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <cmath>
 
 #include "DebugImages.h"
@@ -134,18 +132,36 @@ void TextLineRefiner::refine(std::list<std::vector<QPointF>>& polylines, const i
 }  // TextLineRefiner::refine
 
 void TextLineRefiner::calcBlurredGradient(Grid<float>& gradient, float hSigma, float vSigma) const {
-  using namespace boost::lambda;
-
   const float downscale = 1.0f / (255.0f * 8.0f);
   Grid<float> vertGrad(m_image.width(), m_image.height(), /*padding=*/0);
-  horizontalSobel<float>(m_image.width(), m_image.height(), m_image.data(), m_image.stride(), _1 * downscale,
-                         gradient.data(), gradient.stride(), _1 = _2, _1, gradient.data(), gradient.stride(), _1 = _2);
-  verticalSobel<float>(m_image.width(), m_image.height(), m_image.data(), m_image.stride(), _1 * downscale,
-                       vertGrad.data(), vertGrad.stride(), _1 = _2, _1, gradient.data(), gradient.stride(),
-                       _1 = _1 * m_unitDownVec[0] + _2 * m_unitDownVec[1]);
-  Grid<float>().swap(vertGrad);  // Save memory.
-  gaussBlurGeneric(m_image.size(), hSigma, vSigma, gradient.data(), gradient.stride(), _1, gradient.data(),
-                   gradient.stride(), _1 = _2);
+
+  horizontalSobel<float>(m_image.width(), m_image.height(), m_image.data(), m_image.stride(),
+      [downscale](const auto& src_val) { return src_val * downscale; },
+      gradient.data(), gradient.stride(),
+      [](auto& dest_val, const auto& src_val) { dest_val = src_val; }, [](const auto& val) { return val; },
+      gradient.data(), gradient.stride(),
+      [](auto& dest_val, const auto& src_val) { dest_val = src_val; }
+      );
+
+  verticalSobel<float>(
+      m_image.width(), m_image.height(), m_image.data(), m_image.stride(),
+      [downscale](const auto& src_val) { return src_val * downscale; },
+      vertGrad.data(), vertGrad.stride(),
+      [](auto& dest_val, const auto& src_val) { dest_val = src_val; }, [](const auto& val) { return val; },
+      gradient.data(), gradient.stride(),
+      [this](auto& dest_val, const auto& src_val) {
+        dest_val = dest_val * m_unitDownVec[0] + src_val * m_unitDownVec[1];
+      }
+      );
+
+  Grid<float>().swap(vertGrad);
+
+  gaussBlurGeneric(
+      m_image.size(), hSigma, vSigma, gradient.data(), gradient.stride(),
+      [](const auto& val) { return val; },
+      gradient.data(), gradient.stride(),
+      [](auto& dest_val, const auto& src_val) { dest_val = src_val; }
+      );
 }
 
 float TextLineRefiner::externalEnergyAt(const Grid<float>& gradient, const Vec2f& pos, float penaltyIfOutside) {

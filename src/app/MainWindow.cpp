@@ -15,7 +15,6 @@
 #include <QSortFilterProxyModel>
 #include <QStackedLayout>
 #include <QtWidgets/QInputDialog>
-#include <boost/lambda/lambda.hpp>
 #include <memory>
 
 #include "AbstractRelinker.h"

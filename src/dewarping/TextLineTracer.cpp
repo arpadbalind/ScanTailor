@@ -18,9 +18,6 @@
 #include <Sobel.h>
 
 #include <QPainter>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/if.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <cmath>
 
 #include "DebugImages.h"
@@ -267,8 +264,6 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
                                       const imageproc::GrayImage& image,
                                       const std::pair<QLineF, QLineF>& bounds,
                                       DebugImages* dbg) {
-  using namespace boost::lambda;
-
   const int width = image.width();
   const int height = image.height();
   const QSize size(image.size());
@@ -277,68 +272,108 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   Grid<float> auxGrid(image.width(), image.height(), 0);
 
   const float downscale = 1.0f / (255.0f * 8.0f);
-  horizontalSobel<float>(width, height, image.data(), image.stride(), _1 * downscale, auxGrid.data(), auxGrid.stride(),
-                         _1 = _2, _1, mainGrid.data(), mainGrid.stride(), _1 = _2);
-  verticalSobel<float>(width, height, image.data(), image.stride(), _1 * downscale, auxGrid.data(), auxGrid.stride(),
-                       _1 = _2, _1, mainGrid.data(), mainGrid.stride(), _1 = _1 * direction[0] + _2 * direction[1]);
+
+  horizontalSobel<float>(width, height, image.data(), image.stride(),
+  [downscale](const auto& src_val) { return src_val * downscale; },
+  auxGrid.data(), auxGrid.stride(),
+  [](auto& dest_val, const auto& src_val) { dest_val = src_val; },
+  [](const auto& val) { return val; },
+  mainGrid.data(), mainGrid.stride(),
+  [](auto& dest_val, const auto& src_val) { dest_val = src_val; });
+
+  verticalSobel<float>(width, height, image.data(), image.stride(),
+  [downscale](const auto& src_val) { return src_val * downscale; },
+  auxGrid.data(), auxGrid.stride(),
+  [](auto& dest_val, const auto& src_val) { dest_val = src_val; },
+  [](const auto& val) { return val; },
+  mainGrid.data(), mainGrid.stride(),
+  [direction](auto& dest_val, const auto& src_val) {dest_val = dest_val * direction[0] + src_val * direction[1]; });
+
   if (dbg) {
     dbg->add(visualizeGradient(image, mainGrid), "first_dir_deriv");
   }
 
-  gaussBlurGeneric(size, 6.0f, 6.0f, mainGrid.data(), mainGrid.stride(), _1, mainGrid.data(), mainGrid.stride(),
-                   _1 = _2);
+  gaussBlurGeneric(size, 6.0f, 6.0f, mainGrid.data(), mainGrid.stride(),
+      [](const auto& val) { return val; },
+      mainGrid.data(), mainGrid.stride(), [](auto& dest_val, const auto& src_val) { dest_val = src_val; });
+
   if (dbg) {
     dbg->add(visualizeGradient(image, mainGrid), "first_dir_deriv_blurred");
   }
 
-  horizontalSobel<float>(width, height, mainGrid.data(), mainGrid.stride(), _1, auxGrid.data(), auxGrid.stride(),
-                         _1 = _2, _1, auxGrid.data(), auxGrid.stride(), _1 = _2);
-  verticalSobel<float>(width, height, mainGrid.data(), mainGrid.stride(), _1, mainGrid.data(), mainGrid.stride(),
-                       _1 = _2, _1, mainGrid.data(), mainGrid.stride(), _1 = _2);
+  horizontalSobel<float>(width, height, mainGrid.data(), mainGrid.stride(),
+  [](const auto& val) { return val; },
+  auxGrid.data(), auxGrid.stride(),
+  [](auto& dest, const auto& src) { dest = src; }, [](const auto& val) { return val; },
+  auxGrid.data(), auxGrid.stride(), [](auto& dest, const auto& src) { dest = src; });
+
+  verticalSobel<float>(width, height, mainGrid.data(), mainGrid.stride(),
+  [](const auto& val) { return val; },
+  mainGrid.data(), mainGrid.stride(),
+  [](auto& dest, const auto& src) { dest = src; },
+  [](const auto& val) { return val; },
+  mainGrid.data(), mainGrid.stride(),
+  [](auto& dest, const auto& src) { dest = src; });
+
   rasterOpGeneric(auxGrid.data(), auxGrid.stride(), size, mainGrid.data(), mainGrid.stride(),
-                  _2 = _1 * direction[0] + _2 * direction[1]);
+                  [direction](const auto& src_val, auto& dest_val) { dest_val = src_val * direction[0] + dest_val * direction[1]; });
   if (dbg) {
     dbg->add(visualizeGradient(image, mainGrid), "second_dir_deriv");
   }
 
   float max = 0;
-  rasterOpGeneric(mainGrid.data(), mainGrid.stride(), size, if_then(_1 > var(max), var(max) = _1));
+  rasterOpGeneric(mainGrid.data(), mainGrid.stride(), size, [&max](const auto& val) {
+        if (val > max) {
+          max = val;
+        } });
   const float threshold = max * 15.0f / 255.0f;
 
   BinaryImage initialBinarization(image.size());
+
   rasterOpGeneric(initialBinarization, mainGrid.data(), mainGrid.stride(),
-                  if_then_else(_2 > threshold, _1 = uint32_t(1), _1 = uint32_t(0)));
+      [threshold](auto& dest_val, const auto& src_val) {
+        dest_val = (src_val > threshold) ? uint32_t(1) : uint32_t(0); });
+
   if (dbg) {
     dbg->add(initialBinarization, "initialBinarization");
   }
 
   rasterOpGeneric(mainGrid.data(), mainGrid.stride(), size, auxGrid.data(), auxGrid.stride(),
-                  _2 = bind((float (*)(float)) & std::fabs, _1));
+      [](auto& dest_val, const auto& src_val) { dest_val = std::fabs(src_val); });
+
   if (dbg) {
     dbg->add(visualizeGradient(image, auxGrid), "abs");
   }
 
-  gaussBlurGeneric(size, 12.0f, 12.0f, auxGrid.data(), auxGrid.stride(), _1, auxGrid.data(), auxGrid.stride(), _1 = _2);
+  gaussBlurGeneric(size, 12.0f, 12.0f, auxGrid.data(), auxGrid.stride(),
+      [](const auto& val) { return val; }, auxGrid.data(), auxGrid.stride(),
+      [](auto& dest_val, const auto& src_val) { dest_val = src_val; });
+
   if (dbg) {
     dbg->add(visualizeGradient(image, auxGrid), "blurred");
   }
 
   rasterOpGeneric(mainGrid.data(), mainGrid.stride(), size, auxGrid.data(), auxGrid.stride(),
-                  _2 += _1 - bind((float (*)(float)) & std::fabs, _1));
+      [](auto& dest_val, const auto& src_val) { dest_val += src_val - std::fabs(src_val); });
+
   if (dbg) {
     dbg->add(visualizeGradient(image, auxGrid), "+= diff");
   }
 
   BinaryImage postBinarization(image.size());
+
   rasterOpGeneric(postBinarization, auxGrid.data(), auxGrid.stride(),
-                  if_then_else(_2 > threshold, _1 = uint32_t(1), _1 = uint32_t(0)));
+      [threshold](auto& dest_val, const auto& src_val) { dest_val = (src_val > threshold) ? uint32_t(1) : uint32_t(0); });
+
   if (dbg) {
     dbg->add(postBinarization, "postBinarization");
   }
 
   BinaryImage obstacles(image.size());
+
   rasterOpGeneric(obstacles, auxGrid.data(), auxGrid.stride(),
-                  if_then_else(_2 < -threshold, _1 = uint32_t(1), _1 = uint32_t(0)));
+      [threshold](auto& dest_val, const auto& src_val) { dest_val = (src_val < -threshold) ? uint32_t(1) : uint32_t(0); });
+
   if (dbg) {
     dbg->add(obstacles, "obstacles");
   }
@@ -361,6 +396,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   std::vector<QPoint> seeds;
   QLineF midLine(calcMidLine(bounds.first, bounds.second));
   findMidLineSeeds(sedm, midLine, seeds);
+
   if (dbg) {
     dbg->add(visualizeMidLineSeeds(image, postBinarization, bounds, midLine, seeds), "seeds");
   }
