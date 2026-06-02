@@ -4,7 +4,6 @@
 #include "CylindricalSurfaceDewarper.h"
 
 #include <QDebug>
-#include <boost/foreach.hpp>
 
 #include "NumericTraits.h"
 #include "ToLineProjector.h"

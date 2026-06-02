@@ -4,7 +4,6 @@
 #include "SerializableSpline.h"
 
 #include <QTransform>
-#include <boost/foreach.hpp>
 
 #include "EditableSpline.h"
 #include "XmlMarshaller.h"

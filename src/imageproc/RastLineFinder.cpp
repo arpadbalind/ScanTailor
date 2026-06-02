@@ -3,9 +3,9 @@
 
 #include "RastLineFinder.h"
 
-#include <boost/foreach.hpp>
 #include <cassert>
 #include <cmath>
+#include <stdexcept>
 
 #include "Constants.h"
 #include "VecNT.h"

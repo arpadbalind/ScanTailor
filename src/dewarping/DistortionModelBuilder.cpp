@@ -7,7 +7,6 @@
 #include <QImage>
 #include <QPainter>
 #include <QRandomGenerator>
-#include <boost/foreach.hpp>
 
 #include "CylindricalSurfaceDewarper.h"
 #include "DebugImages.h"

@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QPainter>
 #include <boost/bind/bind.hpp>
-#include <boost/foreach.hpp>
 #include <utility>
 
 #include "ImagePresentation.h"

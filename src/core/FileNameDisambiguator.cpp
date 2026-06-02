@@ -6,7 +6,6 @@
 #include <QDomDocument>
 #include <QFileInfo>
 #include <QMutex>
-#include <boost/foreach.hpp>
 #include <boost/lambda/lambda.hpp>
 #include <boost/multi_index/composite_key.hpp>
 #include <boost/multi_index/member.hpp>
