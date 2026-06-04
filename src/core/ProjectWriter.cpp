@@ -18,12 +18,6 @@
 #include "ProjectPages.h"
 #include "version.h"
 
-#ifndef Q_MOC_RUN
-
-#include <boost/bind/bind.hpp>
-using namespace boost::placeholders;
-#endif
-
 #include <cassert>
 #include <cstddef>
 
@@ -77,7 +71,7 @@ bool ProjectWriter::write(const QString& filePath, const std::vector<FilterPtr>&
   rootEl.appendChild(processImages(doc));
   rootEl.appendChild(processPages(doc));
   rootEl.appendChild(m_outFileNameGen.disambiguator()->toXml(doc, "file-name-disambiguation",
-                                                             boost::bind(&ProjectWriter::packFilePath, this, _1)));
+      [this](const auto& path) { return this->packFilePath(path); }));
 
   QDomElement filtersEl(doc.createElement("filters"));
   rootEl.appendChild(filtersEl);

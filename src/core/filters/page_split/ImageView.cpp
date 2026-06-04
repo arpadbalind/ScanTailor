@@ -7,14 +7,11 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "ImagePresentation.h"
 #include "ImageTransformation.h"
 #include "ProjectPages.h"
-
-using namespace boost::placeholders;
 
 namespace page_split {
 ImageView::ImageView(const QImage& image,
@@ -28,8 +25,8 @@ ImageView::ImageView(const QImage& image,
     : ImageViewBase(image, downscaledImage, ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
       m_pages(std::move(pages)),
       m_imageId(imageId),
-      m_leftUnremoveButton(boost::bind(&ImageView::leftPageCenter, this)),
-      m_rightUnremoveButton(boost::bind(&ImageView::rightPageCenter, this)),
+      m_leftUnremoveButton([this]() { return leftPageCenter(); }),
+      m_rightUnremoveButton([this]() { return rightPageCenter(); }),
       m_dragHandler(*this),
       m_zoomHandler(*this),
       m_handlePixmap(IconProvider::getInstance().getIcon("aqua-sphere").pixmap(16, 16)),
@@ -38,8 +35,8 @@ ImageView::ImageView(const QImage& image,
       m_rightPageRemoved(rightHalfRemoved) {
   setMouseTracking(true);
 
-  m_leftUnremoveButton.setClickCallback(boost::bind(&ImageView::unremoveLeftPage, this));
-  m_rightUnremoveButton.setClickCallback(boost::bind(&ImageView::unremoveRightPage, this));
+  m_leftUnremoveButton.setClickCallback([this]() { return unremoveLeftPage();});
+  m_rightUnremoveButton.setClickCallback([this]() { return unremoveRightPage();});
 
   if (m_leftPageRemoved) {
     makeLastFollower(m_leftUnremoveButton);
@@ -66,18 +63,18 @@ void ImageView::setupCuttersInteraction() {
 
     for (int j = 0; j < 2; ++j) {  // Loop over handles.
       m_handles[i][j].setHitRadius(hitRadius);
-      m_handles[i][j].setPositionCallback(boost::bind(&ImageView::handlePosition, this, i, j));
-      m_handles[i][j].setMoveRequestCallback(boost::bind(&ImageView::handleMoveRequest, this, i, j, _1));
-      m_handles[i][j].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
+      m_handles[i][j].setPositionCallback([this, i_val = i, j_val = j]() { return handlePosition(i_val, j_val);});
+      m_handles[i][j].setMoveRequestCallback([this, i_val = i, j_val = j](const QPointF& pos, [[maybe_unused]] Qt::KeyboardModifiers modifiers) { return handleMoveRequest(i_val, j_val, pos);});
+      m_handles[i][j].setDragFinishedCallback([this](const QPointF& /*pos*/) { return dragFinished();});
 
       m_handleInteractors[i][j].setObject(&m_handles[i][j]);
       m_handleInteractors[i][j].setProximityStatusTip(tip);
       makeLastFollower(m_handleInteractors[i][j]);
     }
 
-    m_lineSegments[i].setPositionCallback(boost::bind(&ImageView::linePosition, this, i));
-    m_lineSegments[i].setMoveRequestCallback(boost::bind(&ImageView::lineMoveRequest, this, i, _1));
-    m_lineSegments[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
+    m_lineSegments[i].setPositionCallback([this, idx = i]() { return linePosition(idx);});
+    m_lineSegments[i].setMoveRequestCallback([this, idx = i](const QLineF& pos, [[maybe_unused]] Qt::KeyboardModifiers modifiers) { return lineMoveRequest(idx, pos);});
+    m_lineSegments[i].setDragFinishedCallback([this](const QPointF& /*pos*/) { return dragFinished();});
 
     m_lineInteractors[i].setObject(&m_lineSegments[i]);
     m_lineInteractors[i].setProximityCursor(Qt::SplitHCursor);

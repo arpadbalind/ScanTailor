@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QPainter>
 #include <QtWidgets/QShortcut>
-#include <boost/bind/bind.hpp>
 
 #include "ImagePresentation.h"
 #include "ToLineProjector.h"
@@ -16,8 +15,6 @@
 #include "spfit/LinearForceBalancer.h"
 #include "spfit/PolylineModelShape.h"
 #include "spfit/SplineFitter.h"
-
-using namespace boost::placeholders;
 
 namespace output {
 DewarpingView::DewarpingView(const QImage& image,
@@ -79,10 +76,22 @@ DewarpingView::DewarpingView(const QImage& image,
   int curveIdx = -1;
   for (InteractiveXSpline* spline : splines) {
     ++curveIdx;
+    /*
     spline->setModifiedCallback(boost::bind(&DewarpingView::curveModified, this, curveIdx));
     spline->setDragFinishedCallback(boost::bind(&DewarpingView::dragFinished, this));
     spline->setStorageTransform(boost::bind(&DewarpingView::sourceToWidget, this, _1),
-                                boost::bind(&DewarpingView::widgetToSource, this, _1));
+                                boost::bind(&DewarpingView::widgetToSource, this, _1));*/
+
+    spline->setModifiedCallback([this, curveIdx = curveIdx]() {this->curveModified(curveIdx); });
+    spline->setDragFinishedCallback([this]() {this->dragFinished(); });
+    spline->setStorageTransform(
+        [this](const auto& srcPoint) {
+          return this->sourceToWidget(srcPoint);
+        },
+        [this](const auto& widgetPoint) {
+          return this->widgetToSource(widgetPoint);
+        }
+        );
     makeLastFollower(*spline);
   }
 

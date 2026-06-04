@@ -9,7 +9,6 @@
 
 #include <QPainter>
 #include <QPointer>
-#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "BackgroundExecutor.h"
@@ -22,8 +21,6 @@
 #include "Settings.h"
 #include "Zone.h"
 #include "ZoneSet.h"
-
-using namespace boost::placeholders;
 
 namespace output {
 static const QRgb maskColor = 0xff587ff4;
@@ -92,8 +89,8 @@ PictureZoneEditor::PictureZoneEditor(const QImage& image,
 
   setMouseTracking(true);
 
-  context().setShowPropertiesCommand(boost::bind(&PictureZoneEditor::showPropertiesDialog, this, _1));
-
+  context().setShowPropertiesCommand(
+      [this](const auto& command) {showPropertiesDialog(command);});
   connect(&zones(), SIGNAL(committed()), SLOT(commitZones()));
 
   makeLastFollower(*context().createDefaultInteraction());

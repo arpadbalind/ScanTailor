@@ -12,12 +12,6 @@
 #include "Proximity.h"
 #include "VecNT.h"
 
-#ifndef Q_MOC_RUN
-
-#include <boost/bind/bind.hpp>
-using namespace boost::placeholders;
-#endif
-
 struct InteractiveXSpline::NoOp {
   void operator()() const {}
 };
@@ -45,10 +39,12 @@ void InteractiveXSpline::setSpline(const XSpline& spline) {
   std::vector<ControlPoint> newControlPoints(numControlPoints);
 
   for (int i = 0; i < numControlPoints; ++i) {
-    newControlPoints[i].point.setPositionCallback(boost::bind(&InteractiveXSpline::controlPointPosition, this, i));
+    newControlPoints[i].point.setPositionCallback([this, i = i]() {return this->controlPointPosition(i);});
+
     newControlPoints[i].point.setMoveRequestCallback(
-        boost::bind(&InteractiveXSpline::controlPointMoveRequest, this, i, _1, _2));
-    newControlPoints[i].point.setDragFinishedCallback(boost::bind(&InteractiveXSpline::dragFinished, this));
+        [this, i = i](const QPointF& pt, QFlags<Qt::KeyboardModifier> modifiers) {this->controlPointMoveRequest(i, pt, modifiers); });
+
+    newControlPoints[i].point.setDragFinishedCallback([this]([[maybe_unused]] const QPointF& pt) { this->dragFinished(); });
 
     if ((i == 0) || (i == numControlPoints - 1)) {
       newControlPoints[i].handler.setKeyboardModifiers(
