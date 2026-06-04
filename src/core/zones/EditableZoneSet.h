@@ -5,7 +5,6 @@
 
 #include <QObject>
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
