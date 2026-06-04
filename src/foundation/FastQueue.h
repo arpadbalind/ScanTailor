@@ -4,10 +4,10 @@
 #pragma once
 
 #include <boost/intrusive/list.hpp>
-#include <boost/type_traits/alignment_of.hpp>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 #include "NonCopyable.h"
 
@@ -41,7 +41,7 @@ class FastQueue {
    public:
     explicit Chunk(size_t capacity) {
       const uintptr_t p = (uintptr_t)(this + 1);
-      const size_t alignment = boost::alignment_of<T>::value;
+      const size_t alignment = std::alignment_of_v<T>;
       pBegin = (T*) (((p + alignment - 1) / alignment) * alignment);
       pEnd = pBegin;
       pBufferEnd = pBegin + capacity;
@@ -55,7 +55,7 @@ class FastQueue {
     }
 
     static size_t storageRequirement(size_t capacity) {
-      return sizeof(Chunk) + boost::alignment_of<T>::value - 1 + capacity * sizeof(T);
+      return sizeof(Chunk) + std::alignment_of_v<T> - 1 + capacity * sizeof(T);
     }
 
     T* pBegin;
