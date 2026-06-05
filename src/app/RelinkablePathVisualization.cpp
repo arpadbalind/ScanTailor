@@ -9,7 +9,6 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <QStylePainter>
-#include <boost/bind/bind.hpp>
 
 #include "ColorSchemeManager.h"
 #include "RelinkablePath.h"
@@ -53,7 +52,6 @@ void RelinkablePathVisualization::clear() {
 
 void RelinkablePathVisualization::setPath(const RelinkablePath& path, bool clickable) {
   clear();
-  using namespace boost::placeholders;
   QStringList components(path.normalizedPath().split(QChar('/'), Qt::SkipEmptyParts));
   if (components.empty()) {
     return;
@@ -109,9 +107,9 @@ void RelinkablePathVisualization::setPath(const RelinkablePath& path, bool click
     }
     stylePathComponentButton(btn, pathComponent.exists);
 
-    connect(btn, &ComponentButton::clicked,
-            boost::bind(&RelinkablePathVisualization::onClicked, this, componentIdx, pathComponent.prefixPath,
-                        pathComponent.suffixPath, pathComponent.type));
+    connect(btn, &ComponentButton::clicked, this,
+            [this, componentIdx, prefixPath = pathComponent.prefixPath, suffixPath = pathComponent.suffixPath, type = pathComponent.type]() {
+              this->onClicked(componentIdx, prefixPath, suffixPath, type);});
   }
 
   m_layout->addStretch();

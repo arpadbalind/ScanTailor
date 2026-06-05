@@ -1,12 +1,11 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_DEWARPING_CYLINDRICALSURFACEDEWARPER_H_
-#define SCANTAILOR_DEWARPING_CYLINDRICALSURFACEDEWARPER_H_
+#pragma once
 
 #include <QLineF>
 #include <QPointF>
-#include <boost/array.hpp>
+#include <array>
 #include <utility>
 #include <vector>
 
@@ -80,10 +79,10 @@ class CylindricalSurfaceDewarper {
                                      HomographicTransform<2, double> img2pln);
 
   static HomographicTransform<2, double> fourPoint2DHomography(
-      const boost::array<std::pair<QPointF, QPointF>, 4>& pairs);
+      const std::array<std::pair<QPointF, QPointF>, 4>& pairs);
 
   static HomographicTransform<1, double> threePoint1DHomography(
-      const boost::array<std::pair<double, double>, 3>& pairs);
+      const std::array<std::pair<double, double>, 3>& pairs);
 
   void initArcLengthMapper(const std::vector<QPointF>& imgDirectrix1, const std::vector<QPointF>& imgDirectrix2);
 
@@ -97,4 +96,3 @@ class CylindricalSurfaceDewarper {
   PolylineIntersector m_imgDirectrix2Intersector;
 };
 }  // namespace dewarping
-#endif  // ifndef SCANTAILOR_DEWARPING_CYLINDRICALSURFACEDEWARPER_H_

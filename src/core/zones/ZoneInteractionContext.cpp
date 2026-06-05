@@ -3,26 +3,44 @@
 
 #include "ZoneInteractionContext.h"
 
-#include <boost/bind/bind.hpp>
-
 #include "ZoneContextMenuInteraction.h"
 #include "ZoneCreationInteraction.h"
 #include "ZoneDefaultInteraction.h"
 #include "ZoneDragInteraction.h"
 #include "ZoneVertexDragInteraction.h"
 
-using namespace boost::placeholders;
-
 ZoneInteractionContext::ZoneInteractionContext(ImageViewBase& imageView, EditableZoneSet& zones)
     : m_imageView(imageView),
       m_zones(zones),
       m_defaultInteractionCreator(boost::bind(&ZoneInteractionContext::createStdDefaultInteraction, this)),
+      /*
       m_zoneCreationInteractionCreator(
           boost::bind(&ZoneInteractionContext::createStdZoneCreationInteraction, this, _1)),
       m_vertexDragInteractionCreator(
           boost::bind(&ZoneInteractionContext::createStdVertexDragInteraction, this, _1, _2, _3)),
       m_zoneDragInteractionCreator(boost::bind(&ZoneInteractionContext::createStdZoneDragInteraction, this, _1, _2)),
       m_contextMenuInteractionCreator(boost::bind(&ZoneInteractionContext::createStdContextMenuInteraction, this, _1)),
+      */
+      m_zoneCreationInteractionCreator(
+          [this](auto& context) {
+            return this->createStdZoneCreationInteraction(context);
+          }
+          ),
+      m_vertexDragInteractionCreator(
+          [this](auto& context, auto& vertex, auto& handle) {
+            return this->createStdVertexDragInteraction(context, vertex, handle);
+          }
+          ),
+      m_zoneDragInteractionCreator(
+          [this](auto& context, auto& zone) {
+            return this->createStdZoneDragInteraction(context, zone);
+          }
+          ),
+      m_contextMenuInteractionCreator(
+          [this](auto& context) {
+            return this->createStdContextMenuInteraction(context);
+          }
+          ),
       m_showPropertiesCommand(&ZoneInteractionContext::showPropertiesStub),
       m_zoneCreationMode(ZoneCreationMode::POLYGONAL) {}
 

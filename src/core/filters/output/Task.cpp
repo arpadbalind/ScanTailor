@@ -9,7 +9,6 @@
 #include <core/TiffWriter.h>
 
 #include <QDir>
-#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "DebugImagesImpl.h"

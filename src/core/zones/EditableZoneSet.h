@@ -1,13 +1,9 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_ZONES_EDITABLEZONESET_H_
-#define SCANTAILOR_ZONES_EDITABLEZONESET_H_
+#pragma once
 
 #include <QObject>
-#include <boost/foreach.hpp>
-#include <boost/iterator/iterator_facade.hpp>
-#include <boost/mpl/bool.hpp>
 #include <boost/multi_index/hashed_index.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -106,5 +102,3 @@ class EditableZoneSet : public QObject {
   ZoneItemsInOrder& m_zoneItemsInOrder;
   PropertySet m_defaultProps;
 };
-
-#endif  // ifndef SCANTAILOR_ZONES_EDITABLEZONESET_H_

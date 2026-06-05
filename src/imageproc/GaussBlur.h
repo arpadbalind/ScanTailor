@@ -2,13 +2,12 @@
 // Copyright (C) 1995 Spencer Kimball and Peter Mattis
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_GAUSSBLUR_H_
-#define SCANTAILOR_IMAGEPROC_GAUSSBLUR_H_
+#pragma once
 
 #include <QSize>
-#include <boost/scoped_array.hpp>
 #include <cstring>
 #include <iterator>
+#include <vector>
 
 #include "ValueConv.h"
 
@@ -54,17 +53,6 @@ GrayImage gaussBlur(const GrayImage& src, float hSigma, float vSigma);
  * const FloatWriter writer = ...;
  * const float val = ...;
  * writer(output[x], val);
- * \endcode
- * Consider using boost::lambda, possible in conjunction with one of the functors
- * from ValueConv.h:
- * \code
- * using namespace boost::lambda;
- *
- * // Just copying.
- * gaussBlurGeneric(..., _1 = _2);
- *
- * // Convert to uint8_t, with rounding and clipping.
- * gaussBlurGeneric(..., _1 = bind<uint8_t>(RoundAndClipValueConv<uint8_t>(), _2);
  * \endcode
  */
 template <typename SrcIt, typename DstIt, typename FloatReader, typename FloatWriter>
@@ -115,9 +103,9 @@ void gaussBlurGeneric(const QSize size,
   const int height = size.height();
   const int widthHeightMax = width > height ? width : height;
 
-  boost::scoped_array<float> valP(new float[widthHeightMax]);
-  boost::scoped_array<float> valM(new float[widthHeightMax]);
-  boost::scoped_array<float> intermediateImage(new float[width * height]);
+  std::vector<float> valP(widthHeightMax);
+  std::vector<float> valM(widthHeightMax);
+  std::vector<float> intermediateImage(width * height);
   const int intermediateStride = width;
 
   // IIR parameters.
@@ -195,4 +183,3 @@ void gaussBlurGeneric(const QSize size,
   }
 }  // gaussBlurGeneric
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_GAUSSBLUR_H_

@@ -8,12 +8,9 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QPainterPath>
-#include <boost/bind/bind.hpp>
 
 #include "ImageViewBase.h"
 #include "ZoneInteractionContext.h"
-
-using namespace boost::placeholders;
 
 class ZoneContextMenuInteraction::OrderByArea {
  public:
@@ -29,7 +26,10 @@ class ZoneContextMenuInteraction::OrderByArea {
 
 ZoneContextMenuInteraction* ZoneContextMenuInteraction::create(ZoneInteractionContext& context,
                                                                InteractionState& interaction) {
-  return create(context, interaction, boost::bind(&ZoneContextMenuInteraction::defaultMenuCustomizer, _1, _2));
+    return create(context, interaction, [](auto&& arg1, auto&& arg2) {
+    return ZoneContextMenuInteraction::defaultMenuCustomizer(std::forward<decltype(arg1)>(arg1), std::forward<decltype(arg2)>(arg2));
+  });
+
 }
 
 ZoneContextMenuInteraction* ZoneContextMenuInteraction::create(ZoneInteractionContext& context,

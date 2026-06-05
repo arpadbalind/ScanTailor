@@ -12,8 +12,6 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
-#include <boost/bind/bind.hpp>
-#include <boost/lambda/lambda.hpp>
 
 #include "ImagePresentation.h"
 #include "OptionsWidget.h"
@@ -22,7 +20,6 @@
 #include "Utils.h"
 
 using namespace imageproc;
-using namespace boost::placeholders;
 
 namespace page_layout {
 ImageView::ImageView(const std::shared_ptr<Settings>& settings,
@@ -66,40 +63,53 @@ ImageView::ImageView(const std::shared_ptr<Settings>& settings,
   static const int masks_by_corner[] = {TOP | LEFT, TOP | RIGHT, BOTTOM | RIGHT, BOTTOM | LEFT};
   for (int i = 0; i < 4; ++i) {
     // Proximity priority - inner rect higher than middle, corners higher than edges.
-    m_innerCorners[i].setProximityPriorityCallback(boost::lambda::constant(4));
-    m_innerEdges[i].setProximityPriorityCallback(boost::lambda::constant(3));
-    m_middleCorners[i].setProximityPriorityCallback(boost::lambda::constant(2));
-    m_middleEdges[i].setProximityPriorityCallback(boost::lambda::constant(1));
+    m_innerCorners[i].setProximityPriorityCallback([](const auto&...) { return 4; });
+    m_innerEdges[i].setProximityPriorityCallback([](const auto&...) { return 3; });
+    m_middleCorners[i].setProximityPriorityCallback([](const auto&...) { return 2; });
+    m_middleEdges[i].setProximityPriorityCallback([](const auto&...) { return 1; });
 
     // Proximity.
-    m_innerCorners[i].setProximityCallback(
-        boost::bind(&ImageView::cornerProximity, this, masks_by_corner[i], &m_innerRect, _1));
-    m_middleCorners[i].setProximityCallback(
-        boost::bind(&ImageView::cornerProximity, this, masks_by_corner[i], &m_middleRect, _1));
-    m_innerEdges[i].setProximityCallback(
-        boost::bind(&ImageView::edgeProximity, this, masks_by_edge[i], &m_innerRect, _1));
-    m_middleEdges[i].setProximityCallback(
-        boost::bind(&ImageView::edgeProximity, this, masks_by_edge[i], &m_middleRect, _1));
+    m_innerCorners[i].setProximityCallback([this, mask = masks_by_corner[i], rect = &m_innerRect](const auto& pt) {
+          return this->cornerProximity(mask, rect, pt); });
+    m_middleCorners[i].setProximityCallback([this, mask = masks_by_corner[i], rect = &m_middleRect](const auto& pt) {
+      return this->cornerProximity(mask, rect, pt); });
+    m_innerEdges[i].setProximityCallback([this, mask = masks_by_edge[i], rect = &m_innerRect](const auto& pt) {
+      return this->edgeProximity(mask, rect, pt); });
+    m_middleEdges[i].setProximityCallback([this, mask = masks_by_edge[i], rect = &m_middleRect](const auto& pt) {
+      return this->edgeProximity(mask, rect, pt); });
+
     // Drag initiation.
-    m_innerCorners[i].setDragInitiatedCallback(boost::bind(&ImageView::dragInitiated, this, _1));
-    m_middleCorners[i].setDragInitiatedCallback(boost::bind(&ImageView::dragInitiated, this, _1));
-    m_innerEdges[i].setDragInitiatedCallback(boost::bind(&ImageView::dragInitiated, this, _1));
-    m_middleEdges[i].setDragInitiatedCallback(boost::bind(&ImageView::dragInitiated, this, _1));
+    m_innerCorners[i].setDragInitiatedCallback([this](const auto& imageView) {return this->dragInitiated(imageView); });
+    m_middleCorners[i].setDragInitiatedCallback([this](const auto& imageView) {return this->dragInitiated(imageView); });
+    m_innerEdges[i].setDragInitiatedCallback([this](const auto& imageView) {return this->dragInitiated(imageView); });
+    m_middleEdges[i].setDragInitiatedCallback([this](const auto& imageView) {return this->dragInitiated(imageView); });
 
     // Drag continuation.
     m_innerCorners[i].setDragContinuationCallback(
-        boost::bind(&ImageView::innerRectDragContinuation, this, masks_by_corner[i], _1));
+        [this, mask = masks_by_corner[i]](const QPointF& pt, [[maybe_unused]] QFlags<Qt::KeyboardModifier> modifiers) {
+          return this->innerRectDragContinuation(mask, pt); });
+
     m_middleCorners[i].setDragContinuationCallback(
-        boost::bind(&ImageView::middleRectDragContinuation, this, masks_by_corner[i], _1));
+        [this, mask = masks_by_corner[i]](const QPointF& pt, [[maybe_unused]] QFlags<Qt::KeyboardModifier> modifiers) {
+          return this->middleRectDragContinuation(mask, pt); });
+
     m_innerEdges[i].setDragContinuationCallback(
-        boost::bind(&ImageView::innerRectDragContinuation, this, masks_by_edge[i], _1));
+        [this, mask = masks_by_edge[i]](const QPointF& pt, [[maybe_unused]] QFlags<Qt::KeyboardModifier> modifiers) {
+          return this->innerRectDragContinuation(mask, pt); });
+
     m_middleEdges[i].setDragContinuationCallback(
-        boost::bind(&ImageView::middleRectDragContinuation, this, masks_by_edge[i], _1));
+        [this, mask = masks_by_edge[i]](const QPointF& pt, [[maybe_unused]] QFlags<Qt::KeyboardModifier> modifiers) {
+          return this->middleRectDragContinuation(mask, pt); });
+
     // Drag finishing.
-    m_innerCorners[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
-    m_middleCorners[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
-    m_innerEdges[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
-    m_middleEdges[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
+    auto callback = [this]([[maybe_unused]] const QPointF& pt) {
+      this->dragFinished();
+    };
+
+    m_innerCorners[i].setDragFinishedCallback(callback);
+    m_middleCorners[i].setDragFinishedCallback(callback);
+    m_innerEdges[i].setDragFinishedCallback(callback);
+    m_middleEdges[i].setDragFinishedCallback(callback);
 
     m_innerCornerHandlers[i].setObject(&m_innerCorners[i]);
     m_middleCornerHandlers[i].setObject(&m_middleCorners[i]);
@@ -129,10 +139,10 @@ ImageView::ImageView(const std::shared_ptr<Settings>& settings,
   }
 
   {
-    m_innerRectArea.setProximityCallback(boost::bind(&ImageView::rectProximity, this, boost::ref(m_innerRect), _1));
-    m_innerRectArea.setDragInitiatedCallback(boost::bind(&ImageView::dragInitiated, this, _1));
-    m_innerRectArea.setDragContinuationCallback(boost::bind(&ImageView::innerRectMoveRequest, this, _1, _2));
-    m_innerRectArea.setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
+    m_innerRectArea.setProximityCallback([this](const QPointF& pt) {return this->rectProximity(m_innerRect, pt); });
+    m_innerRectArea.setDragInitiatedCallback([this](const QPointF& pt) { this->dragInitiated(pt); });
+    m_innerRectArea.setDragContinuationCallback([this](const QPointF& pt, QFlags<Qt::KeyboardModifier> modifiers) { this->innerRectMoveRequest(pt, modifiers); });
+    m_innerRectArea.setDragFinishedCallback([this]([[maybe_unused]] const QPointF& pt) { this->dragFinished(); });
     m_innerRectAreaHandler.setObject(&m_innerRectArea);
     m_innerRectAreaHandler.setProximityStatusTip(tr("Hold left mouse button to drag the page content."));
     m_innerRectAreaHandler.setInteractionStatusTip(tr("Release left mouse button to finish dragging."));
@@ -661,7 +671,7 @@ void ImageView::setupContextMenuInteraction() {
           [this]() { addHorizontalGuide(widgetToGuideCs().map(m_lastContextMenuPos).y()); });
   connect(m_addVerticalGuideAction, &QAction::triggered,
           [this]() { addVerticalGuide(widgetToGuideCs().map(m_lastContextMenuPos).x()); });
-  connect(m_removeAllGuidesAction, &QAction::triggered, boost::bind(&ImageView::removeAllGuides, this));
+  connect(m_removeAllGuidesAction, &QAction::triggered, this, [this]() {this->removeAllGuides();});
   connect(m_removeGuideUnderMouseAction, &QAction::triggered, [this]() { removeGuide(m_guideUnderMouse); });
   connect(m_showMiddleRectAction, &QAction::toggled, [this](bool checked) {
     if (!m_alignment.isNull() && !m_nullContentRect) {
@@ -790,9 +800,10 @@ void ImageView::syncGuidesSettings() {
 
 void ImageView::setupGuideInteraction(const int index) {
   m_draggableGuides[index].setProximityPriority(1);
-  m_draggableGuides[index].setPositionCallback(boost::bind(&ImageView::guidePosition, this, index));
-  m_draggableGuides[index].setMoveRequestCallback(boost::bind(&ImageView::guideMoveRequest, this, index, _1));
-  m_draggableGuides[index].setDragFinishedCallback(boost::bind(&ImageView::guideDragFinished, this));
+  m_draggableGuides[index].setPositionCallback([this, index = index]() {return this->guidePosition(index); });
+  m_draggableGuides[index].setMoveRequestCallback([this, index = index](const QLineF& line, [[maybe_unused]] QFlags<Qt::KeyboardModifier> modifiers) {this->guideMoveRequest(index, line);});
+  m_draggableGuides[index].setDragFinishedCallback([this]([[maybe_unused]] const QPointF& pt) {this->guideDragFinished(); });
+
 
   const Qt::CursorShape cursorShape
       = (m_guides[index].getOrientation() == Qt::Horizontal) ? Qt::SplitVCursor : Qt::SplitHCursor;

@@ -5,13 +5,10 @@
 
 #include <UnitsProvider.h>
 
-#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "ApplyDialog.h"
 #include "Settings.h"
-
-using namespace boost::placeholders;
 
 namespace select_content {
 OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelectionAccessor& pageSelectionAccessor)
@@ -195,8 +192,8 @@ void OptionsWidget::updateDependenciesIfNecessary() {
 void OptionsWidget::showApplyToDialog() {
   auto* dialog = new ApplyDialog(this, m_pageId, m_pageSelectionAccessor);
   dialog->setAttribute(Qt::WA_DeleteOnClose);
-  connect(dialog, SIGNAL(applySelection(const std::set<PageId>&, bool, bool)), this,
-          SLOT(applySelection(const std::set<PageId>&, bool, bool)));
+  connect(dialog, SIGNAL(applySelection(std::set<PageId>, bool, bool)), this,
+          SLOT(applySelection(std::set<PageId>, bool, bool)));
   dialog->show();
 }
 
@@ -289,18 +286,12 @@ void OptionsWidget::onUnitsChanged(Units units) {
 void OptionsWidget::setupUiConnections() {
   CONNECT(widthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(dimensionsChangedLocally(double)));
   CONNECT(heightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(dimensionsChangedLocally(double)));
-  CONNECT(contentDetectAutoBtn, &QPushButton::pressed, this,
-          boost::bind(&OptionsWidget::contentDetectToggled, this, MODE_AUTO));
-  CONNECT(contentDetectManualBtn, &QPushButton::pressed, this,
-          boost::bind(&OptionsWidget::contentDetectToggled, this, MODE_MANUAL));
-  CONNECT(contentDetectDisableBtn, &QPushButton::pressed, this,
-          boost::bind(&OptionsWidget::contentDetectToggled, this, MODE_DISABLED));
-  CONNECT(pageDetectAutoBtn, &QPushButton::pressed, this,
-          boost::bind(&OptionsWidget::pageDetectToggled, this, MODE_AUTO));
-  CONNECT(pageDetectManualBtn, &QPushButton::pressed, this,
-          boost::bind(&OptionsWidget::pageDetectToggled, this, MODE_MANUAL));
-  CONNECT(pageDetectDisableBtn, &QPushButton::pressed, this,
-          boost::bind(&OptionsWidget::pageDetectToggled, this, MODE_DISABLED));
+  CONNECT(contentDetectAutoBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(MODE_AUTO); });
+  CONNECT(contentDetectManualBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(MODE_MANUAL); });
+  CONNECT(contentDetectDisableBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(MODE_DISABLED); });
+  CONNECT(pageDetectAutoBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(MODE_AUTO); });
+  CONNECT(pageDetectManualBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(MODE_MANUAL); });
+  CONNECT(pageDetectDisableBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(MODE_DISABLED); });
   CONNECT(fineTuneBtn, SIGNAL(toggled(bool)), this, SLOT(fineTuningChanged(bool)));
   CONNECT(applyToBtn, SIGNAL(clicked()), this, SLOT(showApplyToDialog()));
 }

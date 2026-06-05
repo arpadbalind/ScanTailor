@@ -1,14 +1,13 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_INTERACTION_INTERACTIVEXSPLINE_H_
-#define SCANTAILOR_INTERACTION_INTERACTIVEXSPLINE_H_
+#pragma once
 
 #include <QCoreApplication>
 #include <QPointF>
-#include <boost/scoped_array.hpp>
 #include <cstddef>
 #include <functional>
+#include <vector>
 
 #include "DraggablePoint.h"
 #include "InteractionState.h"
@@ -85,13 +84,10 @@ class InteractiveXSpline : public InteractionHandler {
   Transform m_fromStorage;
   Transform m_toStorage;
   XSpline m_spline;
-  boost::scoped_array<ControlPoint> m_controlPoints;
+  std::vector<ControlPoint> m_controlPoints;
   InteractionState::Captor m_curveProximity;
   QPointF m_curveProximityPointStorage;
   QPointF m_curveProximityPointScreen;
   double m_curveProximityT;
   bool m_lastProximity;
 };
-
-
-#endif  // ifndef SCANTAILOR_INTERACTION_INTERACTIVEXSPLINE_H_
