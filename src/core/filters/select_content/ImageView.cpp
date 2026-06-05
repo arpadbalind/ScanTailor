@@ -9,14 +9,12 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
-#include <boost/bind/bind.hpp>
 #include <cmath>
 #include <map>
 
 #include "ImagePresentation.h"
 #include "ImageTransformation.h"
 
-using namespace boost::placeholders;
 using namespace imageproc;
 
 namespace select_content {
@@ -59,30 +57,43 @@ ImageView::ImageView(const QImage& image,
 
     // Setup corner drag handlers.
     m_contentRectCorners[i].setPositionCallback(
-        boost::bind(&ImageView::contentRectCornerPosition, this, masks_by_corner[i]));
+        [this, mask = masks_by_corner[i]]() {return contentRectCornerPosition(mask);});
     m_contentRectCorners[i].setMoveRequestCallback(
-        boost::bind(&ImageView::contentRectCornerMoveRequest, this, masks_by_corner[i], _1));
-    m_contentRectCorners[i].setDragFinishedCallback(boost::bind(&ImageView::contentRectDragFinished, this));
+        [this, mask = masks_by_corner[i]](const QPointF& pos, [[maybe_unused]] Qt::KeyboardModifiers modifiers) {
+          return contentRectCornerMoveRequest(mask, pos);});
+
+    m_contentRectCorners[i].setDragFinishedCallback([this](const QPointF& /*pos*/) { return contentRectDragFinished(); });
     m_contentRectCornerHandlers[i].setObject(&m_contentRectCorners[i]);
     m_contentRectCornerHandlers[i].setProximityStatusTip(contentRectDragTip);
-    m_pageRectCorners[i].setPositionCallback(boost::bind(&ImageView::pageRectCornerPosition, this, masks_by_corner[i]));
-    m_pageRectCorners[i].setMoveRequestCallback(
-        boost::bind(&ImageView::pageRectCornerMoveRequest, this, masks_by_corner[i], _1));
-    m_pageRectCorners[i].setDragFinishedCallback(boost::bind(&ImageView::pageRectDragFinished, this));
+    m_pageRectCorners[i].setPositionCallback([this, mask = masks_by_corner[i]]() { return pageRectCornerPosition(mask); });
+    m_pageRectCorners[i].setMoveRequestCallback([this, mask = masks_by_corner[i]](const QPointF& pos, [[maybe_unused]] Qt::KeyboardModifiers modifiers) {
+          return pageRectCornerMoveRequest(mask, pos);});
+    m_pageRectCorners[i].setDragFinishedCallback([this](const QPointF& /*pos*/) { return pageRectDragFinished();});
     m_pageRectCornerHandlers[i].setObject(&m_pageRectCorners[i]);
     m_pageRectCornerHandlers[i].setProximityStatusTip(pageRectDragTip);
 
     // Setup edge drag handlers.
-    m_contentRectEdges[i].setPositionCallback(boost::bind(&ImageView::contentRectEdgePosition, this, masks_by_edge[i]));
+    m_contentRectEdges[i].setPositionCallback(
+        [this, mask = masks_by_edge[i]]() { return contentRectEdgePosition(mask); }
+        );
+
     m_contentRectEdges[i].setMoveRequestCallback(
-        boost::bind(&ImageView::contentRectEdgeMoveRequest, this, masks_by_edge[i], _1));
-    m_contentRectEdges[i].setDragFinishedCallback(boost::bind(&ImageView::contentRectDragFinished, this));
+        [this, mask = masks_by_edge[i]](const QLineF& pos, [[maybe_unused]] Qt::KeyboardModifiers modifiers) { return contentRectEdgeMoveRequest(mask, pos); }
+        );
+
+    m_contentRectEdges[i].setDragFinishedCallback(
+        [this](const QPointF& /*pos*/) { return contentRectDragFinished(); }
+        );
     m_contentRectEdgeHandlers[i].setObject(&m_contentRectEdges[i]);
     m_contentRectEdgeHandlers[i].setProximityStatusTip(contentRectDragTip);
-    m_pageRectEdges[i].setPositionCallback(boost::bind(&ImageView::pageRectEdgePosition, this, masks_by_edge[i]));
+
+    m_pageRectEdges[i].setPositionCallback([this, mask = masks_by_edge[i]]() { return pageRectEdgePosition(mask); });
+
     m_pageRectEdges[i].setMoveRequestCallback(
-        boost::bind(&ImageView::pageRectEdgeMoveRequest, this, masks_by_edge[i], _1));
-    m_pageRectEdges[i].setDragFinishedCallback(boost::bind(&ImageView::pageRectDragFinished, this));
+        [this, mask = masks_by_edge[i]](const QLineF& pos, Qt::KeyboardModifiers modifiers) { return pageRectEdgeMoveRequest(mask, pos); });
+
+    m_pageRectEdges[i].setDragFinishedCallback([this](const QPointF& /*pos*/) { return pageRectDragFinished(); });
+
     m_pageRectEdgeHandlers[i].setObject(&m_pageRectEdges[i]);
     m_pageRectEdgeHandlers[i].setProximityStatusTip(pageRectDragTip);
 
@@ -114,15 +125,16 @@ ImageView::ImageView(const QImage& image,
     m_pageRectArea.setProximityPriority(1);
 
     // Setup rectangle drag interaction
-    m_contentRectArea.setPositionCallback(boost::bind(&ImageView::contentRectPosition, this));
-    m_contentRectArea.setMoveRequestCallback(boost::bind(&ImageView::contentRectMoveRequest, this, _1));
-    m_contentRectArea.setDragFinishedCallback(boost::bind(&ImageView::contentRectDragFinished, this));
+
+    m_contentRectArea.setPositionCallback([this]() { return contentRectPosition(); });
+    m_contentRectArea.setMoveRequestCallback([this](const QPolygonF& poligon) { return contentRectMoveRequest(poligon); });
+    m_contentRectArea.setDragFinishedCallback([this](const QPointF& /*pos*/) { return contentRectDragFinished(); });
     m_contentRectAreaHandler.setObject(&m_contentRectArea);
     m_contentRectAreaHandler.setProximityStatusTip(tr("Hold left mouse button to drag the content box."));
     m_contentRectAreaHandler.setInteractionStatusTip(tr("Release left mouse button to finish dragging."));
-    m_pageRectArea.setPositionCallback(boost::bind(&ImageView::pageRectPosition, this));
-    m_pageRectArea.setMoveRequestCallback(boost::bind(&ImageView::pageRectMoveRequest, this, _1));
-    m_pageRectArea.setDragFinishedCallback(boost::bind(&ImageView::pageRectDragFinished, this));
+    m_pageRectArea.setPositionCallback([this]() { return pageRectPosition();});
+    m_pageRectArea.setMoveRequestCallback([this](const QPolygonF& polygon) { return pageRectMoveRequest(polygon); });
+    m_pageRectArea.setDragFinishedCallback([this](const QPointF& /*pos*/) { return pageRectDragFinished();});
     m_pageRectAreaHandler.setObject(&m_pageRectArea);
     m_pageRectAreaHandler.setProximityStatusTip(tr("Hold left mouse button to drag the page box."));
     m_pageRectAreaHandler.setInteractionStatusTip(tr("Release left mouse button to finish dragging."));

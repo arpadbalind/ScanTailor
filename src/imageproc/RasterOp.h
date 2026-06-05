@@ -1,15 +1,15 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_RASTEROP_H_
-#define SCANTAILOR_IMAGEPROC_RASTEROP_H_
+#pragma once
 
 #include <QPoint>
 #include <QRect>
 #include <QSize>
-#include <boost/cstdint.hpp>
+
 #include <cassert>
 #include <stdexcept>
+#include <cstdint>
 
 #include "BinaryImage.h"
 
@@ -406,4 +406,3 @@ void rasterOp(BinaryImage& dst, const BinaryImage& src) {
   rasterOpInDirection<Rop>(dst, dst.rect(), src, QPoint(0, 0), 1, 1);
 }
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_RASTEROP_H_

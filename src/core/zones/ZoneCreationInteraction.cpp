@@ -7,19 +7,16 @@
 #include <QKeyEvent>
 #include <QPainter>
 #include <QtWidgets/QShortcut>
-#include <boost/bind/bind.hpp>
-#include <boost/lambda/lambda.hpp>
 
 #include "ImageViewBase.h"
 #include "ZoneInteractionContext.h"
 
-using namespace boost::placeholders;
-
 ZoneCreationInteraction::ZoneCreationInteraction(ZoneInteractionContext& context, InteractionState& interaction)
     : m_context(context),
-      m_dragHandler(context.imageView(), boost::bind(&ZoneCreationInteraction::isDragHandlerPermitted, this, _1)),
+      m_dragHandler(context.imageView(), [this](const auto& imageView) {
+            return this->isDragHandlerPermitted(imageView);}),
       m_dragWatcher(m_dragHandler),
-      m_zoomHandler(context.imageView(), boost::lambda::constant(true)),
+      m_zoomHandler(context.imageView(), [](const auto&...) { return true; }),
       m_spline(std::make_shared<EditableSpline>()),
       m_initialZoneCreationMode(context.getZoneCreationMode()),
       m_leftMouseButtonPressed(m_initialZoneCreationMode == ZoneCreationMode::LASSO) {

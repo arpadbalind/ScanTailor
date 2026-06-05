@@ -1,15 +1,13 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_FASTQUEUE_H_
-#define SCANTAILOR_FOUNDATION_FASTQUEUE_H_
+#pragma once
 
-#include <boost/foreach.hpp>
 #include <boost/intrusive/list.hpp>
-#include <boost/type_traits/alignment_of.hpp>
 #include <cassert>
 #include <cstddef>
 #include <cstdint>
+#include <type_traits>
 
 #include "NonCopyable.h"
 
@@ -43,7 +41,7 @@ class FastQueue {
    public:
     explicit Chunk(size_t capacity) {
       const uintptr_t p = (uintptr_t)(this + 1);
-      const size_t alignment = boost::alignment_of<T>::value;
+      const size_t alignment = std::alignment_of_v<T>;
       pBegin = (T*) (((p + alignment - 1) / alignment) * alignment);
       pEnd = pBegin;
       pBufferEnd = pBegin + capacity;
@@ -57,7 +55,7 @@ class FastQueue {
     }
 
     static size_t storageRequirement(size_t capacity) {
-      return sizeof(Chunk) + boost::alignment_of<T>::value - 1 + capacity * sizeof(T);
+      return sizeof(Chunk) + std::alignment_of_v<T> - 1 + capacity * sizeof(T);
     }
 
     T* pBegin;
@@ -144,5 +142,3 @@ template <typename T>
 inline void swap(FastQueue<T>& o1, FastQueue<T>& o2) {
   o1.swap(o2);
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_FASTQUEUE_H_

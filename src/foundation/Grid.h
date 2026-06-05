@@ -1,10 +1,9 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_GRID_H_
-#define SCANTAILOR_FOUNDATION_GRID_H_
+#pragma once
 
-#include <boost/scoped_array.hpp>
+#include <vector>
 
 template <typename Node>
 class Grid {
@@ -45,12 +44,12 @@ class Grid {
   /**
    * \brief Returns a pointer to the beginning of padded data.
    */
-  Node* paddedData() { return m_storage.get(); }
+  Node* paddedData() { return m_storage.data(); }
 
   /**
    * \brief Returns a pointer to the beginning of padded data.
    */
-  const Node* paddedData() const { return m_storage.get(); }
+  const Node* paddedData() const { return m_storage.data(); }
 
   /**
    * Returns the number of nodes in a row, including padding nodes.
@@ -83,7 +82,7 @@ class Grid {
     o2 = tmp;
   }
 
-  boost::scoped_array<Node> m_storage;
+  std::vector<Node> m_storage;
   Node* m_data;
   int m_width;
   int m_height;
@@ -97,8 +96,8 @@ Grid<Node>::Grid() : m_data(0), m_width(0), m_height(0), m_stride(0), m_padding(
 
 template <typename Node>
 Grid<Node>::Grid(int width, int height, int padding)
-    : m_storage(new Node[(width + padding * 2) * (height + padding * 2)]),
-      m_data(m_storage.get() + (width + padding * 2) * padding + padding),
+    : m_storage((width + padding * 2) * (height + padding * 2)),
+      m_data(m_storage.data() + (width + padding * 2) * padding + padding),
       m_width(width),
       m_height(height),
       m_stride(width + padding * 2),
@@ -106,8 +105,8 @@ Grid<Node>::Grid(int width, int height, int padding)
 
 template <typename Node>
 Grid<Node>::Grid(const Grid& other)
-    : m_storage(new Node[(other.stride() * (other.height() + other.padding() * 2))]),
-      m_data(m_storage.get() + other.stride() * other.padding() + other.padding()),
+    : m_storage((other.stride() * (other.height() + other.padding() * 2))),
+      m_data(m_storage.data() + other.stride() * other.padding() + other.padding()),
       m_width(other.width()),
       m_height(other.height()),
       m_stride(other.stride()),
@@ -125,7 +124,7 @@ void Grid<Node>::initPadding(const Node& paddingNode) {
     return;
   }
 
-  Node* line = m_storage.get();
+  Node* line = m_storage.data();
   for (int row = 0; row < m_padding; ++row) {
     for (int x = 0; x < m_stride; ++x) {
       line[x] = paddingNode;
@@ -176,5 +175,3 @@ template <typename Node>
 void swap(Grid<Node>& o1, Grid<Node>& o2) {
   o1.swap(o2);
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_GRID_H_

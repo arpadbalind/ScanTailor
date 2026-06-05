@@ -1,13 +1,12 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_DYNAMICPOOL_H_
-#define SCANTAILOR_FOUNDATION_DYNAMICPOOL_H_
+#pragma once
 
 #include <boost/intrusive/list.hpp>
-#include <boost/scoped_array.hpp>
-#include <cstddef>
 
+#include <cstddef>
+#include <vector>
 #include "NonCopyable.h"
 
 /**
@@ -42,15 +41,15 @@ class DynamicPool {
   /**< Don't overallocate too much. */
 
   struct Chunk : public boost::intrusive::list_base_hook<> {
-    boost::scoped_array<T> storage;
+    std::vector<T> storage;
     T* pData;
     size_t remainingElements;
 
     Chunk() : pData(0), remainingElements(0) {}
 
-    void init(boost::scoped_array<T>& data, size_t size) {
-      data.swap(storage);
-      pData = storage.get();
+    void init(std::vector<T>& dataVec, size_t size) {
+      dataVec.swap(storage);
+      pData = storage.data();
       remainingElements = size;
     }
   };
@@ -86,7 +85,7 @@ T* DynamicPool<T>::alloc(size_t numElements) {
   if (!chunk) {
     // Create a new chunk.
     const size_t chunkSize = adviseChunkSize(numElements);
-    boost::scoped_array<T> data(new T[chunkSize]);
+    std::vector<T> data(chunkSize);
     chunk = &*m_chunkList.insert(m_chunkList.end(), *new Chunk);
     chunk->init(data, chunkSize);
   }
@@ -106,5 +105,3 @@ size_t DynamicPool<T>::adviseChunkSize(size_t numElements) {
   }
   return numElements * (factor + 1);
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_DYNAMICPOOL_H_

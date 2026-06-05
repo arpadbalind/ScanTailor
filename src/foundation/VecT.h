@@ -1,13 +1,10 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_VECT_H_
-#define SCANTAILOR_FOUNDATION_VECT_H_
-
-#include <boost/scoped_array.hpp>
+#pragma once
 #include <cassert>
 #include <cstddef>
-
+#include <vector>
 /**
  * \brief A (column) vector of elements of type T.
  */
@@ -73,9 +70,9 @@ class VecT {
 
   size_t size() const { return m_size; }
 
-  const T* data() const { return m_data.get(); }
+  const T* data() const { return m_data.data(); }
 
-  T* data() { return m_data.get(); }
+  T* data() { return m_data.data(); }
 
   const T& operator[](size_t idx) const {
     assert(idx < m_size);
@@ -92,7 +89,7 @@ class VecT {
   void swap(VecT& other);
 
  private:
-  boost::scoped_array<T> m_data;
+  std::vector<T> m_data;
   size_t m_size;
 };
 
@@ -102,12 +99,11 @@ VecT<T>::VecT() : m_size(0) {}
 
 template <typename T>
 VecT<T>::VecT(size_t size)
-    : m_data(new T[size]()),
-      // The "()" will cause elements to be initialized to T().
+    : m_data(size),
       m_size(size) {}
 
 template <typename T>
-VecT<T>::VecT(size_t size, T initialValue) : m_data(new T[size]), m_size(size) {
+VecT<T>::VecT(size_t size, T initialValue) : m_data(size), m_size(size) {
   for (size_t i = 0; i < size; ++i) {
     m_data[i] = initialValue;
   }
@@ -115,14 +111,14 @@ VecT<T>::VecT(size_t size, T initialValue) : m_data(new T[size]), m_size(size) {
 
 template <typename T>
 template <typename OT>
-VecT<T>::VecT(size_t size, const OT* data) : m_data(new T[size]), m_size(size) {
+VecT<T>::VecT(size_t size, const OT* data) : m_data(size), m_size(size) {
   for (size_t i = 0; i < size; ++i) {
     m_data[i] = static_cast<T>(data[i]);
   }
 }
 
 template <typename T>
-VecT<T>::VecT(const VecT& other) : m_data(new T[other.m_size]), m_size(other.m_size) {
+VecT<T>::VecT(const VecT& other) : m_data(other.m_size), m_size(other.m_size) {
   const T* otherData = other.data();
   for (size_t i = 0; i < m_size; ++i) {
     m_data[i] = otherData[i];
@@ -131,7 +127,7 @@ VecT<T>::VecT(const VecT& other) : m_data(new T[other.m_size]), m_size(other.m_s
 
 template <typename T>
 template <typename OT>
-VecT<T>::VecT(const VecT<OT>& other) : m_data(new T[other.m_size]), m_size(other.m_size) {
+VecT<T>::VecT(const VecT<OT>& other) : m_data(other.m_size), m_size(other.m_size) {
   const T* otherData = other.data();
   for (size_t i = 0; i < m_size; ++i) {
     m_data[i] = otherData[i];
@@ -210,5 +206,3 @@ VecT<T> operator*(double scalar, const VecT<T>& vec) {
   res *= scalar;
   return res;
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_VECT_H_

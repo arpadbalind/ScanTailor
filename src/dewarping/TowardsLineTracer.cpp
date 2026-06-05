@@ -5,10 +5,8 @@
 
 #include <SEDM.h>
 
-#include <boost/foreach.hpp>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/lambda.hpp>
 #include <cassert>
+#include <cmath>
 
 #include "NumericTraits.h"
 #include "SidesOfLine.h"
@@ -154,9 +152,9 @@ void TowardsLineTracer::setupSteps() {
   }
 
   // Sort by decreasing alignment with m_normalTowardsLine.
-  using namespace boost::lambda;
   std::sort(m_steps, m_steps + m_numSteps,
-            bind(&Vec2d::dot, m_normalTowardsLine, bind<const Vec2d&>(&Step::unitVec, _1))
-                > bind(&Vec2d::dot, m_normalTowardsLine, bind<const Vec2d&>(&Step::unitVec, _2)));
+            [this](const auto& a, const auto& b) {
+              return a.unitVec.dot(m_normalTowardsLine) > b.unitVec.dot(m_normalTowardsLine);
+            });
 }  // TowardsLineTracer::setupSteps
 }  // namespace dewarping

@@ -4,15 +4,12 @@
 #include "ProjectReader.h"
 
 #include <QDir>
-#include <boost/bind/bind.hpp>
 
 #include "AbstractFilter.h"
 #include "FileNameDisambiguator.h"
 #include "ProjectPages.h"
 #include "XmlUnmarshaller.h"
 #include "version.h"
-
-using namespace boost::placeholders;
 
 ProjectReader::ProjectReader(const QDomDocument& doc)
     : m_doc(doc), m_disambiguator(std::make_shared<FileNameDisambiguator>()) {
@@ -55,8 +52,8 @@ ProjectReader::ProjectReader(const QDomDocument& doc)
   processPages(pagesEl);
   // Load naming disambiguator.  This needs to be done after processing pages.
   const QDomElement disambigEl(projectEl.namedItem("file-name-disambiguation").toElement());
-  m_disambiguator
-      = std::make_shared<FileNameDisambiguator>(disambigEl, boost::bind(&ProjectReader::expandFilePath, this, _1));
+  m_disambiguator = std::make_shared<FileNameDisambiguator>(disambigEl,
+      [this](const auto& path) { return this->expandFilePath(path); });
 }
 
 ProjectReader::~ProjectReader() = default;

@@ -5,7 +5,6 @@
 
 #include <QPainter>
 #include <QPointer>
-#include <boost/bind/bind.hpp>
 #include <utility>
 
 #include "ImagePresentation.h"
@@ -30,8 +29,6 @@ class FillZoneEditor::MenuCustomizer {
   FillZoneEditor* m_editor;
 };
 
-using namespace boost::placeholders;
-
 FillZoneEditor::FillZoneEditor(const QImage& image,
                                const ImagePixmapUnion& downscaledVersion,
                                const std::function<QPointF(const QPointF&)>& origToImage,
@@ -51,8 +48,7 @@ FillZoneEditor::FillZoneEditor(const QImage& image,
 
   setMouseTracking(true);
 
-  context().setContextMenuInteractionCreator(boost::bind(&FillZoneEditor::createContextMenuInteraction, this, _1));
-
+  context().setContextMenuInteractionCreator([this](auto& context) {return this->createContextMenuInteraction(context);});
   connect(&zones(), SIGNAL(committed()), SLOT(commitZones()));
 
   makeLastFollower(*context().createDefaultInteraction());
@@ -159,7 +155,8 @@ std::vector<ZoneContextMenuItem> FillZoneEditor::MenuCustomizer::operator()(cons
                                                                             const StdMenuItems& stdItems) {
   std::vector<ZoneContextMenuItem> items;
   items.reserve(2);
-  items.emplace_back(tr("Pick color"), boost::bind(&FillZoneEditor::createColorPickupInteraction, m_editor, zone, _1));
+  items.emplace_back(tr("Pick color"), [this, editor = m_editor, zone = zone](auto& context) {
+        return editor->createColorPickupInteraction(zone, context); });
   items.push_back(stdItems.deleteItem);
   return items;
 }

@@ -2,9 +2,6 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "ConstraintSet.h"
-
-#include <boost/foreach.hpp>
-
 #include "FittableSpline.h"
 
 namespace spfit {

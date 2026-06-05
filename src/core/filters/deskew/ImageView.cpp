@@ -11,11 +11,8 @@
 #include <QScrollBar>
 #include <QStyle>
 #include <QWheelEvent>
-#include <boost/bind/bind.hpp>
 
 #include "ImagePresentation.h"
-
-using namespace boost::placeholders;
 
 namespace deskew {
 const double ImageView::m_maxRotationDeg = 45.0;
@@ -36,9 +33,10 @@ ImageView::ImageView(const QImage& image, const QImage& downscaledImage, const I
   const double hitRadius = std::max<double>(0.5 * m_handlePixmap.width(), 15.0);
   for (int i = 0; i < 2; ++i) {
     m_handles[i].setHitRadius(hitRadius);
-    m_handles[i].setPositionCallback(boost::bind(&ImageView::handlePosition, this, i));
-    m_handles[i].setMoveRequestCallback(boost::bind(&ImageView::handleMoveRequest, this, i, _1));
-    m_handles[i].setDragFinishedCallback(boost::bind(&ImageView::dragFinished, this));
+    m_handles[i].setPositionCallback([this, i = i]() {return this->handlePosition(i); });
+    m_handles[i].setMoveRequestCallback([this, i = i](const QPointF& pt, [[maybe_unused]] QFlags<Qt::KeyboardModifier> modifiers) {this->handleMoveRequest(i, pt);});
+    m_handles[i].setDragFinishedCallback([this]([[maybe_unused]] const QPointF& pt) {this->dragFinished();});
+
 
     m_handleInteractors[i].setProximityStatusTip(tip);
     m_handleInteractors[i].setObject(&m_handles[i]);

@@ -1,12 +1,10 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_MATT_H_
-#define SCANTAILOR_FOUNDATION_MATT_H_
-
-#include <boost/scoped_array.hpp>
+#pragma once
 #include <cassert>
 #include <cstddef>
+#include <vector>
 
 /**
  * \brief A matrix of elements of type T.
@@ -77,9 +75,9 @@ class MatT {
 
   size_t cols() const { return m_cols; }
 
-  const T* data() const { return m_data.get(); }
+  const T* data() const { return m_data.data(); }
 
-  T* data() { return m_data.get(); }
+  T* data() { return m_data.data(); }
 
   const T& operator()(size_t row, size_t col) const {
     assert(row < m_rows && col < m_cols);
@@ -98,7 +96,7 @@ class MatT {
  private:
   size_t m_rows;
   size_t m_cols;
-  boost::scoped_array<T> m_data;
+  std::vector<T> m_data;
 };
 
 
@@ -109,11 +107,10 @@ template <typename T>
 MatT<T>::MatT(size_t rows, size_t cols)
     : m_rows(rows),
       m_cols(cols),
-      m_data(new T[rows * cols]()) {  // The "()" will cause elements to be initialized to T().
-}
+      m_data(rows * cols) {}
 
 template <typename T>
-MatT<T>::MatT(size_t rows, size_t cols, T initialValue) : m_rows(rows), m_cols(cols), m_data(new T[rows * cols]) {
+MatT<T>::MatT(size_t rows, size_t cols, T initialValue) : m_rows(rows), m_cols(cols), m_data(rows * cols) {
   const size_t len = rows * cols;
   for (size_t i = 0; i < len; ++i) {
     m_data[i] = initialValue;
@@ -122,7 +119,7 @@ MatT<T>::MatT(size_t rows, size_t cols, T initialValue) : m_rows(rows), m_cols(c
 
 template <typename T>
 template <typename OT>
-MatT<T>::MatT(size_t rows, size_t cols, const OT* data) : m_rows(rows), m_cols(cols), m_data(new T[rows * cols]) {
+MatT<T>::MatT(size_t rows, size_t cols, const OT* data) : m_rows(rows), m_cols(cols), m_data(rows * cols) {
   const size_t len = rows * cols;
   for (size_t i = 0; i < len; ++i) {
     m_data[i] = static_cast<T>(data[i]);
@@ -130,7 +127,7 @@ MatT<T>::MatT(size_t rows, size_t cols, const OT* data) : m_rows(rows), m_cols(c
 }
 
 template <typename T>
-MatT<T>::MatT(const MatT& other) : m_rows(other.rows()), m_cols(other.cols()), m_data(new T[m_rows * m_cols]) {
+MatT<T>::MatT(const MatT& other) : m_rows(other.rows()), m_cols(other.cols()), m_data(m_rows * m_cols) {
   const size_t len = m_rows * m_cols;
   const T* otherData = other.data();
   for (size_t i = 0; i < len; ++i) {
@@ -140,7 +137,7 @@ MatT<T>::MatT(const MatT& other) : m_rows(other.rows()), m_cols(other.cols()), m
 
 template <typename T>
 template <typename OT>
-MatT<T>::MatT(const MatT<OT>& other) : m_rows(other.rows()), m_cols(other.cols()), m_data(new T[m_rows * m_cols]) {
+MatT<T>::MatT(const MatT<OT>& other) : m_rows(other.rows()), m_cols(other.cols()), m_data(m_rows * m_cols) {
   const size_t len = m_rows * m_cols;
   const T* otherData = other.data();
   for (size_t i = 0; i < len; ++i) {
@@ -231,5 +228,3 @@ MatT<T> operator*(double scalar, const MatT<T>& mat) {
   res *= scalar;
   return res;
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_MATT_H_
