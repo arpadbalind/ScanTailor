@@ -20,7 +20,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_custom_target(
     quality
-    COMMAND ${CMAKE_SOURCE_DIR}/tools/clang-tidy.sh ${CMAKE_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E env SRC=$$SRC
+            ${CMAKE_SOURCE_DIR}/tools/clang-tidy.sh
+            ${CMAKE_BINARY_DIR}
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "🔍 Running clang-tidy code quality checks"
 )
