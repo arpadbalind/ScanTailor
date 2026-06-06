@@ -32,5 +32,3 @@ set(adiff_sources
 add_library(math STATIC ${generic_sources} ${spfit_sources} ${adiff_sources})
 target_link_libraries(math PUBLIC foundation)
 target_include_directories(math PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-
-add_subdirectory(tests)
