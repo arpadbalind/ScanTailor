@@ -18,6 +18,8 @@ class ColorSchemeManager {
   ColorSchemeManager() = default;
 
  public:
+  ~ColorSchemeManager() = default;
+
   static ColorSchemeManager& instance();
 
   void setColorScheme(const ColorScheme& colorScheme);

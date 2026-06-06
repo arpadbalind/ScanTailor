@@ -1238,8 +1238,6 @@ void MainWindow::filterResult(const BackgroundTaskPtr& task, const FilterResultP
         QString cmd = settings.value("main_window/external_alarm_cmd", extPlayCmd).toString();
         if (cmd.isEmpty()) {
           QApplication::beep();
-        } else {
-          Q_UNUSED(std::system(cmd.toStdString().c_str()));
         }
       }
 
@@ -1448,7 +1446,9 @@ void MainWindow::onSettingsChanged() {
   ApplicationSettings& settings = ApplicationSettings::getInstance();
   bool needInvalidate = true;
 
-  static_cast<Application*>(qApp)->installLanguage(settings.getLanguage());
+  if (auto* app = qobject_cast<Application*>(qApp)) {
+    app->installLanguage(settings.getLanguage());
+  }
 
   if (m_thumbnailCache) {
     const QSize maxThumbSize = settings.getThumbnailQuality();
