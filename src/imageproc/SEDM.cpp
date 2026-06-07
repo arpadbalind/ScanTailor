@@ -11,6 +11,7 @@
 #include "SeedFill.h"
 
 namespace imageproc {
+using namespace enumflags;
 // Note that -1 is an implementation detail.
 // It exists to make sure INF_DIST + 1 doesn't overflow.
 const uint32_t SEDM::INF_DIST = ~uint32_t(0) - 1;
@@ -30,20 +31,20 @@ SEDM::SEDM(const BinaryImage& image, const DistType distType, const Borders bord
   m_stride = width + 2;
   m_plainData = &m_data[0] + m_stride + 1;
 
-  if (borders & DIST_TO_TOP_BORDER) {
+  if (enumflags::has_any(borders, Borders::DIST_TO_TOP_BORDER)) {
     memset(&m_data[0], 0, m_stride * sizeof(m_data[0]));
   }
-  if (borders & DIST_TO_BOTTOM_BORDER) {
+  if (enumflags::has_any(borders, Borders::DIST_TO_BOTTOM_BORDER)) {
     memset(&m_data[m_data.size() - m_stride], 0, m_stride * sizeof(m_data[0]));
   }
-  if (borders & (DIST_TO_LEFT_BORDER | DIST_TO_RIGHT_BORDER)) {
+  if (enumflags::has_any(borders, (Borders::DIST_TO_LEFT_BORDER | Borders::DIST_TO_RIGHT_BORDER))) {
     const int last = m_stride - 1;
     uint32_t* line = &m_data[0];
     for (int todo = height + 2; todo > 0; --todo) {
-      if (borders & DIST_TO_LEFT_BORDER) {
+      if (enumflags::has_any(borders, Borders::DIST_TO_LEFT_BORDER)) {
         line[0] = 0;
       }
-      if (borders & DIST_TO_RIGHT_BORDER) {
+      if (enumflags::has_any(borders, Borders::DIST_TO_RIGHT_BORDER)) {
         line[last] = 0;
       }
       line += m_stride;
@@ -51,7 +52,7 @@ SEDM::SEDM(const BinaryImage& image, const DistType distType, const Borders bord
   }
 
   uint32_t initial_distance[2];
-  if (distType == DIST_TO_WHITE) {
+  if (distType == DistType::DIST_TO_WHITE) {
     initial_distance[0] = 0;         // white
     initial_distance[1] = INF_DIST;  // black
   } else {

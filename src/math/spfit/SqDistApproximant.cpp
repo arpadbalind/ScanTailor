@@ -54,7 +54,7 @@ SqDistApproximant SqDistApproximant::lineDistance(const QLineF& line) {
 SqDistApproximant SqDistApproximant::weightedLineDistance(const QLineF& line, double weight) {
   Vec2d u(line.p2() - line.p1());
   const double sqlen = u.squaredNorm();
-  if (sqlen > 1e-6) {
+  if (sqlen > epsilon) {
     u /= std::sqrt(sqlen);
   } else {
     return pointDistance(line.p1());
@@ -89,6 +89,7 @@ SqDistApproximant SqDistApproximant::weightedCurveDistance(const Vec2d& referenc
 }
 
 double SqDistApproximant::evaluate(const Vec2d& pt) const {
+  // NOLINTNEXTLINE(readability-magic-numbers)
   StaticMatrixCalc<double, 8, 1> mc;
   return (mc(pt, 1, 2) * mc(A) * mc(pt, 2, 1) + mc(b, 1, 2) * mc(pt, 2, 1)).rawData()[0] + c;
 }

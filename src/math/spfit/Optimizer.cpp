@@ -137,7 +137,7 @@ void Optimizer::adjustConstraints(double direction) {
   }
 }
 
-void Optimizer::swap(Optimizer& other) {
+void Optimizer::swap(Optimizer& other) noexcept {
   m_A.swap(other.m_A);
   m_b.swap(other.m_b);
   m_x.swap(other.m_x);

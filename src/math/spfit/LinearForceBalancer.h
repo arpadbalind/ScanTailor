@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_LINEARFORCEBALANCER_H_
-#define SCANTAILOR_SPFIT_LINEARFORCEBALANCER_H_
+#pragma once
 
 namespace spfit {
 /**
@@ -18,6 +17,7 @@ class LinearForceBalancer {
    * Sets both the current and the target ratio, so that it doesn't change over time.
    */
   explicit LinearForceBalancer(double internalExternalRatio);
+  inline static constexpr double epsilon{ 1e-6 };
 
   double currentRatio() const { return m_currentRatio; }
 
@@ -48,8 +48,7 @@ class LinearForceBalancer {
 
   double m_currentRatio;
   double m_targetRatio;
-  double m_rateOfChange;
-  int m_iterationsToTarget;
+  double m_rateOfChange{ 0.0 };
+  int m_iterationsToTarget{ 0 };
 };
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_LINEARFORCEBALANCER_H_

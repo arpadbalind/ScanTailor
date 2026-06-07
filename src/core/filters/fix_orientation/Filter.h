@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FIX_ORIENTATION_FILTER_H_
-#define SCANTAILOR_FIX_ORIENTATION_FILTER_H_
+#pragma once
 
 #include <memory>
 
@@ -34,8 +33,7 @@ class Settings;
  * \note All methods of this class except the destructor
  *       must be called from the GUI thread only.
  */
-class Filter : public AbstractFilter {
-  DECLARE_NON_COPYABLE(Filter)
+class Filter : public AbstractFilter, private NonCopyable {
 
  public:
   explicit Filter(const PageSelectionAccessor& pageSelectionAccessor);
@@ -78,4 +76,3 @@ class Filter : public AbstractFilter {
   SafeDeletingQObjectPtr<OptionsWidget> m_optionsWidget;
 };
 }  // namespace fix_orientation
-#endif  // ifndef SCANTAILOR_FIX_ORIENTATION_FILTER_H_

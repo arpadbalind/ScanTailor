@@ -62,6 +62,12 @@ class VecT {
   template <typename OT>
   VecT& operator=(const VecT<OT>& other);
 
+  VecT(VecT&&) = default;
+
+  VecT& operator=(VecT&&) = default;
+
+  ~VecT() = default;
+
   VecT& operator+=(const VecT& rhs);
 
   VecT& operator-=(const VecT& rhs);
@@ -86,7 +92,7 @@ class VecT {
 
   void fill(const T& value);
 
-  void swap(VecT& other);
+  void swap(VecT& other) noexcept;
 
  private:
   std::vector<T> m_data;
@@ -181,15 +187,15 @@ void VecT<T>::fill(const T& value) {
 }
 
 template <typename T>
-void VecT<T>::swap(VecT& other) {
-  size_t tmp = m_size;
+void VecT<T>::swap(VecT& other) noexcept {
+  const size_t tmp = m_size;
   m_size = other.m_size;
   other.m_size = tmp;
   m_data.swap(other.m_data);
 }
 
 template <typename T>
-void swap(const VecT<T>& o1, const VecT<T>& o2) {
+void swap(const VecT<T>& o1, const VecT<T>& o2) noexcept {
   o1.swap(o2);
 }
 

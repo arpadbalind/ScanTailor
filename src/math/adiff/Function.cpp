@@ -26,14 +26,14 @@ Function<2>::Function(size_t argIdx, double val, const SparseMap<2>& sparseMap)
   // argIdx row
   for (size_t i = 0; i < numVars; ++i) {
     const size_t u = sparseMap.nonZeroElementIdx(argIdx, i);
-    if (u != sparseMap.ZERO_ELEMENT) {
+    if (u != SparseMap<2>::ZERO_ELEMENT) {
       firstDerivs[u] = 1.0;
     }
   }
   // argIdx column
   for (size_t i = 0; i < numVars; ++i) {
     const size_t u = sparseMap.nonZeroElementIdx(i, argIdx);
-    if (u != sparseMap.ZERO_ELEMENT) {
+    if (u != SparseMap<2>::ZERO_ELEMENT) {
       firstDerivs[u] = 1.0;
     }
   }
@@ -45,7 +45,7 @@ VecT<double> Function<2>::gradient(const SparseMap<2>& sparseMap) const {
 
   for (size_t i = 0; i < numVars; ++i) {
     const size_t u = sparseMap.nonZeroElementIdx(i, i);
-    if (u != sparseMap.ZERO_ELEMENT) {
+    if (u != SparseMap<2>::ZERO_ELEMENT) {
       grad[i] = firstDerivs[u];
     }
   }
@@ -60,13 +60,14 @@ MatT<double> Function<2>::hessian(const SparseMap<2>& sparseMap) const {
     for (size_t j = 0; j < numVars; ++j) {
       double Fij = 0;
       const size_t ij = sparseMap.nonZeroElementIdx(i, j);
-      if (ij != sparseMap.ZERO_ELEMENT) {
+      if (ij != SparseMap<2>::ZERO_ELEMENT) {
         if (i == j) {
           Fij = secondDerivs[ij];
         } else {
           const size_t ii = sparseMap.nonZeroElementIdx(i, i);
           const size_t jj = sparseMap.nonZeroElementIdx(j, j);
           assert(ii != sparseMap.ZERO_ELEMENT && jj != sparseMap.ZERO_ELEMENT);
+          // NOLINTNEXTLINE(readability-magic-numbers)
           Fij = 0.5 * (secondDerivs[ij] - (secondDerivs[ii] + secondDerivs[jj]));
         }
       }
@@ -76,7 +77,7 @@ MatT<double> Function<2>::hessian(const SparseMap<2>& sparseMap) const {
   return hess;
 }
 
-void Function<2>::swap(Function<2>& other) {
+void Function<2>::swap(Function<2>& other) noexcept {
   std::swap(value, other.value);
   firstDerivs.swap(other.firstDerivs);
   secondDerivs.swap(other.secondDerivs);
@@ -165,8 +166,8 @@ Function<2> operator*(const Function<2>& f1, const Function<2>& f2) {
 
   for (size_t u = 0; u < p; ++u) {
     res.firstDerivs[u] = f1.firstDerivs[u] * f2.value + f1.value * f2.firstDerivs[u];
-    res.secondDerivs[u]
-        = f1.secondDerivs[u] * f2.value + 2.0 * f1.firstDerivs[u] * f2.firstDerivs[u] + f1.value * f2.secondDerivs[u];
+    // NOLINTNEXTLINE(readability-magic-numbers)
+    res.secondDerivs[u] = f1.secondDerivs[u] * f2.value + 2.0 * f1.firstDerivs[u] * f2.firstDerivs[u] + f1.value * f2.secondDerivs[u];
   }
   return res;
 }

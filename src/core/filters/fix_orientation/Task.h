@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FIX_ORIENTATION_TASK_H_
-#define SCANTAILOR_FIX_ORIENTATION_TASK_H_
+#pragma once
 
 #include <FilterData.h>
 
@@ -23,9 +22,7 @@ namespace fix_orientation {
 class Filter;
 class Settings;
 
-class Task {
-  DECLARE_NON_COPYABLE(Task)
-
+class Task : private NonCopyable {
  public:
   Task(const PageId& pageId,
        std::shared_ptr<Filter> filter,
@@ -52,4 +49,3 @@ class Task {
   bool m_batchProcessing;
 };
 }  // namespace fix_orientation
-#endif  // ifndef SCANTAILOR_FIX_ORIENTATION_TASK_H_

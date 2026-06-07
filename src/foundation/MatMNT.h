@@ -1,9 +1,8 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_MATMNT_H_
-#define SCANTAILOR_FOUNDATION_MATMNT_H_
-
+#pragma once
+#include <array>
 #include <cstddef>
 
 template <size_t M, size_t N, typename T>
@@ -25,7 +24,8 @@ template <size_t M, size_t N, typename T>
 class MatMNT {
  public:
   using type = T;
-  enum { ROWS = static_cast<int>(M), COLS = static_cast<int>(N) };
+  static constexpr size_t ROWS{ M };
+  static constexpr size_t COLS{ N };
 
   /**
    * \brief Initializes matrix elements to T().
@@ -56,16 +56,16 @@ class MatMNT {
   template <typename OT>
   MatMNT& operator=(const MatMNT<M, N, OT>& other);
 
-  const T* data() const { return m_data; }
+  const T* data() const { return m_data.data(); }
 
-  T* data() { return m_data; }
+  T* data() { return m_data.data(); }
 
   const T& operator()(int i, int j) const { return m_data[i + j * M]; }
 
   T& operator()(int i, int j) { return m_data[i + j * M]; }
 
  private:
-  T m_data[M * N];
+  std::array<T, M * N> m_data;
 };
 
 
@@ -95,5 +95,3 @@ MatMNT<M, N, T>::MatMNT(const MatMNT<M, N, OT>& other) {
     m_data[i] = static_cast<T>(data[i]);
   }
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_MATMNT_H_

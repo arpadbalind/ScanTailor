@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_APP_MAINWINDOW_H_
-#define SCANTAILOR_APP_MAINWINDOW_H_
+#pragma once
 
 #include <QMainWindow>
 #include <QObjectCleanupHandler>
@@ -60,9 +59,7 @@ class QLineF;
 class QRectF;
 class QLayout;
 
-class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::MainWindow {
-  DECLARE_NON_COPYABLE(MainWindow)
-
+class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::MainWindow, private NonCopyable {
   Q_OBJECT
  public:
   MainWindow();
@@ -110,7 +107,7 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
   void execGotoPageDialog();
 
   void goToPage(const PageId& pageId,
-                ThumbnailSequence::SelectionAction selectionAction = ThumbnailSequence::RESET_SELECTION);
+                ThumbnailSequence::SelectionAction selectionAction = ThumbnailSequence::SelectionAction::RESET_SELECTION);
 
   void currentPageChanged(const PageInfo& pageInfo, const QRectF& thumbRect, ThumbnailSequence::SelectionFlags flags);
 
@@ -229,7 +226,7 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
   void updateSortOptions();
 
   void resetThumbSequence(const std::shared_ptr<const PageOrderProvider>& pageOrderProvider,
-                          ThumbnailSequence::SelectionAction selectionAction = ThumbnailSequence::RESET_SELECTION);
+                          ThumbnailSequence::SelectionAction selectionAction = ThumbnailSequence::SelectionAction::RESET_SELECTION);
 
   void removeFilterOptionsWidget();
 
@@ -338,6 +335,3 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
   QTimer m_maxLogicalThumbSizeUpdater;
   QTimer m_sceneItemsPosUpdater;
 };
-
-
-#endif  // ifndef SCANTAILOR_APP_MAINWINDOW_H_

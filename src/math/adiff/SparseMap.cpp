@@ -4,10 +4,8 @@
 #include "SparseMap.h"
 
 namespace adiff {
-const size_t SparseMap<2>::ZERO_ELEMENT = ~size_t(0);
-
 SparseMap<2>::SparseMap(size_t numVars)
-    : m_numVars(numVars), m_numNonZeroElements(0), m_map(numVars, numVars, ZERO_ELEMENT) {}
+    : m_numVars(numVars), m_map(numVars, numVars, ZERO_ELEMENT) {}
 
 void SparseMap<2>::markNonZero(size_t i, size_t j) {
   size_t& el = m_map(i, j);

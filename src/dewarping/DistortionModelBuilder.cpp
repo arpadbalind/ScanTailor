@@ -303,6 +303,7 @@ XSpline DistortionModelBuilder::fitExtendedSpline(const std::vector<QPointF>& po
                                                   [[maybe_unused]] const Vec2d& centroid,
                                                   const std::pair<QLineF, QLineF>& bounds) {
   using namespace spfit;
+  using namespace enumflags;
 
   const QLineF chord(polyline.front(), polyline.back());
   XSpline spline;
@@ -326,8 +327,8 @@ XSpline DistortionModelBuilder::fitExtendedSpline(const std::vector<QPointF>& po
                                       Flags polylineFlags,
                                       const FrenetFrame& frenetFrame,
                                       double signedCurvature) const override {
-      if (polylineFlags & (POLYLINE_FRONT | POLYLINE_BACK)) {
-        if (sampleFlags & FittableSpline::JUNCTION_SAMPLE) {
+      if (enumflags::has_any(polylineFlags, (Flags::POLYLINE_FRONT | Flags::POLYLINE_BACK))) {
+        if (enumflags::has_any(sampleFlags, FittableSpline::SampleFlags::JUNCTION_SAMPLE)) {
           return SqDistApproximant::pointDistance(frenetFrame.origin());
         } else {
           return SqDistApproximant();

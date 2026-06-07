@@ -25,9 +25,7 @@
   }
 
 namespace {
-class ScopedClearAcceptance {
-  DECLARE_NON_COPYABLE(ScopedClearAcceptance)
-
+class ScopedClearAcceptance : private NonCopyable {
  public:
   explicit ScopedClearAcceptance(QEvent* event);
 

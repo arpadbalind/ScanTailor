@@ -71,6 +71,12 @@ class MatT {
 
   MatT& operator*=(T scalar);
 
+  MatT(MatT&&) = default;
+
+  MatT& operator=(MatT&&) = default;
+
+  ~MatT() = default;
+
   size_t rows() const { return m_rows; }
 
   size_t cols() const { return m_cols; }
@@ -91,7 +97,7 @@ class MatT {
 
   void fill(const T& value);
 
-  void swap(MatT& other);
+  void swap(MatT& other) noexcept;
 
  private:
   size_t m_rows;
@@ -198,7 +204,7 @@ void MatT<T>::fill(const T& value) {
 }
 
 template <typename T>
-void MatT<T>::swap(MatT& other) {
+void MatT<T>::swap(MatT& other) noexcept {
   size_t tmp = m_rows;
   m_rows = other.m_rows;
   other.m_rows = tmp;
@@ -211,7 +217,7 @@ void MatT<T>::swap(MatT& other) {
 }
 
 template <typename T>
-void swap(const MatT<T>& o1, const MatT<T>& o2) {
+void swap(const MatT<T>& o1, const MatT<T>& o2) noexcept {
   o1.swap(o2);
 }
 

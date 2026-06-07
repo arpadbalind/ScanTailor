@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_POLYLINEMODELSHAPE_H_
-#define SCANTAILOR_SPFIT_POLYLINEMODELSHAPE_H_
+#pragma once
 
 #include <QPointF>
 #include <vector>
@@ -15,11 +14,15 @@
 #include "XSpline.h"
 
 namespace spfit {
-class PolylineModelShape : public ModelShape {
-  DECLARE_NON_COPYABLE(PolylineModelShape)
+class PolylineModelShape : public ModelShape, private NonCopyable {
 
  public:
-  enum Flags { DEFAULT_FLAGS = 0, POLYLINE_FRONT = 1 << 0, POLYLINE_BACK = 1 << 1 };
+  enum class Flags : std::uint8_t {
+    DEFAULT_FLAGS  = 0,
+    POLYLINE_FRONT = 1 << 0,
+    POLYLINE_BACK  = 1 << 1,
+    MASK_ALL = POLYLINE_FRONT | POLYLINE_BACK
+  };
 
   explicit PolylineModelShape(const std::vector<QPointF>& polyline);
 
@@ -36,7 +39,10 @@ class PolylineModelShape : public ModelShape {
   std::vector<XSpline::PointAndDerivs> m_vertices;
 };
 
-
-DEFINE_FLAG_OPS(PolylineModelShape::Flags)
+constexpr PolylineModelShape::Flags operator|(PolylineModelShape::Flags a, PolylineModelShape::Flags b) noexcept {
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
+  return static_cast<PolylineModelShape::Flags>(static_cast<std::uint8_t>(a) | static_cast<std::uint8_t>(b));
+}
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_POLYLINEMODELSHAPE_H_
+
+

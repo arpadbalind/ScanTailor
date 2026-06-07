@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_APP_THUMBNAILSEQUENCE_H_
-#define SCANTAILOR_APP_THUMBNAILSEQUENCE_H_
+#pragma once
 
 #include <QObject>
 #include <memory>
@@ -26,14 +25,13 @@ class QSizeF;
 class QRectF;
 class QPoint;
 
-class ThumbnailSequence : public QObject {
+class ThumbnailSequence : public QObject, private NonCopyable {
   Q_OBJECT
-  DECLARE_NON_COPYABLE(ThumbnailSequence)
 
  public:
-  enum SelectionAction { KEEP_SELECTION, RESET_SELECTION, FORCE_RESET_SELECTION };
+  enum class SelectionAction { KEEP_SELECTION, RESET_SELECTION, FORCE_RESET_SELECTION };
 
-  enum SelectionFlags {
+  enum class SelectionFlags : std::uint8_t {
     DEFAULT_SELECTION_FLAGS = 0,
 
     /** Indicates the item was selected by a user action, rather than programmatically. */
@@ -137,7 +135,7 @@ class ThumbnailSequence : public QObject {
    * with REDUNDANT_SELECTION flag set, in case our page was already the
    * selection leader.
    */
-  bool setSelection(const PageId& pageId, SelectionAction selectionAction = FORCE_RESET_SELECTION);
+  bool setSelection(const PageId& pageId, SelectionAction selectionAction = SelectionAction::FORCE_RESET_SELECTION);
 
   /**
    * \brief Returns the current selection leader.
@@ -259,8 +257,3 @@ class ThumbnailSequence : public QObject {
 
   std::unique_ptr<Impl> m_impl;
 };
-
-
-DEFINE_FLAG_OPS(ThumbnailSequence::SelectionFlags)
-
-#endif  // ifndef SCANTAILOR_APP_THUMBNAILSEQUENCE_H_

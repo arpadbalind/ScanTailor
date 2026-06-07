@@ -29,8 +29,6 @@ using namespace imageproc;
 
 class PictureZoneEditor::MaskTransformTask : public AbstractCommand<std::shared_ptr<AbstractCommand<void>>>,
                                              public QObject {
-  DECLARE_NON_COPYABLE(MaskTransformTask)
-
  public:
   MaskTransformTask(PictureZoneEditor* zoneEditor,
                     const BinaryImage& mask,

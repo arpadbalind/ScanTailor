@@ -13,8 +13,9 @@ OptimizationResult::OptimizationResult(double forceBefore, double forceAfter)
 }
 
 double OptimizationResult::improvementPercentage() const {
+  const double TO_PERCENT{ 100.0 };
   double improvement = m_forceBefore - m_forceAfter;
   improvement /= (m_forceBefore + std::numeric_limits<double>::epsilon());
-  return improvement * 100;  // Convert to percents.
+  return improvement * TO_PERCENT;  // Convert to percents.
 }
 }  // namespace spfit

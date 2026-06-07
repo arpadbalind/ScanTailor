@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_STAGESEQUENCE_H_
-#define SCANTAILOR_CORE_STAGESEQUENCE_H_
+#pragma once
 
 #include <memory>
 #include <vector>
@@ -21,8 +20,7 @@ class ProjectPages;
 class PageSelectionAccessor;
 class AbstractRelinker;
 
-class StageSequence {
-  DECLARE_NON_COPYABLE(StageSequence)
+class StageSequence : private NonCopyable {
 
  public:
   using FilterPtr = std::shared_ptr<AbstractFilter>;
@@ -80,6 +78,3 @@ class StageSequence {
   int m_pageLayoutFilterIdx;
   int m_outputFilterIdx;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_STAGESEQUENCE_H_

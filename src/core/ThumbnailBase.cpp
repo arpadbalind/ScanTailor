@@ -17,8 +17,7 @@
 
 using namespace imageproc;
 
-class ThumbnailBase::LoadCompletionHandler : public AbstractCommand<void, const ThumbnailLoadResult&> {
-  DECLARE_NON_COPYABLE(LoadCompletionHandler)
+class ThumbnailBase::LoadCompletionHandler : public AbstractCommand<void, const ThumbnailLoadResult&>, private NonCopyable {
 
  public:
   explicit LoadCompletionHandler(ThumbnailBase* thumb) : m_thumb(thumb) {}

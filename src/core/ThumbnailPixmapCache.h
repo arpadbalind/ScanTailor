@@ -15,8 +15,7 @@ class QPixmap;
 class QString;
 class QSize;
 
-class ThumbnailPixmapCache {
-  DECLARE_NON_COPYABLE(ThumbnailPixmapCache)
+class ThumbnailPixmapCache : private NonCopyable {
 
  public:
   enum Status { LOADED, LOAD_FAILED, QUEUED };

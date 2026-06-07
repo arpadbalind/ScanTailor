@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_OPTIMIZER_H_
-#define SCANTAILOR_SPFIT_OPTIMIZER_H_
+#pragma once
 
 #include <list>
 #include <vector>
@@ -55,7 +54,7 @@ class Optimizer {
    */
   double internalForce() const { return m_internalForce.c; }
 
-  OptimizationResult optimize(double internalExternalRatio);
+  OptimizationResult optimize(double internalForceWeight);
 
   const double* displacementVector() const { return m_x.data(); }
 
@@ -65,7 +64,7 @@ class Optimizer {
    */
   void undoLastStep();
 
-  void swap(Optimizer& other);
+  void swap(Optimizer& other) noexcept;
 
  private:
   void adjustConstraints(double direction);
@@ -79,8 +78,7 @@ class Optimizer {
 };
 
 
-inline void swap(Optimizer& o1, Optimizer& o2) {
+inline void swap(Optimizer& o1, Optimizer& o2) noexcept {
   o1.swap(o2);
 }
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_OPTIMIZER_H_

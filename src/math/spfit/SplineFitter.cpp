@@ -7,12 +7,12 @@
 #include "ModelShape.h"
 
 namespace spfit {
-SplineFitter::SplineFitter(FittableSpline* spline) : m_spline(spline), m_optimizer(spline->numControlPoints() * 2) {
+SplineFitter::SplineFitter(FittableSpline* spline) : m_spline(spline), m_optimizer(static_cast<size_t>(spline->numControlPoints()) * 2) {
   // Each control point is a pair of (x, y) varaiables.
 }
 
 void SplineFitter::splineModified() {
-  Optimizer(m_spline->numControlPoints() * 2).swap(m_optimizer);
+  Optimizer(static_cast<size_t>(m_spline->numControlPoints()) * 2).swap(m_optimizer);
 }
 
 void SplineFitter::setConstraints(const ConstraintSet& constraints) {
@@ -80,15 +80,17 @@ void SplineFitter::addAttractionForce([[maybe_unused]] const Vec2d& splinePoint,
   for (int i = 0; i < numCoeffs; ++i) {
     const int cpIdx = coeffs[i].controlPointIdx;
     const QPointF cp(m_spline->controlPointPosition(cpIdx));
-    m_tempVars[i * 2] = cp.x();
-    m_tempVars[i * 2 + 1] = cp.y();
+    const auto idx = static_cast<std::size_t>(i) * 2;
+    m_tempVars[idx] = cp.x();
+    m_tempVars[idx + 1] = cp.y();
   }
-  f.recalcForTranslatedArguments(numVars ? &m_tempVars[0] : nullptr);
+  f.recalcForTranslatedArguments(numVars != 0 ? m_tempVars.data() : nullptr);
   // What remains is a mapping from the reduced set of variables to the full set.
   m_tempSparseMap.resize(numVars);
   for (int i = 0; i < numCoeffs; ++i) {
-    m_tempSparseMap[i * 2] = coeffs[i].controlPointIdx * 2;
-    m_tempSparseMap[i * 2 + 1] = coeffs[i].controlPointIdx * 2 + 1;
+    const auto idx = static_cast<std::size_t>(i) * 2;
+    m_tempSparseMap[idx] = coeffs[i].controlPointIdx * 2;
+    m_tempSparseMap[idx + 1] = coeffs[i].controlPointIdx * 2 + 1;
   }
 
   m_optimizer.addExternalForce(f, m_tempSparseMap);
@@ -127,7 +129,9 @@ OptimizationResult SplineFitter::optimize(double internalForceWeight) {
 
   const int numControlPoints = m_spline->numControlPoints();
   for (int i = 0; i < numControlPoints; ++i) {
-    const Vec2d delta(m_optimizer.displacementVector() + i * 2);
+
+    const auto offset = static_cast<std::ptrdiff_t>(i) * 2;
+    const Vec2d delta(m_optimizer.displacementVector() + offset);
     m_spline->moveControlPoint(i, m_spline->controlPointPosition(i) + delta);
   }
   return res;
@@ -136,7 +140,9 @@ OptimizationResult SplineFitter::optimize(double internalForceWeight) {
 void SplineFitter::undoLastStep() {
   const int numControlPoints = m_spline->numControlPoints();
   for (int i = 0; i < numControlPoints; ++i) {
-    const Vec2d delta(m_optimizer.displacementVector() + i * 2);
+
+    const auto offset = static_cast<std::ptrdiff_t>(i) * 2;
+    const Vec2d delta(m_optimizer.displacementVector() + offset);
     m_spline->moveControlPoint(i, m_spline->controlPointPosition(i) - delta);
   }
 

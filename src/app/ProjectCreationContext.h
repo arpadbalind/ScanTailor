@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_APP_PROJECTCREATIONCONTEXT_H_
-#define SCANTAILOR_APP_PROJECTCREATIONCONTEXT_H_
+#pragma once
 
 #include <QObject>
 #include <QPointer>
@@ -17,9 +16,8 @@ class ProjectFilesDialog;
 class FixDpiDialog;
 class QWidget;
 
-class ProjectCreationContext : public QObject {
+class ProjectCreationContext : public QObject, private NonCopyable {
   Q_OBJECT
-  DECLARE_NON_COPYABLE(ProjectCreationContext)
 
  public:
   explicit ProjectCreationContext(QWidget* parent);
@@ -58,6 +56,3 @@ class ProjectCreationContext : public QObject {
   Qt::LayoutDirection m_layoutDirection;
   QWidget* m_parent;
 };
-
-
-#endif  // ifndef SCANTAILOR_APP_PROJECTCREATIONCONTEXT_H_

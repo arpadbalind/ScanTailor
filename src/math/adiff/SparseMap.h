@@ -1,10 +1,10 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_ADIFF_SPARSEMAP_H_
-#define SCANTAILOR_ADIFF_SPARSEMAP_H_
+#pragma once
 
 #include <cstddef>
+#include <limits>
 
 #include "MatT.h"
 
@@ -24,7 +24,7 @@ template <>
 class SparseMap<2> {
   // Member-wise copying is OK.
  public:
-  static const size_t ZERO_ELEMENT;
+  inline static constexpr size_t ZERO_ELEMENT = std::numeric_limits<size_t>::max();
 
   /**
    * Creates a structure for a (numVars)x(numVars) Hessian
@@ -67,8 +67,7 @@ class SparseMap<2> {
 
  private:
   size_t m_numVars;
-  size_t m_numNonZeroElements;
+  size_t m_numNonZeroElements{0};
   MatT<size_t> m_map;
 };
 }  // namespace adiff
-#endif  // ifndef SCANTAILOR_ADIFF_SPARSEMAP_H_

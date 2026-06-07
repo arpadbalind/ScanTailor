@@ -17,12 +17,19 @@
  */
 template <typename T>
 class DynamicPool {
-  DECLARE_NON_COPYABLE(DynamicPool)
 
  public:
-  DynamicPool() {}
+  static constexpr size_t OVERALLOCATION_FACTOR { 3 };
+  static constexpr size_t OVERALLOCATION_LIMIT { 256 };
 
+  DynamicPool() = default;
   ~DynamicPool();
+
+  DynamicPool(const DynamicPool&) = delete;
+  DynamicPool& operator=(const DynamicPool&) = delete;
+
+  DynamicPool(DynamicPool&&) = delete;
+  DynamicPool& operator=(DynamicPool&&) = delete;
 
   /**
    * \brief Allocates a sequence of objects.
@@ -33,19 +40,12 @@ class DynamicPool {
   T* alloc(size_t numElements);
 
  private:
-  enum { OVERALLOCATION_FACTOR = 3 };
-
-  /**< Allocate 3 times the requested size. */
-  enum { OVERALLOCATION_LIMIT = 256 };
-
-  /**< Don't overallocate too much. */
-
   struct Chunk : public boost::intrusive::list_base_hook<> {
     std::vector<T> storage;
-    T* pData;
-    size_t remainingElements;
+    T* pData{ nullptr };
+    size_t remainingElements{0};
 
-    Chunk() : pData(0), remainingElements(0) {}
+    Chunk() = default;
 
     void init(std::vector<T>& dataVec, size_t size) {
       dataVec.swap(storage);
@@ -73,12 +73,12 @@ DynamicPool<T>::~DynamicPool() {
 
 template <typename T>
 T* DynamicPool<T>::alloc(size_t numElements) {
-  Chunk* chunk = 0;
+  Chunk* chunk = nullptr;
 
   if (!m_chunkList.empty()) {
     chunk = &m_chunkList.back();
     if (chunk->remainingElements < numElements) {
-      chunk = 0;
+      chunk = nullptr;
     }
   }
 
@@ -100,7 +100,7 @@ T* DynamicPool<T>::alloc(size_t numElements) {
 template <typename T>
 size_t DynamicPool<T>::adviseChunkSize(size_t numElements) {
   size_t factor = OVERALLOCATION_LIMIT / numElements;
-  if (factor > (size_t) OVERALLOCATION_FACTOR) {
+  if (factor > OVERALLOCATION_FACTOR) {
     factor = OVERALLOCATION_FACTOR;
   }
   return numElements * (factor + 1);

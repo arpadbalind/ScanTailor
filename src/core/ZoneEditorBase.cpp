@@ -12,7 +12,6 @@
 #include "ZoneModeListener.h"
 
 class ZoneEditorBase::ZoneModeProvider {
-  DECLARE_NON_COPYABLE(ZoneModeProvider)
  public:
   explicit ZoneModeProvider(const ZoneEditorBase& parent);
 

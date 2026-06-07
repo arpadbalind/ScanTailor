@@ -12,8 +12,7 @@
 #include "NonCopyable.h"
 
 namespace {
-class PngHandle {
-  DECLARE_NON_COPYABLE(PngHandle)
+class PngHandle : private NonCopyable {
 
  public:
   PngHandle();

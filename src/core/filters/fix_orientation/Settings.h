@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FIX_ORIENTATION_SETTINGS_H_
-#define SCANTAILOR_FIX_ORIENTATION_SETTINGS_H_
+#pragma once
 
 #include <QMutex>
 #include <set>
@@ -16,9 +15,7 @@
 class AbstractRelinker;
 
 namespace fix_orientation {
-class Settings {
-  DECLARE_NON_COPYABLE(Settings)
-
+class Settings : private NonCopyable {
  public:
   Settings();
 
@@ -45,4 +42,3 @@ class Settings {
   PerImageRotation m_perImageRotation;
 };
 }  // namespace fix_orientation
-#endif  // ifndef SCANTAILOR_FIX_ORIENTATION_SETTINGS_H_

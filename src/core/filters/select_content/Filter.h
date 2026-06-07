@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SELECT_CONTENT_FILTER_H_
-#define SCANTAILOR_SELECT_CONTENT_FILTER_H_
+#pragma once
 
 #include <QCoreApplication>
 #include <memory>
@@ -30,9 +29,7 @@ class Task;
 class CacheDrivenTask;
 class Settings;
 
-class Filter : public AbstractFilter {
-  DECLARE_NON_COPYABLE(Filter)
-
+class Filter : public AbstractFilter, private NonCopyable {
   Q_DECLARE_TR_FUNCTIONS(select_content::Filter)
  public:
   explicit Filter(const PageSelectionAccessor& pageSelectionAccessor);
@@ -78,4 +75,3 @@ class Filter : public AbstractFilter {
   int m_selectedPageOrder;
 };
 }  // namespace select_content
-#endif  // ifndef SCANTAILOR_SELECT_CONTENT_FILTER_H_

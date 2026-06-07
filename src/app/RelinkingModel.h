@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_APP_RELINKINGMODEL_H_
-#define SCANTAILOR_APP_RELINKINGMODEL_H_
+#pragma once
 
 #include <QAbstractListModel>
 #include <QIcon>
@@ -21,8 +20,7 @@
 #include "RelinkablePath.h"
 #include "VirtualFunction.h"
 
-class RelinkingModel : public QAbstractListModel {
-  DECLARE_NON_COPYABLE(RelinkingModel)
+class RelinkingModel : public QAbstractListModel, private NonCopyable {
 
  public:
   enum Status { Exists, Missing, StatusUpdatePending };
@@ -115,6 +113,3 @@ class RelinkingModel : public QAbstractListModel {
   std::unique_ptr<StatusUpdateThread> m_statusUpdateThread;
   bool m_haveUncommittedChanges;
 };
-
-
-#endif  // ifndef SCANTAILOR_APP_RELINKINGMODEL_H_

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_THUMBNAILBASE_H_
-#define SCANTAILOR_CORE_THUMBNAILBASE_H_
+#pragma once
 
 #include <QGraphicsItem>
 #include <QRectF>
@@ -17,8 +16,7 @@
 
 class ThumbnailLoadResult;
 
-class ThumbnailBase : public QGraphicsItem {
-  DECLARE_NON_COPYABLE(ThumbnailBase)
+class ThumbnailBase : public QGraphicsItem, private NonCopyable {
 
  public:
   ThumbnailBase(std::shared_ptr<ThumbnailPixmapCache> thumbnailCache,
@@ -100,6 +98,3 @@ class ThumbnailBase : public QGraphicsItem {
 
   std::shared_ptr<LoadCompletionHandler> m_completionHandler;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_THUMBNAILBASE_H_

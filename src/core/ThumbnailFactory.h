@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_THUMBNAILFACTORY_H_
-#define SCANTAILOR_CORE_THUMBNAILFACTORY_H_
+#pragma once
 
 #include <QSizeF>
 #include <memory>
@@ -14,8 +13,7 @@ class PageInfo;
 class CompositeCacheDrivenTask;
 class QGraphicsItem;
 
-class ThumbnailFactory {
-  DECLARE_NON_COPYABLE(ThumbnailFactory)
+class ThumbnailFactory : private NonCopyable {
 
  public:
   ThumbnailFactory(std::shared_ptr<ThumbnailPixmapCache> pixmapCache,
@@ -33,6 +31,3 @@ class ThumbnailFactory {
   QSizeF m_maxSize;
   std::shared_ptr<CompositeCacheDrivenTask> m_task;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_THUMBNAILFACTORY_H_

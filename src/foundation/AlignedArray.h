@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_ALIGNEDARRAY_H_
-#define SCANTAILOR_FOUNDATION_ALIGNEDARRAY_H_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -16,9 +15,7 @@
  * where bytes = units * sizeof(T)
  */
 template <typename T, size_t alignment_in_units>
-class AlignedArray {
-  DECLARE_NON_COPYABLE(AlignedArray)
-
+class AlignedArray : private NonCopyable {
  public:
   /**
    * \brief Constructs a null array.
@@ -68,5 +65,3 @@ void AlignedArray<T, alignment_in_units>::swap(AlignedArray& other) {
   m_storage = other.m_storage;
   other.m_storage = temp;
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_ALIGNEDARRAY_H_

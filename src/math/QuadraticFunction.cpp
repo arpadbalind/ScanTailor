@@ -60,7 +60,7 @@ void QuadraticFunction::recalcForTranslatedArguments(const double* translation) 
   }
 }
 
-void QuadraticFunction::swap(QuadraticFunction& other) {
+void QuadraticFunction::swap(QuadraticFunction& other) noexcept {
   A.swap(other.A);
   b.swap(other.b);
   std::swap(c, other.c);

@@ -657,7 +657,7 @@ imageproc::BinaryImage ContentBoxFinder::estimateTextMask(const imageproc::Binar
   // line (which may have a fill factor similar to that of text) by the
   // presence of ultimate eroded points.
 
-  const BinaryImage ueps(SEDM(content, SEDM::DIST_TO_BLACK, SEDM::DIST_TO_NO_BORDERS).findPeaksDestructive());
+  const BinaryImage ueps(SEDM(content, SEDM::DistType::DIST_TO_BLACK, SEDM::Borders::DIST_TO_NO_BORDERS).findPeaksDestructive());
   if (dbg) {
     QImage canvas(contentBlocks.toQImage().convertToFormat(QImage::Format_ARGB32_Premultiplied));
     QPainter painter;
@@ -1137,7 +1137,7 @@ QRect ContentBoxFinder::trim(const imageproc::BinaryImage& content,
   rasterOp<RopSrc>(remainingContent, newArea, content, newArea.topLeft());
   rasterOp<RopAnd<RopSrc, RopDst>>(remainingContent, newArea, contentBlocks, newArea.topLeft());
 
-  const SEDM dmToOthers(remainingContent, SEDM::DIST_TO_BLACK, SEDM::DIST_TO_NO_BORDERS);
+  const SEDM dmToOthers(remainingContent, SEDM::DistType::DIST_TO_BLACK, SEDM::Borders::DIST_TO_NO_BORDERS);
   remainingContent.release();
 
   double sumDistToGarbage = 0;
@@ -1314,7 +1314,7 @@ void ContentBoxFinder::filterShadows([[maybe_unused]] const TaskStatus& status,
 
 ContentBoxFinder::Garbage::Garbage(const Type type, const BinaryImage& garbage)
     : m_garbage(garbage),
-      m_sedmBorders(type == VERT ? SEDM::DIST_TO_VERT_BORDERS : SEDM::DIST_TO_HOR_BORDERS),
+      m_sedmBorders(type == VERT ? SEDM::Borders::DIST_TO_VERT_BORDERS : SEDM::Borders::DIST_TO_HOR_BORDERS),
       m_sedmUpdatePending(true) {}
 
 void ContentBoxFinder::Garbage::add(const BinaryImage& garbage, const QRect& rect) {
@@ -1324,7 +1324,7 @@ void ContentBoxFinder::Garbage::add(const BinaryImage& garbage, const QRect& rec
 
 const SEDM& ContentBoxFinder::Garbage::sedm() {
   if (m_sedmUpdatePending) {
-    m_sedm = SEDM(m_garbage, SEDM::DIST_TO_BLACK, m_sedmBorders);
+    m_sedm = SEDM(m_garbage, SEDM::DistType::DIST_TO_BLACK, m_sedmBorders);
   }
   return m_sedm;
 }

@@ -35,8 +35,7 @@ class FastQueue {
   void swap(FastQueue& other);
 
  private:
-  struct Chunk : public boost::intrusive::list_base_hook<> {
-    DECLARE_NON_COPYABLE(Chunk)
+  struct Chunk : public boost::intrusive::list_base_hook<>, private NonCopyable {
 
    public:
     explicit Chunk(size_t capacity) {

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_XSPLINE_H_
-#define SCANTAILOR_MATH_XSPLINE_H_
+#pragma once
 
 #include <QLineF>
 #include <QPointF>
@@ -21,6 +20,7 @@
  */
 class XSpline : public spfit::FittableSpline {
  public:
+  static constexpr double DEFAULT_ACCURACY{ 0.2 };
   struct PointAndDerivs {
     QPointF point;
 
@@ -143,9 +143,9 @@ class XSpline : public spfit::FittableSpline {
    * \param accuracy The maximum distance from the found point to the spline.
    * \return The closest point found.
    */
-  QPointF pointClosestTo(QPointF to, double* t, double accuracy = 0.2) const;
+  QPointF pointClosestTo(QPointF to, double* t, double accuracy = DEFAULT_ACCURACY) const;
 
-  QPointF pointClosestTo(QPointF to, double accuracy = 0.2) const;
+  QPointF pointClosestTo(QPointF to, double accuracy = DEFAULT_ACCURACY) const;
 
   /** \see spfit::FittableSpline::sample() */
   void sample(const VirtualFunction<void, const QPointF&, double, SampleFlags>& sink,
@@ -157,7 +157,7 @@ class XSpline : public spfit::FittableSpline {
                                   double fromT = 0.0,
                                   double toT = 1.0) const;
 
-  void swap(XSpline& other) { m_controlPoints.swap(other.m_controlPoints); }
+  void swap(XSpline& other) noexcept { m_controlPoints.swap(other.m_controlPoints); }
 
  private:
   struct ControlPoint {
@@ -205,8 +205,6 @@ class XSpline : public spfit::FittableSpline {
 };
 
 
-inline void swap(XSpline& o1, XSpline& o2) {
+inline void swap(XSpline& o1, XSpline& o2) noexcept {
   o1.swap(o2);
 }
-
-#endif  // ifndef SCANTAILOR_MATH_XSPLINE_H_

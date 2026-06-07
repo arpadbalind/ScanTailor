@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_MATRIXCALC_H_
-#define SCANTAILOR_MATH_MATRIXCALC_H_
+#pragma once
 
 #include <cassert>
 #include <cstddef>
@@ -23,8 +22,8 @@ namespace mcalc {
 template <typename T>
 class AbstractAllocator {
  public:
+  virtual ~AbstractAllocator() = default;
   virtual T* allocT(size_t size) = 0;
-
   virtual size_t* allocP(size_t size) = 0;
 };
 
@@ -32,9 +31,9 @@ class AbstractAllocator {
 template <typename T, size_t TSize, size_t PSize>
 class StaticPoolAllocator : public AbstractAllocator<T> {
  public:
-  virtual T* allocT(size_t size) { return m_poolT.alloc(size); }
+  T* allocT(size_t size) override { return m_poolT.alloc(size); }
 
-  virtual size_t* allocP(size_t size) { return m_poolP.alloc(size); }
+  size_t* allocP(size_t size) override { return m_poolP.alloc(size); }
 
  private:
   StaticPool<size_t, PSize> m_poolP;
@@ -45,9 +44,9 @@ class StaticPoolAllocator : public AbstractAllocator<T> {
 template <typename T>
 class DynamicPoolAllocator : public AbstractAllocator<T> {
  public:
-  virtual T* allocT(size_t size) { return m_poolT.alloc(size); }
+  T* allocT(size_t size) override { return m_poolT.alloc(size); }
 
-  virtual size_t* allocP(size_t size) { return m_poolP.alloc(size); }
+  size_t* allocP(size_t size) override { return m_poolP.alloc(size); }
 
  private:
   DynamicPool<size_t> m_poolP;
@@ -112,12 +111,12 @@ class Mat {
 };
 }  // namespace mcalc
 
+// NOLINTNEXTLINE(readability-magic-numbers)
 template <typename T, typename Alloc = mcalc::StaticPoolAllocator<T, 128, 9>>
-class MatrixCalc {
-  DECLARE_NON_COPYABLE(MatrixCalc)
+class MatrixCalc : private NonCopyable {
 
  public:
-  MatrixCalc() {}
+  MatrixCalc() = default;
 
   mcalc::Mat<T> operator()(const T* data, int rows, int cols) { return mcalc::Mat<T>(&m_alloc, data, rows, cols); }
 
@@ -148,7 +147,7 @@ class MatrixCalc {
   Alloc m_alloc;
 };
 
-
+// NOLINTNEXTLINE(readability-magic-numbers)
 template <typename T, size_t TSize = 128, size_t PSize = 9>
 class StaticMatrixCalc : public MatrixCalc<T, mcalc::StaticPoolAllocator<T, TSize, PSize>> {};
 
@@ -206,7 +205,7 @@ Mat<T> Mat<T>::trans() const {
 template <typename T>
 Mat<T> Mat<T>::write(T* buf) const {
   if (data && buf) {
-    const size_t size = static_cast<size_t>(rows * cols);
+    const size_t size = static_cast<size_t>(rows) * static_cast<size_t>(cols);
     std::copy(data, data + size, buf);
   }
   return *this;
@@ -324,7 +323,6 @@ Mat<T> operator*(const Mat<T>& m, T scalar) {
 
 template <typename T>
 Mat<T> operator/(const Mat<T>& m, T scalar) {
-  return m * (1.0f / scalar);
+  return m * (1.0F / scalar);
 }
 }  // namespace mcalc
-#endif  // ifndef SCANTAILOR_MATH_MATRIXCALC_H_

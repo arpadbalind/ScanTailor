@@ -1,9 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_DEFAULTPARAMSPROFILEMANAGER_H_
-#define SCANTAILOR_CORE_DEFAULTPARAMSPROFILEMANAGER_H_
-
+#pragma once
 
 #include <foundation/NonCopyable.h>
 
@@ -13,8 +11,7 @@
 
 class DefaultParams;
 
-class DefaultParamsProfileManager {
-  DECLARE_NON_COPYABLE(DefaultParamsProfileManager)
+class DefaultParamsProfileManager : private NonCopyable {
  public:
   DefaultParamsProfileManager();
 
@@ -37,6 +34,3 @@ class DefaultParamsProfileManager {
  private:
   QString m_path;
 };
-
-
-#endif  // SCANTAILOR_CORE_DEFAULTPARAMSPROFILEMANAGER_H_

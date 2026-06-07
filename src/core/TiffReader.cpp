@@ -52,8 +52,7 @@ class TiffReader::TiffHandle {
 
 
 template <typename T>
-class TiffReader::TiffBuffer {
-  DECLARE_NON_COPYABLE(TiffBuffer)
+class TiffReader::TiffBuffer : private NonCopyable {
 
  public:
   TiffBuffer() : m_data(nullptr) {}

@@ -1,10 +1,10 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_VECNT_H_
-#define SCANTAILOR_FOUNDATION_VECNT_H_
+#pragma once
 
 #include <QPointF>
+#include <array>
 #include <cstddef>
 
 template <size_t N, typename T>
@@ -23,7 +23,7 @@ template <size_t N, typename T>
 class VecNT {
  public:
   using type = T;
-  enum { SIZE = static_cast<int>(N) };
+  inline static constexpr size_t SIZE{ N };
 
   /**
    * \brief Initializes vector elements to T().
@@ -121,9 +121,9 @@ class VecNT {
 
   VecNT& operator/=(T scalar);
 
-  const T* data() const { return m_data; }
+  const T* data() const noexcept { return m_data.data(); }
 
-  T* data() { return m_data; }
+  T* data() noexcept { return m_data.data(); }
 
   /**
    * \brief Sums elements in the vector.
@@ -135,7 +135,7 @@ class VecNT {
   T squaredNorm() const { return dot(*this); }
 
  private:
-  T m_data[N];
+  std::array<T, N> m_data;
 };
 
 
@@ -217,32 +217,32 @@ VecNT<N, T>::VecNT(const VecNT<N - 1, OT>& lesser, T last) {
 
 template <size_t N, typename T>
 VecNT<N, T>::VecNT(T x) {
-  vecnt::SizeSpecific<N, T>::assign(m_data, x);
+  vecnt::SizeSpecific<N, T>::assign(m_data.data(), x);
 }
 
 template <size_t N, typename T>
 VecNT<N, T>::VecNT(T x, T y) {
-  vecnt::SizeSpecific<N, T>::assign(m_data, x, y);
+  vecnt::SizeSpecific<N, T>::assign(m_data.data(), x, y);
 }
 
 template <size_t N, typename T>
 VecNT<N, T>::VecNT(T x, T y, T z) {
-  vecnt::SizeSpecific<N, T>::assign(m_data, x, y, z);
+  vecnt::SizeSpecific<N, T>::assign(m_data.data(), x, y, z);
 }
 
 template <size_t N, typename T>
 VecNT<N, T>::VecNT(T x, T y, T z, T w) {
-  vecnt::SizeSpecific<N, T>::assign(m_data, x, y, z, w);
+  vecnt::SizeSpecific<N, T>::assign(m_data.data(), x, y, z, w);
 }
 
 template <size_t N, typename T>
 VecNT<N, T>::VecNT(const QPointF& pt) {
-  vecnt::SizeSpecific<N, T>::assign(m_data, pt);
+  vecnt::SizeSpecific<N, T>::assign(m_data.data(), pt);
 }
 
 template <size_t N, typename T>
 VecNT<N, T>::operator QPointF() const {
-  return vecnt::SizeSpecific<N, T>::toQPointF(m_data);
+  return vecnt::SizeSpecific<N, T>::toQPointF(m_data.data());
 }
 
 template <size_t N, typename T>
@@ -353,5 +353,3 @@ VecNT<N, T> operator*(T scalar, const VecNT<N, T>& vec) {
   res *= scalar;
   return res;
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_VECNT_H_

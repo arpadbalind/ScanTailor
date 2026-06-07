@@ -27,7 +27,7 @@
 #include "ThumbnailFactory.h"
 
 using namespace ::boost::multi_index;
-
+using namespace enumflags;
 class ThumbnailSequence::Item {
  public:
   Item(const PageInfo& pageInfo, CompositeItem* compItem);
@@ -460,7 +460,7 @@ void ThumbnailSequence::Impl::reset(const PageSequence& pages,
   std::set<PageId> selected;
   PageInfo selectionLeader;
 
-  if (selectionAction == KEEP_SELECTION) {
+  if (selectionAction == SelectionAction::KEEP_SELECTION) {
     selectedItems().swap(selected);
     if (m_selectionLeader) {
       selectionLeader = m_selectionLeader->pageInfo;
@@ -516,7 +516,7 @@ void ThumbnailSequence::Impl::reset(const PageSequence& pages,
   }
   if (m_selectionLeader) {
     m_selectionLeader->setSelectionLeader(true);
-    m_owner.emitNewSelectionLeader(selectionLeader, m_selectionLeader->composite, DEFAULT_SELECTION_FLAGS);
+    m_owner.emitNewSelectionLeader(selectionLeader, m_selectionLeader->composite, SelectionFlags::DEFAULT_SELECTION_FLAGS);
   }
 }  // ThumbnailSequence::Impl::reset
 
@@ -655,7 +655,7 @@ void ThumbnailSequence::Impl::invalidateThumbnailImpl(const ItemsById::iterator 
   // Possibly emit the newSelectionLeader() signal.
   if (m_selectionLeader == &*idIt) {
     if ((oldSize != newSize) || (oldPos != idIt->composite->pos())) {
-      m_owner.emitNewSelectionLeader(idIt->pageInfo, idIt->composite, REDUNDANT_SELECTION);
+      m_owner.emitNewSelectionLeader(idIt->pageInfo, idIt->composite, SelectionFlags::REDUNDANT_SELECTION);
     }
   }
 }  // ThumbnailSequence::Impl::invalidateThumbnailImpl
@@ -715,7 +715,7 @@ bool ThumbnailSequence::Impl::cancelingSelectionAccepted() {
 }
 
 bool ThumbnailSequence::Impl::setSelection(const PageId& pageId, const SelectionAction selectionAction) {
-  if ((selectionAction == RESET_SELECTION) && !cancelingSelectionAccepted()) {
+  if ((selectionAction == SelectionAction::RESET_SELECTION) && !cancelingSelectionAccepted()) {
     return false;
   }
 
@@ -726,7 +726,7 @@ bool ThumbnailSequence::Impl::setSelection(const PageId& pageId, const Selection
 
   const bool wasSelectionLeader = (&*idIt == m_selectionLeader);
 
-  if (selectionAction != KEEP_SELECTION) {
+  if (selectionAction != SelectionAction::KEEP_SELECTION) {
     // Clear selection from all items except the one for which
     // selection is requested.
     SelectedThenUnselected::iterator it(m_selectedThenUnselected.begin());
@@ -760,12 +760,12 @@ bool ThumbnailSequence::Impl::setSelection(const PageId& pageId, const Selection
     moveToSelected(m_selectionLeader);
   }
 
-  SelectionFlags flags = DEFAULT_SELECTION_FLAGS;
+  SelectionFlags flags = SelectionFlags::DEFAULT_SELECTION_FLAGS;
   if (wasSelectionLeader) {
-    flags |= REDUNDANT_SELECTION;
+    flags |= SelectionFlags::REDUNDANT_SELECTION;
   }
-  if (selectionAction != KEEP_SELECTION) {
-    flags |= SELECTION_CLEARED;
+  if (selectionAction != SelectionAction::KEEP_SELECTION) {
+    flags |= SelectionFlags::SELECTION_CLEARED;
   }
 
   m_owner.emitNewSelectionLeader(idIt->pageInfo, idIt->composite, flags);
@@ -1056,7 +1056,7 @@ void ThumbnailSequence::Impl::itemSelectedByUser(CompositeItem* compositeItem, c
 }
 
 void ThumbnailSequence::Impl::selectItemWithControl(const ItemsById::iterator& idIt) {
-  SelectionFlags flags = SELECTED_BY_USER;
+  SelectionFlags flags = SelectionFlags::SELECTED_BY_USER;
 
   if (!idIt->isSelected()) {
     if (m_selectionLeader) {
@@ -1072,7 +1072,7 @@ void ThumbnailSequence::Impl::selectItemWithControl(const ItemsById::iterator& i
 
   if (!multipleItemsSelected()) {
     // Clicked on the only selected item.
-    flags |= REDUNDANT_SELECTION;
+    flags |= SelectionFlags::REDUNDANT_SELECTION;
     m_owner.emitNewSelectionLeader(m_selectionLeader->pageInfo, m_selectionLeader->composite, flags);
     return;
   }
@@ -1087,7 +1087,7 @@ void ThumbnailSequence::Impl::selectItemWithControl(const ItemsById::iterator& i
   }
   // Select the new selection leader among other selected items.
   m_selectionLeader = nullptr;
-  flags |= AVOID_SCROLLING_TO;
+  flags |= SelectionFlags::AVOID_SCROLLING_TO;
   ItemsInOrder::iterator ordIt1(m_items.project<ItemsInOrderTag>(idIt));
   ItemsInOrder::iterator ordIt2(ordIt1);
   while (true) {
@@ -1122,9 +1122,9 @@ void ThumbnailSequence::Impl::selectItemWithShift(const ItemsById::iterator& idI
     return;
   }
 
-  SelectionFlags flags = SELECTED_BY_USER;
+  SelectionFlags flags = SelectionFlags::SELECTED_BY_USER;
   if (m_selectionLeader == &*idIt) {
-    flags |= REDUNDANT_SELECTION;
+    flags |= SelectionFlags::REDUNDANT_SELECTION;
   }
 
   // Select all the items between the selection leader and the item that was clicked.
@@ -1178,11 +1178,11 @@ void ThumbnailSequence::Impl::selectItemNoModifiers(const ItemsById::iterator& i
     return;
   }
 
-  SelectionFlags flags = SELECTED_BY_USER;
+  SelectionFlags flags = SelectionFlags::SELECTED_BY_USER;
   if (m_selectionLeader == &*idIt) {
-    flags |= REDUNDANT_SELECTION;
+    flags |= SelectionFlags::REDUNDANT_SELECTION;
   }
-  flags |= SELECTION_CLEARED;
+  flags |= SelectionFlags::SELECTION_CLEARED;
 
   clearSelection();
 

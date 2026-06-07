@@ -1,9 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_SEDM_H_
-#define SCANTAILOR_IMAGEPROC_SEDM_H_
-
+#pragma once
 #include <FlagOps.h>
 
 #include <QSize>
@@ -31,7 +29,7 @@ class SEDM {
   /**
    * \brief The type of distance to compute.
    */
-  enum DistType {
+  enum class DistType : std::uint8_t {
     /**
      * For every black pixel, the distance to the nearest
      * white one is computed.
@@ -48,7 +46,7 @@ class SEDM {
   /**
    * \brief Determines whether to compute the distance to borders.
    */
-  enum Borders {
+  enum class Borders : std::uint8_t {
     DIST_TO_NO_BORDERS = 0,
     DIST_TO_TOP_BORDER = 1,
     DIST_TO_LEFT_BORDER = 2,
@@ -90,7 +88,7 @@ class SEDM {
    *        distance to particular borders.  The borders
    *        are assumed to lie one pixel off the image area.
    */
-  explicit SEDM(const BinaryImage& image, DistType distType = DIST_TO_WHITE, Borders borders = DIST_TO_ALL_BORDERS);
+  explicit SEDM(const BinaryImage& image, DistType distType = DistType::DIST_TO_WHITE, Borders borders = Borders::DIST_TO_ALL_BORDERS);
 
   /**
    * \brief Build a distance map from a connectivity map.
@@ -186,7 +184,4 @@ class SEDM {
 inline void swap(SEDM& o1, SEDM& o2) {
   o1.swap(o2);
 }
-
-DEFINE_FLAG_OPS(SEDM::Borders)
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_SEDM_H_

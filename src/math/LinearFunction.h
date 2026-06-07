@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_LINEARFUNCTION_H_
-#define SCANTAILOR_MATH_LINEARFUNCTION_H_
+#pragma once
 
 #include <cstddef>
 
@@ -39,7 +38,7 @@ class LinearFunction {
    */
   double evaluate(const double* x) const;
 
-  void swap(LinearFunction& other);
+  void swap(LinearFunction& other) noexcept;
 
   LinearFunction& operator+=(const LinearFunction& other);
 
@@ -47,8 +46,6 @@ class LinearFunction {
 };
 
 
-inline void swap(LinearFunction& f1, LinearFunction& f2) {
+inline void swap(LinearFunction& f1, LinearFunction& f2) noexcept {
   f1.swap(f2);
 }
-
-#endif  // ifndef SCANTAILOR_MATH_LINEARFUNCTION_H_

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_QUADRATICFUNCTION_H_
-#define SCANTAILOR_MATH_QUADRATICFUNCTION_H_
+#pragma once
 
 #include <cstddef>
 
@@ -70,7 +69,7 @@ class QuadraticFunction {
    */
   void recalcForTranslatedArguments(const double* translation);
 
-  void swap(QuadraticFunction& other);
+  void swap(QuadraticFunction& other) noexcept;
 
   QuadraticFunction& operator+=(const QuadraticFunction& other);
 
@@ -78,8 +77,6 @@ class QuadraticFunction {
 };
 
 
-inline void swap(QuadraticFunction& f1, QuadraticFunction& f2) {
+inline void swap(QuadraticFunction& f1, QuadraticFunction& f2) noexcept {
   f1.swap(f2);
 }
-
-#endif  // ifndef SCANTAILOR_MATH_QUADRATICFUNCTION_H_

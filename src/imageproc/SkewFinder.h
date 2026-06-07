@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_SKEWFINDER_H_
-#define SCANTAILOR_IMAGEPROC_SKEWFINDER_H_
+#pragma once
 
 #include "NonCopyable.h"
 
@@ -47,8 +46,7 @@ class Skew {
 };
 
 
-class SkewFinder {
-  DECLARE_NON_COPYABLE(SkewFinder)
+class SkewFinder : private NonCopyable {
 
  public:
   static const double DEFAULT_MAX_ANGLE;
@@ -147,4 +145,3 @@ class SkewFinder {
   int m_fineReduction;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_SKEWFINDER_H_

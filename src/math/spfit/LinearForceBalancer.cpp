@@ -8,9 +8,7 @@
 namespace spfit {
 LinearForceBalancer::LinearForceBalancer(double internalExternalRatio)
     : m_currentRatio(internalExternalRatio),
-      m_targetRatio(internalExternalRatio),
-      m_rateOfChange(0),
-      m_iterationsToTarget(0) {}
+      m_targetRatio(internalExternalRatio) {}
 
 void LinearForceBalancer::setCurrentRatio(double internalExternalRatio) {
   m_currentRatio = internalExternalRatio;
@@ -31,7 +29,7 @@ double LinearForceBalancer::calcInternalForceWeight(double internalForce, double
   // (internal * lambda) / external = ratio
   // internal * lambda = external * ratio
   double lambda = 0;
-  if (std::fabs(internalForce) > 1e-6) {
+  if (std::fabs(internalForce) > epsilon) {
     lambda = m_currentRatio * externalForce / internalForce;
   }
   return lambda;

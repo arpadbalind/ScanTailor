@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_PROJECTPAGES_H_
-#define SCANTAILOR_CORE_PROJECTPAGES_H_
+#pragma once
 
 #include <QMutex>
 #include <QObject>
@@ -29,9 +28,8 @@ class RelinkablePath;
 class AbstractRelinker;
 class QDomElement;
 
-class ProjectPages : public QObject {
+class ProjectPages : public QObject, private NonCopyable {
   Q_OBJECT
-  DECLARE_NON_COPYABLE(ProjectPages)
 
  public:
   enum Pages { ONE_PAGE, TWO_PAGES, AUTO_PAGES };
@@ -156,6 +154,3 @@ class ProjectPages : public QObject {
   std::vector<ImageDesc> m_images;
   PageId::SubPage m_subPagesInOrder[2];
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_PROJECTPAGES_H_

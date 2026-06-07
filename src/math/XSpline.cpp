@@ -177,7 +177,7 @@ void XSpline::sample(const VirtualFunction<void, const QPointF&, double, SampleF
 
   const QPointF fromPt(pointAt(fromT));
   const QPointF toPt(pointAt(toT));
-  sink(fromPt, fromT, HEAD_SAMPLE);
+  sink(fromPt, fromT, SampleFlags::HEAD_SAMPLE);
 
   const int numSegments = this->numSegments();
   if (numSegments == 0) {
@@ -188,7 +188,7 @@ void XSpline::sample(const VirtualFunction<void, const QPointF&, double, SampleF
   maybeAddMoreSamples(sink, maxSqdistToSpline, maxSqdistBetweenSamples, numSegments, rNumSegments, fromT, fromPt, toT,
                       toPt);
 
-  sink(toPt, toT, TAIL_SAMPLE);
+  sink(toPt, toT, SampleFlags::TAIL_SAMPLE);
 }  // XSpline::sample
 
 void XSpline::maybeAddMoreSamples(const VirtualFunction<void, const QPointF&, double, SampleFlags>& sink,
@@ -206,19 +206,19 @@ void XSpline::maybeAddMoreSamples(const VirtualFunction<void, const QPointF&, do
     return;
   }
 
-  SampleFlags flags = DEFAULT_SAMPLE;
+  SampleFlags flags = SampleFlags::DEFAULT_SAMPLE;
   double midT = 0.5 * (prevT + nextT);
   const double nearbyJunctionT = std::floor(midT * numSegments + 0.5) * rNumSegments;
 
   // If nearbyJunctionT is between prevT and nextT, make it our midT.
   if (((nearbyJunctionT - prevT) * (nextT - prevT) > 0) && ((nearbyJunctionT - nextT) * (prevT - nextT) > 0)) {
     midT = nearbyJunctionT;
-    flags = JUNCTION_SAMPLE;
+    flags = SampleFlags::JUNCTION_SAMPLE;
   }
 
   const QPointF midPt(pointAt(midT));
 
-  if (flags != JUNCTION_SAMPLE) {
+  if (flags != SampleFlags::JUNCTION_SAMPLE) {
     const QPointF projection(ToLineProjector(QLineF(prevPt, nextPt)).projectionPoint(midPt));
 
     if (prevNextSqdist <= maxSqdistBetweenSamples) {

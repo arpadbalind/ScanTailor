@@ -29,10 +29,8 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}"
 
 set(DEFAULT_COMPILER_FLAGS_IS_SET YES CACHE INTERNAL "" FORCE)
 
-
 option(CMAKE_POSITION_INDEPENDENT_CODE "" ON)
 option(CMAKE_INSTALL_RPATH_USE_LINK_PATH "" ON)
-
 
 include(cmake/SetDefaultBuildType.cmake)
 include(cmake/UpdateTranslations.cmake)
@@ -48,24 +46,22 @@ if (NOT CMAKE_INSTALL_BINDIR)
   set(CMAKE_INSTALL_BINDIR "bin")
 endif()
 
-#=================================== JPEG ===================================#
+find_program(CCACHE_PROGRAM ccache)
+
+if(CCACHE_PROGRAM)
+    message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
+    set(CMAKE_C_COMPILER_LAUNCHER   ${CCACHE_PROGRAM})
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE_PROGRAM})
+endif()
+
 find_package(JPEG REQUIRED)
-
-#=================================== ZLIB ===================================#
 find_package(ZLIB REQUIRED)
-
-#================================== PNG ==================================#
 find_package(PNG REQUIRED)
-
-#=================================== TIFF ===================================#
-
 find_package(TIFF REQUIRED)
 
-#================================= Boost ================================#
+#=================================== Boost ===================================#
 set(Boost_USE_MULTITHREADED ON)
-
 find_package(Boost 1.60 COMPONENTS unit_test_framework prg_exec_monitor REQUIRED)
-
 include_directories(${Boost_INCLUDE_DIRS})
 add_definitions(-DBOOST_MULTI_INDEX_DISABLE_SERIALIZATION)
 if (NOT Boost_USE_STATIC_LIBS)

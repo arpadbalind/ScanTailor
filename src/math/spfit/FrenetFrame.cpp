@@ -8,9 +8,9 @@
 namespace spfit {
 FrenetFrame::FrenetFrame(const Vec2d& origin, const Vec2d& tangentVector, YAxisDirection ydir) : m_origin(origin) {
   const double sqlen = tangentVector.squaredNorm();
-  if (sqlen > 1e-6) {
+  if (sqlen > epsilon) {
     m_unitTangent = tangentVector / std::sqrt(sqlen);
-    if (ydir == Y_POINTS_UP) {
+    if (ydir == FrenetFrame::YAxisDirection::Y_POINTS_UP) {
       m_unitNormal[0] = -m_unitTangent[1];
       m_unitNormal[1] = m_unitTangent[0];
     } else {

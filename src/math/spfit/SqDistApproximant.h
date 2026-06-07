@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_SQDISTAPPROXIMANT_H_
-#define SCANTAILOR_SPFIT_SQDISTAPPROXIMANT_H_
+#pragma once
 
 #include <QLineF>
 
@@ -29,6 +28,7 @@ class FrenetFrame;
  * \see Eq 8 in [1], Fig 4, 5 in [2].
  */
 struct SqDistApproximant {
+  inline static constexpr double epsilon{ 1e-6 };
   Mat22d A;
   Vec2d b;
   double c;
@@ -75,4 +75,3 @@ struct SqDistApproximant {
   double evaluate(const Vec2d& pt) const;
 };
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_SQDISTAPPROXIMANT_H_

@@ -22,7 +22,7 @@ double LinearFunction::evaluate(const double* x) const {
   return sum;
 }
 
-void LinearFunction::swap(LinearFunction& other) {
+void LinearFunction::swap(LinearFunction& other) noexcept {
   a.swap(other.a);
   std::swap(b, other.b);
 }

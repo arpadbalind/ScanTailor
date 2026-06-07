@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_PROJECTWRITER_H_
-#define SCANTAILOR_CORE_PROJECTWRITER_H_
+#pragma once
 
 #include <foundation/Hashes.h>
 
@@ -29,8 +28,7 @@ class PageInfo;
 class QDomDocument;
 class QDomElement;
 
-class ProjectWriter {
-  DECLARE_NON_COPYABLE(ProjectWriter)
+class ProjectWriter : private NonCopyable {
 
  public:
   using FilterPtr = std::shared_ptr<AbstractFilter>;
@@ -162,5 +160,3 @@ template <typename Callable>
 void ProjectWriter::enumPages(Callable out) const {
   enumPagesImpl(ProxyFunction<Callable, void, const PageId&, int>(out));
 }
-
-#endif  // ifndef SCANTAILOR_CORE_PROJECTWRITER_H_

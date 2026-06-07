@@ -51,7 +51,7 @@ TEST(SEDMTestSuite, test1) {
                                  0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
   const BinaryImage img(makeBinaryImage(inp, 9, 9));
-  const SEDM sedm(img, SEDM::DIST_TO_WHITE, SEDM::DIST_TO_NO_BORDERS);
+  const SEDM sedm(img, SEDM::DistType::DIST_TO_WHITE, SEDM::Borders::DIST_TO_NO_BORDERS);
   EXPECT_TRUE(verifySEDM(sedm, out));
 }
 }  // namespace tests

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_ADIFF_FUNCTION_H_
-#define SCANTAILOR_ADIFF_FUNCTION_H_
+#pragma once
 
 #include <cstddef>
 
@@ -62,7 +61,7 @@ class Function<2> {
 
   MatT<double> hessian(const SparseMap<2>& sparseMap) const;
 
-  void swap(Function& other);
+  void swap(Function& other) noexcept;
 
   Function& operator+=(const Function& other);
 
@@ -72,7 +71,7 @@ class Function<2> {
 };
 
 
-inline void swap(Function<2>& f1, Function<2>& f2) {
+inline void swap(Function<2>& f1, Function<2>& f2) noexcept {
   f1.swap(f2);
 }
 
@@ -88,4 +87,3 @@ Function<2> operator*(double scalar, const Function<2>& f);
 
 Function<2> operator/(const Function<2>& num, const Function<2>& den);
 }  // namespace adiff
-#endif  // ifndef SCANTAILOR_ADIFF_FUNCTION_H_
