@@ -31,7 +31,7 @@ class LinearSolver {
   /*
    * \throw std::runtime_error If rows_AB < cols_A_rows_X.
    */
-  LinearSolver(size_t rows_AB, size_t cols_A_rows_X, size_t cols_BX);
+  LinearSolver(size_t rows_AB, std::size_t cols_A_rows_X, std::size_t cols_BX);
 
   /**
    * \brief Solves Ax = b
@@ -40,12 +40,12 @@ class LinearSolver {
    * \param X Matrix (or vector) X.  Results will be written here.
    * \param B Matrix (or vector) B.  It's allowed to pass the same pointer for X and B.
    * \param tbuffer Temporary buffer of at least "cols(A) * (rows(B) + cols(B))" T elements.
-   * \param pbuffer Temporary buffer of at least "rows(B)" size_t elements.
+   * \param pbuffer Temporary buffer of at least "rows(B)" std::size_t elements.
    *
    * \throw std::runtime_error If the system can't be solved.
    */
   template <typename T>
-  void solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuffer) const;
+  void solve(const T* A, T* X, const T* B, T* tbuffer, std::size_t* pbuffer) const;
 
   /**
    * \brief A simplified version of the one above.
@@ -56,39 +56,39 @@ class LinearSolver {
   void solve(const T* A, T* X, const T* B) const;
 
  private:
-  size_t m_rowsAB;
-  size_t m_colsArowsX;
-  size_t m_colsBX;
+  std::size_t m_rowsAB;
+  std::size_t m_colsArowsX;
+  std::size_t m_colsBX;
 };
 
 
 template <typename T>
-void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuffer) const {
+void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, std::size_t* pbuffer) const {
   using namespace std;  // To catch different overloads of std::abs()
   const T epsilon(std::sqrt(numeric_limits<T>::epsilon()));
 
-  const size_t num_elements_A = m_rowsAB * m_colsArowsX;
+  const std::size_t num_elements_A = m_rowsAB * m_colsArowsX;
 
   T* const luData = tbuffer;  // Dimensions: m_rowsAB, m_colsArowsX
   tbuffer += num_elements_A;
 
   // Copy this matrix to lu.
-  for (size_t i = 0; i < num_elements_A; ++i) {
+  for (std::size_t i = 0; i < num_elements_A; ++i) {
     luData[i] = A[i];
   }
 
   // Maps virtual row numbers to physical ones.
-  size_t* const perm = pbuffer;
-  for (size_t i = 0; i < m_rowsAB; ++i) {
+  std::size_t* const perm = pbuffer;
+  for (std::size_t i = 0; i < m_rowsAB; ++i) {
     perm[i] = i;
   }
 
   T* pCol = luData;
-  for (size_t i = 0; i < m_colsArowsX; ++i, pCol += m_rowsAB) {
+  for (std::size_t i = 0; i < m_colsArowsX; ++i, pCol += m_rowsAB) {
     // Find the largest pivot.
-    size_t virtPivotRow = i;
+    std::size_t virtPivotRow = i;
     T largestAbsPivot(std::abs(pCol[perm[i]]));
-    for (size_t j = i + 1; j < m_rowsAB; ++j) {
+    for (std::size_t j = i + 1; j < m_rowsAB; ++j) {
       const T absPivot(std::abs(pCol[perm[j]]));
       if (absPivot > largestAbsPivot) {
         largestAbsPivot = absPivot;
@@ -100,7 +100,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
       throw std::runtime_error("LinearSolver: not a full rank matrix");
     }
 
-    const size_t physPivotRow(perm[virtPivotRow]);
+    const std::size_t physPivotRow(perm[virtPivotRow]);
     perm[virtPivotRow] = perm[i];
     perm[i] = physPivotRow;
 
@@ -108,7 +108,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
     const T rPivot(T(1) / *pPivot);
 
     // Eliminate entries below the pivot.
-    for (size_t j = i + 1; j < m_rowsAB; ++j) {
+    for (std::size_t j = i + 1; j < m_rowsAB; ++j) {
       const T* p1 = pPivot;
       T* p2 = pCol + perm[j];
       if (std::abs(*p2) <= epsilon) {
@@ -120,7 +120,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
       const T factor(*p2 * rPivot);
       *p2 = factor;  // Factor goes into L, zero goes into U.
       // Transform the rest of the row.
-      for (size_t col = i + 1; col < m_colsArowsX; ++col) {
+      for (std::size_t col = i + 1; col < m_colsArowsX; ++col) {
         p1 += m_rowsAB;
         p2 += m_rowsAB;
         *p2 -= *p1 * factor;
@@ -133,8 +133,8 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
   // tbuffer += m_colsArowsX * m_colsBX;
   T* pYCol = yData;
   const T* pBCol = B;
-  for (size_t yCol = 0; yCol < m_colsBX; ++yCol) {
-    size_t virtRow = 0;
+  for (std::size_t yCol = 0; yCol < m_colsBX; ++yCol) {
+    std::size_t virtRow = 0;
     for (; virtRow < m_colsArowsX; ++virtRow) {
       const int physRow = static_cast<int>(perm[virtRow]);
       T right(pBCol[physRow]);
@@ -142,7 +142,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
       // Move already calculated factors to the right side.
       const T* pLu = luData + physRow;
       // Go left to right, stop at diagonal.
-      for (size_t luCol = 0; luCol < virtRow; ++luCol) {
+      for (std::size_t luCol = 0; luCol < virtRow; ++luCol) {
         right -= *pLu * pYCol[luCol];
         pLu += m_rowsAB;
       }
@@ -159,7 +159,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
       // Move everything to the right side, then verify it's zero.
       const T* pLu = luData + physRow;
       // Go left to right all the way.
-      for (size_t luCol = 0; luCol < m_colsArowsX; ++luCol) {
+      for (std::size_t luCol = 0; luCol < m_colsArowsX; ++luCol) {
         right -= *pLu * pYCol[luCol];
         pLu += m_rowsAB;
       }
@@ -176,7 +176,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
   T* pXCol = X;
   pYCol = yData;
   const T* pLuLastCol = luData + (m_colsArowsX - 1) * m_rowsAB;
-  for (size_t xCol = 0; xCol < m_colsBX; ++xCol) {
+  for (std::size_t xCol = 0; xCol < m_colsBX; ++xCol) {
     for (int virtRow = static_cast<int>(m_colsArowsX - 1); virtRow >= 0; --virtRow) {
       T right(pYCol[virtRow]);
 
@@ -198,6 +198,6 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, size_t* pbuff
 template <typename T>
 void LinearSolver::solve(const T* A, T* X, const T* B) const {
   std::vector<T> tbuffer(m_colsArowsX * (m_rowsAB + m_colsBX));
-  std::vector<size_t> pbuffer(m_rowsAB);
+  std::vector<std::size_t> pbuffer(m_rowsAB);
   solve(A, X, B, tbuffer.data(), pbuffer.data());
 }

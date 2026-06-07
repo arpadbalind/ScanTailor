@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include <QLineF>
-
 #include "MatMNT.h"
 #include "VecNT.h"
 
+class QLineF;
 namespace spfit {
 class FrenetFrame;
 

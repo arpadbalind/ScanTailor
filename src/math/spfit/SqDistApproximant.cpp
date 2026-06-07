@@ -4,7 +4,15 @@
 #include "SqDistApproximant.h"
 
 #include "FrenetFrame.h"
+#include "MatMNT.h"
 #include "MatrixCalc.h"
+#include "VecNT.h"
+
+#include <QLineF>
+
+#include <cassert>
+#include <cmath>
+#include <limits>
 
 namespace spfit {
 SqDistApproximant::SqDistApproximant(const Vec2d& origin, const Vec2d& u, const Vec2d& v, double m, double n) {

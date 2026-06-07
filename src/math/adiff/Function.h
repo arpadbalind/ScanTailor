@@ -41,7 +41,7 @@ class Function<2> {
   /**
    * Constructs the "f(x1, x2, ...) = 0" function.
    */
-  explicit Function(size_t numNonZeroVars);
+  explicit Function(std::size_t numNonZeroVars);
 
   /**
    * Constructs the "f(x1, x2, ...) = 0" function.
@@ -55,7 +55,7 @@ class Function<2> {
    * \param val Argument value.
    * \param sparseMap Tells which derivatives to compute.
    */
-  Function(size_t argIdx, double val, const SparseMap<2>& sparseMap);
+  Function(std::size_t argIdx, double val, const SparseMap<2>& sparseMap);
 
   VecT<double> gradient(const SparseMap<2>& sparseMap) const;
 

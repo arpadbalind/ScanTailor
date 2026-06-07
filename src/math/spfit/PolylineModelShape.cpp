@@ -5,8 +5,20 @@
 
 #include <QDebug>
 
+#include "FittableSpline.h"
+#include "FlagOps.h"
 #include "FrenetFrame.h"
+#include "NumericTraits.h"
+#include "SqDistApproximant.h"
 #include "ToLineProjector.h"
+#include "XSpline.h"
+#include "VecNT.h"
+
+#include <QPointF>
+
+#include <cassert>
+#include <stdexcept>
+#include <vector>
 
 namespace spfit {
 using namespace enumflags;

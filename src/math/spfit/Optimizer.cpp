@@ -2,10 +2,20 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "Optimizer.h"
+#include "LinearFunction.h"
+#include "MatT.h"
 #include "MatrixCalc.h"
+#include "OptimizationResult.h"
+#include "VecT.h"
+
+#include <algorithm>
+#include <cstddef>
+#include <list>
+#include <stdexcept>
+#include <vector>
 
 namespace spfit {
-Optimizer::Optimizer(size_t numVars)
+Optimizer::Optimizer(std::size_t numVars)
     : m_numVars(numVars),
       m_A(numVars, numVars),
       m_b(numVars),
@@ -14,8 +24,8 @@ Optimizer::Optimizer(size_t numVars)
       m_internalForce(numVars) {}
 
 void Optimizer::setConstraints(const std::list<LinearFunction>& constraints) {
-  const size_t numConstraints = constraints.size();
-  const size_t numDimensions = m_numVars + numConstraints;
+  const std::size_t numConstraints = constraints.size();
+  const std::size_t numDimensions = m_numVars + numConstraints;
 
   MatT<double> A(numDimensions, numDimensions);
   VecT<double> b(numDimensions);
@@ -33,9 +43,9 @@ void Optimizer::setConstraints(const std::list<LinearFunction>& constraints) {
   // J: constant part of constraint functions.
 
   auto ctr(constraints.begin());
-  for (size_t i = m_numVars; i < numDimensions; ++i, ++ctr) {
+  for (std::size_t i = m_numVars; i < numDimensions; ++i, ++ctr) {
     b[i] = -ctr->b;
-    for (size_t j = 0; j < m_numVars; ++j) {
+    for (std::size_t j = 0; j < m_numVars; ++j) {
       A(i, j) = A(j, i) = ctr->a[j];
     }
   }
@@ -50,10 +60,10 @@ void Optimizer::addExternalForce(const QuadraticFunction& force) {
 }
 
 void Optimizer::addExternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap) {
-  const size_t numVars = force.numVars();
-  for (size_t i = 0; i < numVars; ++i) {
+  const std::size_t numVars = force.numVars();
+  for (std::size_t i = 0; i < numVars; ++i) {
     const int ii = sparseMap[i];
-    for (size_t j = 0; j < numVars; ++j) {
+    for (std::size_t j = 0; j < numVars; ++j) {
       const int jj = sparseMap[j];
       m_externalForce.A(ii, jj) += force.A(i, j);
     }
@@ -67,10 +77,10 @@ void Optimizer::addInternalForce(const QuadraticFunction& force) {
 }
 
 void Optimizer::addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap) {
-  const size_t numVars = force.numVars();
-  for (size_t i = 0; i < numVars; ++i) {
+  const std::size_t numVars = force.numVars();
+  for (std::size_t i = 0; i < numVars; ++i) {
     const int ii = sparseMap[i];
-    for (size_t j = 0; j < numVars; ++j) {
+    for (std::size_t j = 0; j < numVars; ++j) {
       const int jj = sparseMap[j];
       m_internalForce.A(ii, jj) += force.A(i, j);
     }
@@ -87,9 +97,9 @@ OptimizationResult Optimizer::optimize(double internalForceWeight) {
 
   // For the layout of m_A and m_b, see setConstraints()
   const QuadraticFunction::Gradient grad(m_internalForce.gradient());
-  for (size_t i = 0; i < m_numVars; ++i) {
+  for (std::size_t i = 0; i < m_numVars; ++i) {
     m_b[i] = -grad.b[i];
-    for (size_t j = 0; j < m_numVars; ++j) {
+    for (std::size_t j = 0; j < m_numVars; ++j) {
       m_A(i, j) = grad.A(i, j);
     }
   }
@@ -125,12 +135,12 @@ void Optimizer::undoLastStep() {
  * direction == -1 is used for undoing the last step.
  */
 void Optimizer::adjustConstraints(double direction) {
-  const size_t numDimensions = m_b.size();
-  for (size_t i = m_numVars; i < numDimensions; ++i) {
+  const std::size_t numDimensions = m_b.size();
+  for (std::size_t i = m_numVars; i < numDimensions; ++i) {
     // See setConstraints() for more information
     // on the layout of m_A and m_b.
     double c = 0;
-    for (size_t j = 0; j < m_numVars; ++j) {
+    for (std::size_t j = 0; j < m_numVars; ++j) {
       c += m_A(i, j) * m_x[j];
     }
     m_b[i] -= c * direction;

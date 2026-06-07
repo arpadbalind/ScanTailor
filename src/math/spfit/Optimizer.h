@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "FittableSpline.h"
-#include "LinearFunction.h"
 #include "MatT.h"
 #include "OptimizationResult.h"
 #include "QuadraticFunction.h"
@@ -16,11 +15,13 @@
 #include "VecT.h"
 #include "VirtualFunction.h"
 
+class LinearFunction;
 namespace spfit {
+
 class Optimizer {
   // Member-wise copying is OK.
  public:
-  explicit Optimizer(size_t numVars = 0);
+  explicit Optimizer(std::size_t numVars = 0);
 
   /**
    * Sets linear constraints in the form of b^T * x + c = 0
@@ -40,7 +41,7 @@ class Optimizer {
 
   void addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap);
 
-  size_t numVars() const { return m_numVars; }
+  std::size_t numVars() const { return m_numVars; }
 
   /**
    * Get the external force accumulated from calls to addAttractionForce().
@@ -69,7 +70,7 @@ class Optimizer {
  private:
   void adjustConstraints(double direction);
 
-  size_t m_numVars;
+  std::size_t m_numVars;
   MatT<double> m_A;
   VecT<double> m_b;
   VecT<double> m_x;

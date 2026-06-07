@@ -5,14 +5,20 @@
 
 #include "ConstraintSet.h"
 #include "ModelShape.h"
+#include "QuadraticFunction.h"
+#include "VecNT.h"
+#include "VirtualFunction.h"
+
+#include <cstddef>
+#include <vector>
 
 namespace spfit {
-SplineFitter::SplineFitter(FittableSpline* spline) : m_spline(spline), m_optimizer(static_cast<size_t>(spline->numControlPoints()) * 2) {
+SplineFitter::SplineFitter(FittableSpline* spline) : m_spline(spline), m_optimizer(static_cast<std::size_t>(spline->numControlPoints()) * 2) {
   // Each control point is a pair of (x, y) varaiables.
 }
 
 void SplineFitter::splineModified() {
-  Optimizer(static_cast<size_t>(m_spline->numControlPoints()) * 2).swap(m_optimizer);
+  Optimizer(static_cast<std::size_t>(m_spline->numControlPoints()) * 2).swap(m_optimizer);
 }
 
 void SplineFitter::setConstraints(const ConstraintSet& constraints) {

@@ -573,17 +573,17 @@ QuadraticFunction XSpline::controlPointsAttractionForce(int segBegin, int segEnd
 
   const int numControlPoints = this->numControlPoints();
 
-  SparseMap<2> sparseMap(static_cast<size_t>(numControlPoints) * 2);
+  SparseMap<2> sparseMap(static_cast<std::size_t>(numControlPoints) * 2);
   sparseMap.markAllNonZero();
 
   Function<2> force(sparseMap);
   if (segBegin != segEnd) {
-    Function<2> prevX(static_cast<size_t>(segBegin) * 2, m_controlPoints[segBegin].pos.x(), sparseMap);
-    Function<2> prevY(static_cast<size_t>(segBegin) * 2 + 1, m_controlPoints[segBegin].pos.y(), sparseMap);
+    Function<2> prevX(static_cast<std::size_t>(segBegin) * 2, m_controlPoints[segBegin].pos.x(), sparseMap);
+    Function<2> prevY(static_cast<std::size_t>(segBegin) * 2 + 1, m_controlPoints[segBegin].pos.y(), sparseMap);
 
     for (int i = segBegin + 1; i <= segEnd; ++i) {
-      Function<2> nextX(static_cast<size_t>(i) * 2, m_controlPoints[i].pos.x(), sparseMap);
-      Function<2> nextY(static_cast<size_t>(i) * 2 + 1, m_controlPoints[i].pos.y(), sparseMap);
+      Function<2> nextX(static_cast<std::size_t>(i) * 2, m_controlPoints[i].pos.x(), sparseMap);
+      Function<2> nextY(static_cast<std::size_t>(i) * 2 + 1, m_controlPoints[i].pos.y(), sparseMap);
 
       const Function<2> dx(nextX - prevX);
       const Function<2> dy(nextY - prevY);
@@ -594,7 +594,7 @@ QuadraticFunction XSpline::controlPointsAttractionForce(int segBegin, int segEnd
     }
   }
 
-  QuadraticFunction f(static_cast<size_t>(numControlPoints) * 2);
+  QuadraticFunction f(static_cast<std::size_t>(numControlPoints) * 2);
   // NOLINTNEXTLINE(readability-magic-numbers)
   f.A = 0.5 * force.hessian(sparseMap);
   f.b = force.gradient(sparseMap);
@@ -615,7 +615,7 @@ QuadraticFunction XSpline::junctionPointsAttractionForce(int segBegin, int segEn
 
   const int numControlPoints = this->numControlPoints();
 
-  SparseMap<2> sparseMap(static_cast<size_t>(numControlPoints) * 2);
+  SparseMap<2> sparseMap(static_cast<std::size_t>(numControlPoints) * 2);
   sparseMap.markAllNonZero();
 
   Function<2> force(sparseMap);
@@ -632,8 +632,8 @@ QuadraticFunction XSpline::junctionPointsAttractionForce(int segBegin, int segEn
       linearCombinationAt(controlPointIndexToT(i), coeffs);
       for (const LinearCoefficient& coeff : coeffs) {
         const QPointF cp(m_controlPoints[coeff.controlPointIdx].pos);
-        Function<2> x(static_cast<size_t>(coeff.controlPointIdx) * 2, cp.x(), sparseMap);
-        Function<2> y(static_cast<size_t>(coeff.controlPointIdx) * 2 + 1, cp.y(), sparseMap);
+        Function<2> x(static_cast<std::size_t>(coeff.controlPointIdx) * 2, cp.x(), sparseMap);
+        Function<2> y(static_cast<std::size_t>(coeff.controlPointIdx) * 2 + 1, cp.y(), sparseMap);
         x *= coeff.coeff;
         y *= coeff.coeff;
         nextX += x;
@@ -651,7 +651,7 @@ QuadraticFunction XSpline::junctionPointsAttractionForce(int segBegin, int segEn
     }
   }
 
-  QuadraticFunction f(static_cast<size_t>(numControlPoints) * 2);
+  QuadraticFunction f(static_cast<std::size_t>(numControlPoints) * 2);
   // NOLINTNEXTLINE(readability-magic-numbers)
   f.A = 0.5 * force.hessian(sparseMap);
   f.b = force.gradient(sparseMap);

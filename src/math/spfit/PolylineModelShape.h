@@ -10,8 +10,10 @@
 #include "ModelShape.h"
 #include "NonCopyable.h"
 #include "SqDistApproximant.h"
-#include "VecNT.h"
 #include "XSpline.h"
+#include "VecNT.h"
+
+class QPointF;
 
 namespace spfit {
 class PolylineModelShape : public ModelShape, private NonCopyable {

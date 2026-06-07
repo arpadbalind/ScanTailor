@@ -47,14 +47,14 @@ class QuadraticFunction {
    * Constructs a quadratic functiono of the given number of variables,
    * initializing everything to zero.
    */
-  explicit QuadraticFunction(size_t numVars = 0);
+  explicit QuadraticFunction(std::size_t numVars = 0);
 
   /**
    * Resets everything to zero, so that F(x) = 0
    */
   void reset();
 
-  size_t numVars() const { return b.size(); }
+  std::size_t numVars() const { return b.size(); }
 
   /**
    * Evaluates x^T * A * x + b^T * x + c

@@ -24,14 +24,14 @@ class LinearFunction {
    * Constructs a linear function of the given number of variables,
    * initializing everything to zero.
    */
-  explicit LinearFunction(size_t numVars = 0);
+  explicit LinearFunction(std::size_t numVars = 0);
 
   /**
    * Resets everything to zero, so that F(x) = 0
    */
   void reset();
 
-  size_t numVars() const { return a.size(); }
+  std::size_t numVars() const { return a.size(); }
 
   /**
    * Evaluates a^T * x + b

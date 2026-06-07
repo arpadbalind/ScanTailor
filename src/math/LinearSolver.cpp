@@ -3,7 +3,7 @@
 
 #include "LinearSolver.h"
 
-LinearSolver::LinearSolver(size_t rows_AB, size_t cols_A_rows_X, size_t cols_BX)
+LinearSolver::LinearSolver(std::size_t rows_AB, std::size_t cols_A_rows_X, std::size_t cols_BX)
     : m_rowsAB(rows_AB), m_colsArowsX(cols_A_rows_X), m_colsBX(cols_BX) {
   if (m_rowsAB < m_colsArowsX) {
     throw std::runtime_error("LinearSolver: can's solve underdetermined systems");

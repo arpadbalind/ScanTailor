@@ -182,7 +182,6 @@ Checks: >
   -readability-redundant-*,
   -bugprone-narrowing-conversions,
   -cppcoreguidelines-narrowing-conversions,
-  -misc-include-cleaner,
 
 CheckOptions:
   - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor

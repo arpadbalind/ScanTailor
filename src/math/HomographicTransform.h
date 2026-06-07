@@ -8,10 +8,10 @@
 #include "MatrixCalc.h"
 #include "VecNT.h"
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 class HomographicTransform;
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 class HomographicTransformBase {
  public:
   using Vec = VecNT<N, T>;
@@ -30,7 +30,7 @@ class HomographicTransformBase {
 };
 
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 class HomographicTransform : public HomographicTransformBase<N, T> {
  public:
   explicit HomographicTransform(const typename HomographicTransformBase<N, T>::Mat& mat)
@@ -52,7 +52,7 @@ class HomographicTransform<1, T> : public HomographicTransformBase<1, T> {
 };
 
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 HomographicTransform<N, T> HomographicTransformBase<N, T>::inv() const {
   StaticMatrixCalc<T, 4 * (N + 1) * (N + 1), N + 1> mc;
   Mat invMat;
@@ -60,7 +60,7 @@ HomographicTransform<N, T> HomographicTransformBase<N, T>::inv() const {
   return HomographicTransform<N, T>(invMat);
 }
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 typename HomographicTransformBase<N, T>::Vec HomographicTransformBase<N, T>::operator()(const Vec& from) const {
   StaticMatrixCalc<T, N + 1, 1> mc;
   const VecNT<N + 1, T> hsrc(from, T(1));

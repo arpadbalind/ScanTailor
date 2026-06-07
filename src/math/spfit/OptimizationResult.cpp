@@ -4,6 +4,7 @@
 #include "OptimizationResult.h"
 
 #include <algorithm>
+#include <limits>
 
 namespace spfit {
 OptimizationResult::OptimizationResult(double forceBefore, double forceAfter)

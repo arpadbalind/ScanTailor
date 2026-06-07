@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <QLineF>
-#include <QPointF>
 #include <cstddef>
 #include <list>
 
-#include "LinearFunction.h"
+class LinearFunction;
+class QLineF;
+class QPointF;
 
 namespace spfit {
 class FittableSpline;

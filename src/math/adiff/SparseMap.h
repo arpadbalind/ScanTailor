@@ -24,18 +24,18 @@ template <>
 class SparseMap<2> {
   // Member-wise copying is OK.
  public:
-  inline static constexpr size_t ZERO_ELEMENT = std::numeric_limits<size_t>::max();
+  inline static constexpr std::size_t ZERO_ELEMENT = std::numeric_limits<std::size_t>::max();
 
   /**
    * Creates a structure for a (numVars)x(numVars) Hessian
    * with all elements being initially considered as zero.
    */
-  explicit SparseMap(size_t numVars);
+  explicit SparseMap(std::size_t numVars);
 
   /**
    * Returns N for an NxN Hessian.
    */
-  size_t numVars() const { return m_numVars; }
+  std::size_t numVars() const { return m_numVars; }
 
   /**
    * \brief Marks an element at (i, j) as non-zero.
@@ -43,7 +43,7 @@ class SparseMap<2> {
    * Calling this function on an element already marked non-zero
    * has no effect.
    */
-  void markNonZero(size_t i, size_t j);
+  void markNonZero(std::size_t i, std::size_t j);
 
   /**
    * \brief Marks all elements as non-zero.
@@ -56,18 +56,18 @@ class SparseMap<2> {
   /**
    * Returns the number of elements marked as non-zero.
    */
-  size_t numNonZeroElements() const { return m_numNonZeroElements; }
+  std::size_t numNonZeroElements() const { return m_numNonZeroElements; }
 
   /**
    * Returns an index in the range of [0, numNonZeroElements)
    * associated with the element, or ZERO_ELEMENT, if the element
    * wasn't marked non-zero.
    */
-  size_t nonZeroElementIdx(size_t i, size_t j) const;
+  std::size_t nonZeroElementIdx(std::size_t i, std::size_t j) const;
 
  private:
-  size_t m_numVars;
-  size_t m_numNonZeroElements{0};
-  MatT<size_t> m_map;
+  std::size_t m_numVars;
+  std::size_t m_numNonZeroElements{0};
+  MatT<std::size_t> m_map;
 };
 }  // namespace adiff

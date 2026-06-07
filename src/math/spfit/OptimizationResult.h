@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <limits>
-
 namespace spfit {
 class OptimizationResult {
  public:
