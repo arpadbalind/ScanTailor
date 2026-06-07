@@ -4,6 +4,7 @@
 #include "LinearFunction.h"
 
 #include <algorithm>
+#include <cstddef>
 
 LinearFunction::LinearFunction(std::size_t numVars) : a(numVars) {}
 

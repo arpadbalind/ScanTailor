@@ -3,6 +3,9 @@
 
 #include "LinearSolver.h"
 
+#include <cstddef>
+#include <stdexcept>
+
 LinearSolver::LinearSolver(std::size_t rows_AB, std::size_t cols_A_rows_X, std::size_t cols_BX)
     : m_rowsAB(rows_AB), m_colsArowsX(cols_A_rows_X), m_colsBX(cols_BX) {
   if (m_rowsAB < m_colsArowsX) {

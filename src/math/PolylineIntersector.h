@@ -2,13 +2,12 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #pragma once
-
-#include <QLineF>
-#include <QPointF>
 #include <vector>
 
 #include "VecNT.h"
 
+class QPointF;
+class QLineF;
 class PolylineIntersector {
  public:
   class Hint {

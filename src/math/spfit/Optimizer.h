@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "FittableSpline.h"
+#include "LinearFunction.h"
 #include "MatT.h"
 #include "OptimizationResult.h"
 #include "QuadraticFunction.h"
@@ -15,7 +16,6 @@
 #include "VecT.h"
 #include "VirtualFunction.h"
 
-class LinearFunction;
 namespace spfit {
 
 class Optimizer {

@@ -3,9 +3,14 @@
 
 #include "PolylineIntersector.h"
 
+#include <QLineF>
+#include <QPointF>
+
 #include <cmath>
+#include <vector>
 
 #include "ToLineProjector.h"
+#include "VecNT.h"
 
 PolylineIntersector::Hint::Hint() = default;
 

@@ -3,8 +3,8 @@
 
 #pragma once
 
-#include <QLineF>
-#include <QPointF>
+class QLineF;
+class QPointF;
 
 /**
  * This function allows you to check if a pair of points is on the same
@@ -19,4 +19,4 @@
  *       not a line segment.  If the line is really a point, zero will
  *       always be returned.
  */
-qreal sidesOfLine(const QLineF& line, const QPointF& p1, const QPointF& p2);
+float sidesOfLine(const QLineF& line, const QPointF& p1, const QPointF& p2);

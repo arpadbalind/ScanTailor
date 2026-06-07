@@ -4,12 +4,23 @@
 #include "XSpline.h"
 
 #include <QDebug>
-#include <cmath>
+#include <QPointF>
 
-#include "ToLineProjector.h"
-#include "VecNT.h"
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <limits>
+#include <vector>
+
 #include "adiff/Function.h"
 #include "adiff/SparseMap.h"
+#include "NumericTraits.h"
+#include "QuadraticFunction.h"
+#include "ToLineProjector.h"
+#include "VecNT.h"
+#include "VirtualFunction.h"
 
 struct XSpline::TensionDerivedParams {
   static const double t0;

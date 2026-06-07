@@ -4,7 +4,6 @@
 #pragma once
 
 #include <QLineF>
-#include <QPointF>
 #include <array>
 #include <vector>
 
@@ -13,6 +12,7 @@
 #include "VirtualFunction.h"
 #include "spfit/FittableSpline.h"
 
+class QPointF;
 /**
  * \brief An open X-Spline.
  *

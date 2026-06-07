@@ -4,6 +4,9 @@
 #include "QuadraticFunction.h"
 
 #include <algorithm>
+#include <cstddef>
+
+#include "MatT.h"
 
 QuadraticFunction::QuadraticFunction(std::size_t numVars) : A(numVars, numVars), b(numVars) {}
 

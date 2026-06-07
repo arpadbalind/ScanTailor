@@ -6,6 +6,8 @@
 #include "NumericTraits.h"
 
 #include <array>
+#include <QLineF>
+#include <QRectF>
 
 bool lineBoundedByRect(QLineF& line, const QRectF& rect) {
   const std::array<QLineF, 4> rect_lines = {QLineF(rect.topLeft(), rect.topRight()), QLineF(rect.bottomLeft(), rect.bottomRight()),

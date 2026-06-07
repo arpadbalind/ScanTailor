@@ -3,11 +3,10 @@
 
 #pragma once
 
-#include <QLineF>
-#include <QPointF>
-
 #include "VecNT.h"
 
+class QLineF;
+class QPointF;
 /**
  * \brief Projects points onto a line (not a line segment).
  *

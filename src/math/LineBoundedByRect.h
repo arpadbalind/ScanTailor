@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <QLineF>
-#include <QRectF>
-
+class QLineF;
+class QRectF;
 /**
  * If \p line (not line segment!) intersects with \p rect,
  * writes intersection points as the new \p line endpoints
