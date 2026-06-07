@@ -2,12 +2,13 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "LineBoundedByRect.h"
-
 #include "LineIntersectionScalar.h"
 #include "NumericTraits.h"
 
+#include <array>
+
 bool lineBoundedByRect(QLineF& line, const QRectF& rect) {
-  const QLineF rect_lines[4] = {QLineF(rect.topLeft(), rect.topRight()), QLineF(rect.bottomLeft(), rect.bottomRight()),
+  const std::array<QLineF, 4> rect_lines = {QLineF(rect.topLeft(), rect.topRight()), QLineF(rect.bottomLeft(), rect.bottomRight()),
                                 QLineF(rect.topLeft(), rect.bottomLeft()), QLineF(rect.topRight(), rect.bottomRight())};
 
   double max = NumericTraits<double>::min();
@@ -36,7 +37,6 @@ bool lineBoundedByRect(QLineF& line, const QRectF& rect) {
   if (max > min) {
     line = QLineF(line.pointAt(min), line.pointAt(max));
     return true;
-  } else {
-    return false;
   }
+  return false;
 }  // lineBoundedByRect

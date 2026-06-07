@@ -18,7 +18,7 @@ class LinearFunction {
   // Member-wise copying is OK.
  public:
   VecT<double> a;
-  double b;
+  double b{ 0.0 };
 
   /**
    * Constructs a linear function of the given number of variables,

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-LinearFunction::LinearFunction(size_t numVars) : a(numVars), b(0) {}
+LinearFunction::LinearFunction(size_t numVars) : a(numVars) {}
 
 void LinearFunction::reset() {
   a.fill(0);

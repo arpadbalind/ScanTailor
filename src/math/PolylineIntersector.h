@@ -20,8 +20,8 @@ class PolylineIntersector {
    private:
     void update(int newSegment);
 
-    int m_lastSegment;
-    int m_direction;
+    int m_lastSegment{ 0 };
+    int m_direction{ 1 };
   };
 
 
@@ -32,7 +32,7 @@ class PolylineIntersector {
  private:
   bool intersectsSegment(const QLineF& normal, int segment) const;
 
-  bool intersectsSpan(const QLineF& normal, const QLineF& span) const;
+  static bool intersectsSpan(const QLineF& normal, const QLineF& span);
 
   QPointF intersectWithSegment(const QLineF& line, int segment) const;
 

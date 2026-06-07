@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-QuadraticFunction::QuadraticFunction(size_t numVars) : A(numVars, numVars), b(numVars), c(0) {}
+QuadraticFunction::QuadraticFunction(size_t numVars) : A(numVars, numVars), b(numVars) {}
 
 void QuadraticFunction::reset() {
   A.fill(0);

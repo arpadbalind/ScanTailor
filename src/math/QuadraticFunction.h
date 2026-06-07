@@ -41,7 +41,7 @@ class QuadraticFunction {
    */
   MatT<double> A;
   VecT<double> b;
-  double c;
+  double c{ 0.0 };
 
   /**
    * Constructs a quadratic functiono of the given number of variables,

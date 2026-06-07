@@ -37,7 +37,7 @@ else
     files=$(git ls-files -co --exclude-standard | grep '\.\(c\|cpp\)$')
 fi
 
-echo "ARPY_FILES:"
+echo "🔍FILES IN UNDER INVESTIGATION:"
 printf '%s\n' ${files}
 
 output=$(mktemp -tu tidy.XXXXXX)

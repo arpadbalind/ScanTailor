@@ -5,6 +5,7 @@
 
 #include <QLineF>
 #include <QPointF>
+#include <array>
 #include <vector>
 
 #include "NumericTraits.h"
@@ -21,6 +22,7 @@
 class XSpline : public spfit::FittableSpline {
  public:
   static constexpr double DEFAULT_ACCURACY{ 0.2 };
+  inline static constexpr double epsilon{ 1e-6 };
   struct PointAndDerivs {
     QPointF point;
 
@@ -183,7 +185,7 @@ class XSpline : public spfit::FittableSpline {
 
   QPointF pointAtImpl(int segment, double t) const;
 
-  int linearCombinationFor(LinearCoefficient* coeffs, int segment, double t) const;
+  int linearCombinationFor(std::array<LinearCoefficient, 4>& coeffs, int segment, double t) const;
 
   DecomposedDerivs decomposedDerivs(double t) const;
 

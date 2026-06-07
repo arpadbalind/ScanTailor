@@ -23,17 +23,17 @@ class ArcLengthMapper {
     friend class ArcLengthMapper;
 
    public:
-    Hint();
+    Hint() = default;
 
    private:
     void update(int newSegment);
 
-    int m_lastSegment;
-    int m_direction;
+    int m_lastSegment{ 0 };
+    int m_direction { 1 };
   };
 
 
-  ArcLengthMapper();
+  ArcLengthMapper() = default;
 
   /**
    * \brief Adds an x -> f(x) sample.
@@ -87,5 +87,5 @@ class ArcLengthMapper {
   double interpolateXInSegment(double x, int segment) const;
 
   std::vector<Sample> m_samples;
-  double m_prevFX;
+  double m_prevFX{ 0.0 };
 };
