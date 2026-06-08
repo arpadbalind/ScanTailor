@@ -164,7 +164,7 @@ Mat<T> Mat<T>::inv() const {
   assert(cols == rows);
 
   T* identData = alloc->allocT(rows * cols);
-  Mat ident(alloc, identData, rows, cols);
+  const Mat ident(alloc, identData, rows, cols);
   const int todo = rows * cols;
   for (int i = 0; i < todo; ++i) {
     identData[i] = T();

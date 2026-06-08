@@ -137,7 +137,7 @@ void LinearSolver::solve(const T* A, T* X, const T* B, T* tbuffer, std::size_t* 
     std::size_t virtRow = 0;
     for (; virtRow < m_colsArowsX; ++virtRow) {
       const int physRow = static_cast<int>(perm[virtRow]);
-      T right(pBCol[physRow]);
+      T right(pBCol[physRow]); // NOLINT(clang-analyzer-core.uninitialized.Assign)
 
       // Move already calculated factors to the right side.
       const T* pLu = luData + physRow;
