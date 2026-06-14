@@ -29,8 +29,7 @@ void SplineFitter::setSamplingParams(const FittableSpline::SamplingParams& param
   m_samplingParams = params;
 }
 
-void SplineFitter::addAttractionForce([[maybe_unused]] const Vec2d& splinePoint,
-                                      const std::vector<FittableSpline::LinearCoefficient>& coeffs,
+void SplineFitter::addAttractionForce(const std::vector<FittableSpline::LinearCoefficient>& coeffs,
                                       const SqDistApproximant& sqdistApprox) {
   const auto numCoeffs = static_cast<int>(coeffs.size());
   const int numVars = numCoeffs * 2;
@@ -106,7 +105,7 @@ void SplineFitter::addAttractionForces(const ModelShape& modelShape, double from
   auto sampleProcessor = [this, &modelShape](const QPointF& pt, double t, FittableSpline::SampleFlags flags) {
     m_spline->linearCombinationAt(t, m_tempCoeffs);
     const SqDistApproximant approx(modelShape.localSqDistApproximant(pt, flags));
-    addAttractionForce(pt, m_tempCoeffs, approx);
+    addAttractionForce(m_tempCoeffs, approx);
   };
 
   m_spline->sample(ProxyFunction<decltype(sampleProcessor), void, const QPointF&, double, FittableSpline::SampleFlags>(
@@ -138,7 +137,7 @@ OptimizationResult SplineFitter::optimize(double internalForceWeight) {
 
     const auto offset = static_cast<std::ptrdiff_t>(i) * 2;
     const Vec2d delta(m_optimizer.displacementVector() + offset);
-    m_spline->moveControlPoint(i, m_spline->controlPointPosition(i) + delta);
+    m_spline->moveControlPoint(i, QPointF(Vec2d(m_spline->controlPointPosition(i)) + delta));
   }
   return res;
 }
@@ -149,7 +148,7 @@ void SplineFitter::undoLastStep() {
 
     const auto offset = static_cast<std::ptrdiff_t>(i) * 2;
     const Vec2d delta(m_optimizer.displacementVector() + offset);
-    m_spline->moveControlPoint(i, m_spline->controlPointPosition(i) - delta);
+    m_spline->moveControlPoint(i, QPointF(Vec2d(m_spline->controlPointPosition(i)) - delta));
   }
 
   m_optimizer.undoLastStep();  // Zeroes the displacement vector among other things.

@@ -488,7 +488,7 @@ QLineF TextLineTracer::calcMidLine(const QLineF& line1, const QLineF& line2) {
     Vec2d v2(line2.p2() - line2.p1());
     v1 /= std::sqrt(v1.squaredNorm());
     v2 /= std::sqrt(v2.squaredNorm());
-    return QLineF(intersection, intersection + 0.5 * (v1 + v2));
+    return QLineF(intersection, QPointF(Vec2d(intersection) + 0.5 * (v1 + v2)));
   }
 }
 

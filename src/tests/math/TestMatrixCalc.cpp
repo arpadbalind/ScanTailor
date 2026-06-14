@@ -3,7 +3,6 @@
 
 #include <array>
 #include <gtest/gtest.h>
-#include <cmath>
 #include <stdexcept>
 
 #include "MatrixCalc.h"

@@ -36,7 +36,7 @@ class VecNT {
    * Conversion is done by static casts.
    */
   template <typename OT>
-  VecNT(const OT* data);
+  explicit VecNT(const OT* data);
 
   /**
    * \brief Construction from a vector of same dimension but another type.
@@ -44,7 +44,7 @@ class VecNT {
    * Conversion is done by static casts.
    */
   template <typename OT>
-  VecNT(const VecNT<N, OT>& other);
+  explicit VecNT(const VecNT<N, OT>& other);
 
   /**
    * \brief Construction from a one-less dimensional
@@ -87,15 +87,9 @@ class VecNT {
    * Will not compile for N != 2.  Will compile for any T's that
    * are convertable from qreal by a static cast.
    */
-  VecNT(const QPointF& pt);
+  explicit VecNT(const QPointF& pt);
 
-  /**
-   * \brief Implicit conversion to QPointF.
-   *
-   * Will not compile for N != 2.  Will compile for any T's that
-   * are convertable to qreal by a static cast.
-   */
-  operator QPointF() const;
+  explicit operator QPointF() const;
 
   /**
    * \brief Assignment from a vector of same dimension but another type.
@@ -121,19 +115,15 @@ class VecNT {
 
   VecNT& operator/=(T scalar);
 
-  const T* data() const noexcept { return m_data.data(); }
+  [[nodiscard]] const T* data() const noexcept { return m_data.data(); }
 
   T* data() noexcept { return m_data.data(); }
 
-  /**
-   * \brief Sums elements in the vector.
-   */
-  T sum() const;
+  [[nodiscard]] T sum() const;
 
-  T dot(const VecNT& other) const;
+  [[nodiscard]] T dot(const VecNT& other) const;
 
-  T squaredNorm() const { return dot(*this); }
-
+  [[nodiscard]] T squaredNorm() const { return dot(*this); }
  private:
   std::array<T, N> m_data;
 };
@@ -160,7 +150,7 @@ struct SizeSpecific<2, T> {
     data[1] = static_cast<T>(pt.y());
   }
 
-  static QPointF toQPointF(const T* data) { return QPointF(static_cast<qreal>(data[0]), static_cast<qreal>(data[1])); }
+  static QPointF toQPointF(const T* data) { return {static_cast<qreal>(data[0]), static_cast<qreal>(data[1])}; }
 };
 
 template <typename T>

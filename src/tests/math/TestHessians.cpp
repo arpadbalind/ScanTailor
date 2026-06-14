@@ -4,9 +4,6 @@
 #include "TestUtils.h"
 #include <gtest/gtest.h>
 
-#include <cmath>
-#include <cstdlib>
-
 #include "adiff/Function.h"
 #include "adiff/SparseMap.h"
 #include "MatT.h"

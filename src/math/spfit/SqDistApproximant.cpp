@@ -65,12 +65,12 @@ SqDistApproximant SqDistApproximant::weightedLineDistance(const QLineF& line, do
   if (sqlen > epsilon) {
     u /= std::sqrt(sqlen);
   } else {
-    return pointDistance(line.p1());
+    return pointDistance(Vec2d(line.p1()));
   }
 
   // Unit normal to line.
   const Vec2d v(-u[1], u[0]);
-  return SqDistApproximant(line.p1(), u, v, 0, weight);
+  return SqDistApproximant(Vec2d(line.p1()), Vec2d(u), Vec2d(v), 0, weight);
 }
 
 SqDistApproximant SqDistApproximant::curveDistance(const Vec2d& referencePoint,

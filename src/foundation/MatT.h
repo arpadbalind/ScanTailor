@@ -87,12 +87,12 @@ class MatT {
 
   const T& operator()(size_t row, size_t col) const {
     assert(row < m_rows && col < m_cols);
-    return m_data[row + col * m_rows];
+    return m_data[row + (col * m_rows)];
   }
 
   T& operator()(size_t row, size_t col) {
     assert(row < m_rows && col < m_cols);
-    return m_data[row + col * m_rows];
+    return m_data[row + (col * m_rows)];
   }
 
   void fill(const T& value);

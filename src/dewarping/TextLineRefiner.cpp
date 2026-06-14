@@ -126,7 +126,7 @@ void TextLineRefiner::refine(std::list<std::vector<QPointF>>& polylines, const i
     const Snake& snake = snakes[i];
     polyline.clear();
     for (const SnakeNode& node : snake.nodes) {
-      polyline.push_back(node.center);
+      polyline.push_back(QPointF(node.center));
     }
   }
 }  // TextLineRefiner::refine
@@ -201,7 +201,7 @@ TextLineRefiner::Snake TextLineRefiner::makeSnake(const std::vector<QPointF>& po
   float nextInsertT = 0;
   for (size_t i = 1; i < polylineSize; ++i) {
     const Vec2f base(polyline[i - 1]);
-    const Vec2f vec((polyline[i] - base));
+    const Vec2f vec((Vec2f(polyline[i]) - base));
     const auto nextT = static_cast<float>(baseT + std::sqrt(vec.squaredNorm()));
 
     while (nextT >= nextInsertT) {
@@ -250,7 +250,7 @@ void TextLineRefiner::calcFrenetFrames(std::vector<FrenetFrame>& frenetFrames,
       nextSegment /= nextSegmentLen;
     }
 
-    Vec2f tangentVec(0.5 * (prevSegment + nextSegment));
+    Vec2f tangentVec(0.5F * (prevSegment + nextSegment));
     const auto len = static_cast<float>(std::sqrt(tangentVec.squaredNorm()));
     if (len > std::numeric_limits<float>::epsilon()) {
       tangentVec /= len;
@@ -387,9 +387,9 @@ QImage TextLineRefiner::visualizeSnakes(const std::vector<Snake>& snakes, const 
 
     const size_t numNodes = snake.nodes.size();
     for (size_t i = 0; i < numNodes; ++i) {
-      const QPointF mid(snake.nodes[i].center + QPointF(0.5, 0.5));
-      const QPointF top(mid - snake.nodes[i].ribHalfLength * frenetFrames[i].unitDownNormal);
-      const QPointF bottom(mid + snake.nodes[i].ribHalfLength * frenetFrames[i].unitDownNormal);
+      const QPointF mid(QPointF(snake.nodes[i].center + Vec2f(0.5, 0.5)));
+      const QPointF top(QPointF(Vec2f(mid) - snake.nodes[i].ribHalfLength * frenetFrames[i].unitDownNormal));
+      const QPointF bottom(QPointF(Vec2f(mid) + snake.nodes[i].ribHalfLength * frenetFrames[i].unitDownNormal));
       topPolyline << top;
       middlePolyline << mid;
       bottomPolyline << bottom;
@@ -741,7 +741,7 @@ float TextLineRefiner::Optimizer::calcBendingEnergy(const SnakeNode& node,
     return 1000.0f;  // Penalty for moving too close to another node.
   }
 
-  const Vec2f bendVec(vec / vecLen - prevVec / prevVecLen);
+  const Vec2f bendVec(Vec2d(QPointF(vec) / vecLen) - Vec2d(QPointF(prevVec) / prevVecLen));
   return m_bendingWeight * bendVec.squaredNorm();
 }
 }  // namespace dewarping

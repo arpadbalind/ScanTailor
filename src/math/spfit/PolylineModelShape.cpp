@@ -94,7 +94,7 @@ SqDistApproximant PolylineModelShape::localSqDistApproximant(const QPointF& pt,
 
     const XSpline::PointAndDerivs& pd1 = m_vertices[segmentIdx];
     const XSpline::PointAndDerivs& pd2 = m_vertices[segmentIdx + 1];
-    const FrenetFrame frenetFrame(bestFootPoint, pd2.point - pd1.point);
+    const FrenetFrame frenetFrame(Vec2d(bestFootPoint), Vec2d(pd2.point - pd1.point));
 
     const double k1 = pd1.signedCurvature();
     const double k2 = pd2.signedCurvature();
@@ -105,7 +105,7 @@ SqDistApproximant PolylineModelShape::localSqDistApproximant(const QPointF& pt,
   assert(vertexIdx != -1);
 
   const XSpline::PointAndDerivs& pd = m_vertices[vertexIdx];
-  const FrenetFrame frenetFrame(bestFootPoint, pd.firstDeriv);
+  const FrenetFrame frenetFrame(Vec2d(bestFootPoint), Vec2d(pd.firstDeriv));
 
   Flags polylineFlags = Flags::DEFAULT_FLAGS;
   if (vertexIdx == 0) {
@@ -125,6 +125,6 @@ SqDistApproximant PolylineModelShape::calcApproximant(const QPointF& pt,
   if (enumflags::any_of(sampleFlags, FittableSpline::SampleFlags::HEAD_SAMPLE | FittableSpline::SampleFlags::TAIL_SAMPLE)) {
     return SqDistApproximant::pointDistance(frenetFrame.origin());
   }
-  return SqDistApproximant::curveDistance(pt, frenetFrame, signedCurvature);
+  return SqDistApproximant::curveDistance(Vec2d(pt), frenetFrame, signedCurvature);
 }
 }  // namespace spfit

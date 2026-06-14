@@ -53,11 +53,11 @@ QPointF PolylineIntersector::intersect(const QLineF& line, Hint& hint) const {
   const Vec2d nv(normal.p2() - normal.p1());
   int leftIdx = 0;
   auto rightIdx = static_cast<int>(m_polyline.size() - 1);
-  double leftDot = nv.dot(m_polyline[leftIdx] - origin);
+  double leftDot = nv.dot(Vec2d(m_polyline[leftIdx] - origin));
 
   while (leftIdx + 1 < rightIdx) {
     const int midIdx = (leftIdx + rightIdx) >> 1;
-    const double midDot = nv.dot(m_polyline[midIdx] - origin);
+    const double midDot = nv.dot(Vec2d(m_polyline[midIdx] - origin));
 
     if (midDot * leftDot <= 0) {
       // Note: <= 0 vs < 0 is actually important for this branch.

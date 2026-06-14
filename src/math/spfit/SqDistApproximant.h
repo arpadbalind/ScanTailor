@@ -9,7 +9,6 @@
 class QLineF;
 namespace spfit {
 class FrenetFrame;
-
 /**
  * A quadratic function of the form:\n
  * F(x) = x^T * A * x + b^T * x + c\n
@@ -28,15 +27,7 @@ class FrenetFrame;
  */
 struct SqDistApproximant {
   inline static constexpr double epsilon{ 1e-6 };
-  Mat22d A;
-  Vec2d b;
-  double c;
-
-  /**
-   * Constructs a distance function that always evaluates to zero.
-   * Passing it to Optimizer::addSample() will have no effect.
-   */
-  SqDistApproximant() : c(0) {}
+  SqDistApproximant() = default;
 
   /**
    * \brief The general case constructor.
@@ -71,6 +62,11 @@ struct SqDistApproximant {
                                                  double signedCurvature,
                                                  double weight);
 
-  double evaluate(const Vec2d& pt) const;
+  [[nodiscard]] double evaluate(const Vec2d& pt) const;
+   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  Mat22d A;
+  Vec2d b;
+  double c{ 0.0};
+   // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 }  // namespace spfit

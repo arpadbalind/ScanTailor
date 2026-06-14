@@ -203,7 +203,7 @@ RastLineFinder::SearchSpace::SearchSpace(const RastLineFinder& owner,
   const Vec2d minTowardsMaxAngleVec(-minAngleUnitVec.y(), minAngleUnitVec.x());
   const Vec2d maxTowardsMinAngleVec(maxAngleUnitVec.y(), -maxAngleUnitVec.x());
 
-  for (unsigned idx : candidateIdxs) {
+  for (const auto& idx : candidateIdxs) {
     const Point& pnt = owner.m_points[idx];
     if (!pnt.available) {
       continue;
@@ -211,11 +211,11 @@ RastLineFinder::SearchSpace::SearchSpace(const RastLineFinder& owner,
 
     const Vec2d relPt(pnt.pt - origin);
 
-    if ((Vec2d(pnt.pt - minAngleInnerPt).dot(minAngleUnitVec) >= 0)
-        && (Vec2d(pnt.pt - maxAngleOuterPt).dot(maxAngleUnitVec) <= 0)) {
+    if ((Vec2d(pnt.pt - minAngleInnerPt).dot(Vec2d(minAngleUnitVec)) >= 0)
+        && (Vec2d(pnt.pt - maxAngleOuterPt).dot(Vec2d(maxAngleUnitVec)) <= 0)) {
       // Accepted.
-    } else if ((Vec2d(pnt.pt - maxAngleInnerPt).dot(maxAngleUnitVec) >= 0)
-               && (Vec2d(pnt.pt - minAngleOuterPt).dot(minAngleUnitVec) <= 0)) {
+    } else if ((Vec2d(pnt.pt - maxAngleInnerPt).dot(Vec2d(maxAngleUnitVec)) >= 0)
+               && (Vec2d(pnt.pt - minAngleOuterPt).dot(Vec2d(minAngleUnitVec)) <= 0)) {
       // Accepted.
     } else if ((minTowardsMaxAngleVec.dot(relPt) >= 0) && (maxTowardsMinAngleVec.dot(relPt) >= 0)
                && (relPt.squaredNorm() >= minSqdist) && (relPt.squaredNorm() <= maxSqdist)) {

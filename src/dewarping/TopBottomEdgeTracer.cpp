@@ -669,11 +669,11 @@ Vec2f TopBottomEdgeTracer::downTheHillDirection(const QRectF& pageRect,
   }
   centroid /= snake.size();
 
-  QLineF line(centroid, centroid + boundsDir);
+  QLineF line(centroid, QPointF(Vec2f(centroid) + boundsDir));
   lineBoundedByRect(line, pageRect);
   // The downhill direction is the direction *inside* the page.
-  const Vec2d v1(line.p1() - centroid);
-  const Vec2d v2(line.p2() - centroid);
+  const Vec2f v1(line.p1() - centroid);
+  const Vec2f v2(line.p2() - centroid);
   if (v1.squaredNorm() > v2.squaredNorm()) {
     return v1;
   } else {
@@ -799,7 +799,7 @@ void TopBottomEdgeTracer::downTheHillSnake(std::vector<QPointF>& snake, const Gr
     uint32_t stepIdx = bestPathIdx;
     while (stepIdx != ~uint32_t(0)) {
       const Step& step = stepStorage[stepIdx];
-      snake.push_back(step.pt);
+      snake.push_back(QPointF(step.pt));
       stepIdx = step.prevStepIdx;
     }
     assert(numNodes == snake.size());
@@ -926,7 +926,7 @@ void TopBottomEdgeTracer::upTheHillSnake(std::vector<QPointF>& snake, const Grid
     uint32_t stepIdx = bestPathIdx;
     while (stepIdx != ~uint32_t(0)) {
       const Step& step = stepStorage[stepIdx];
-      snake.push_back(step.pt);
+      snake.push_back(QPointF(step.pt));
       stepIdx = step.prevStepIdx;
     }
     assert(numNodes == snake.size());

@@ -51,7 +51,7 @@ class StaticPool : public StaticPoolBase<T> {
 
 template <typename T>
 T* StaticPoolBase<T>::alloc(size_t numElements) {
-  if (numElements > m_sizeRemaining || !m_next) {
+  if (numElements > m_sizeRemaining || nullptr == m_next) {
     throw std::runtime_error("StaticPool overflow");
   }
 

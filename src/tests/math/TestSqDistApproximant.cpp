@@ -5,7 +5,6 @@
 #include <QPointF>
 
 #include <cmath>
-#include <cstdlib>
 #include <gtest/gtest.h>
 #include <numbers>
 #include <random>
@@ -15,8 +14,7 @@
 #include "spfit/SqDistApproximant.h"
 #include "VecNT.h"
 
-namespace spfit {
-namespace tests {
+namespace spfit::tests {
 
 TEST(SqDistApproximantTestSuite, test_point_distance) {
   std::mt19937 rng{12345}; // deterministic test seed
@@ -51,14 +49,14 @@ TEST(SqDistApproximantTestSuite, test_line_distance) {
     const double angle = angleDist(rng);
 
     const Vec2d delta{std::cos(angle), std::sin(angle)};
-    const QLineF line{pt1, pt1 + delta};
+    const QLineF line{QPointF(pt1), QPointF(pt1 + delta)};
 
     const SqDistApproximant approx{SqDistApproximant::lineDistance(line)};
     const ToLineProjector proj{line};
 
     for (int j = 0; j < 10; ++j) {
       const Vec2d pt{frand(), frand()};
-      const double control = proj.projectionSqDist(pt);
+      const double control = proj.projectionSqDist(QPointF(pt));
 
       ExpectClose(approx.evaluate(pt), control, EPSILON);
     }
@@ -97,14 +95,10 @@ TEST(SqDistApproximantTestSuite, test_general_case) {
       const double uProj = u.dot(pt - origin);
       const double vProj = v.dot(pt - origin);
 
-      const double control =
-          m * uProj * uProj +
-          n * vProj * vProj;
+      const double control = (m * uProj * uProj) + (n * vProj * vProj);
 
-      ExpectClose(approx.evaluate(pt), control, 1e-6);
+      ExpectClose(approx.evaluate(pt), control, EPSILON);
     }
   }
 }
-
-}  // namespace tests
-}  // namespace spfit
+}

@@ -33,8 +33,7 @@ class SplineFitter : private NonCopyable {
 
   void setSamplingParams(const FittableSpline::SamplingParams& samplingParams);
 
-  void addAttractionForce(const Vec2d& splinePoint,
-                          const std::vector<FittableSpline::LinearCoefficient>& coeffs,
+  void addAttractionForce(const std::vector<FittableSpline::LinearCoefficient>& coeffs,
                           const SqDistApproximant& sqdistApprox);
 
   void addAttractionForces(const ModelShape& modelShape, double fromT = 0.0, double toT = 1.0);
