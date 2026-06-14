@@ -34,13 +34,13 @@ class Span {
    */
   Span(const Span& begin, const Span& end) : m_begin(begin.end()), m_end(end.begin()) {}
 
-  int begin() const { return m_begin; }
+  [[nodiscard]] int begin() const { return m_begin; }
 
-  int end() const { return m_end; }
+  [[nodiscard]] int end() const { return m_end; }
 
-  int width() const { return m_end - m_begin; }
+  [[nodiscard]] int width() const { return m_end - m_begin; }
 
-  double center() const { return 0.5 * (m_begin + m_end); }
+  [[nodiscard]] double center() const { return 0.5 * (m_begin + m_end); }
 
   bool operator==(const Span& other) const { return m_begin == other.m_begin && m_end == other.m_end; }
 

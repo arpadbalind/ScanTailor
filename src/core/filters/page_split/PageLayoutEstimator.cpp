@@ -412,7 +412,7 @@ PageLayout PageLayoutEstimator::cutAtWhitespaceDeskewed150(const LayoutType layo
   spanFinder.setMinWhitespaceWidth(8);
 
   std::deque<Span> spans;
-  SlicedHistogram hist(ccImg, SlicedHistogram::COLS);
+  SlicedHistogram hist(ccImg, SlicedHistogram::Type::COLS);
   spanFinder.find(hist, [&](Span s) { spans.push_back(s); });
 
   if (dbg) {

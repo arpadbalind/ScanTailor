@@ -11,10 +11,10 @@ SlicedHistogram::SlicedHistogram() = default;
 
 SlicedHistogram::SlicedHistogram(const BinaryImage& image, const Type type) {
   switch (type) {
-    case ROWS:
+    case Type::ROWS:
       processHorizontalLines(image, image.rect());
       break;
-    case COLS:
+    case Type::COLS:
       processVerticalLines(image, image.rect());
       break;
   }
@@ -26,10 +26,10 @@ SlicedHistogram::SlicedHistogram(const BinaryImage& image, const QRect& area, co
   }
 
   switch (type) {
-    case ROWS:
+    case Type::ROWS:
       processHorizontalLines(image, area);
       break;
-    case COLS:
+    case Type::COLS:
       processVerticalLines(image, area);
       break;
   }

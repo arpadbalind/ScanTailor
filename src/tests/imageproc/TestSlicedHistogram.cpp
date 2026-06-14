@@ -11,8 +11,7 @@
 
 #include "Utils.h"
 
-namespace imageproc {
-namespace tests {
+namespace imageproc::tests {
 using namespace utils;
 
 static bool checkHistogram(const SlicedHistogram& hist, const int* dataBegin, const int* dataEnd) {
@@ -30,10 +29,10 @@ static bool checkHistogram(const SlicedHistogram& hist, const int* dataBegin, co
 TEST(SlicedHistogramTestSuite, test_null_image) {
   const BinaryImage nullImg;
 
-  SlicedHistogram horHist(nullImg, SlicedHistogram::ROWS);
+  SlicedHistogram horHist(nullImg, SlicedHistogram::Type::ROWS);
   EXPECT_TRUE(horHist.size() == 0);
 
-  SlicedHistogram verHist(nullImg, SlicedHistogram::COLS);
+  SlicedHistogram verHist(nullImg, SlicedHistogram::Type::COLS);
   EXPECT_TRUE(verHist.size() == 0);
 }
 
@@ -41,7 +40,7 @@ TEST(SlicedHistogramTestSuite, test_exceeding_area) {
   const BinaryImage img(1, 1);
   const QRect area(0, 0, 1, 2);
 
-  EXPECT_THROW(SlicedHistogram(img, area, SlicedHistogram::ROWS), std::invalid_argument);
+  EXPECT_THROW(SlicedHistogram(img, area, SlicedHistogram::Type::ROWS), std::invalid_argument);
 }
 
 TEST(SlicedHistogramTestSuite, test_small_image) {
@@ -55,17 +54,16 @@ TEST(SlicedHistogramTestSuite, test_small_image) {
 
   const BinaryImage img(makeBinaryImage(inp, 9, 9));
 
-  SlicedHistogram horHist(img, SlicedHistogram::ROWS);
+  SlicedHistogram horHist(img, SlicedHistogram::Type::ROWS);
   EXPECT_TRUE(checkHistogram(horHist, hor_counts, hor_counts + 9));
 
-  SlicedHistogram verHist(img, SlicedHistogram::COLS);
+  SlicedHistogram verHist(img, SlicedHistogram::Type::COLS);
   EXPECT_TRUE(checkHistogram(verHist, ver_counts, ver_counts + 9));
 
-  horHist = SlicedHistogram(img, img.rect().adjusted(0, 1, 0, 0), SlicedHistogram::ROWS);
+  horHist = SlicedHistogram(img, img.rect().adjusted(0, 1, 0, 0), SlicedHistogram::Type::ROWS);
   EXPECT_TRUE(checkHistogram(horHist, hor_counts + 1, hor_counts + 9));
 
-  verHist = SlicedHistogram(img, img.rect().adjusted(1, 0, 0, 0), SlicedHistogram::COLS);
+  verHist = SlicedHistogram(img, img.rect().adjusted(1, 0, 0, 0), SlicedHistogram::Type::COLS);
   EXPECT_TRUE(checkHistogram(verHist, ver_counts + 1, ver_counts + 9));
 }
-}  // namespace tests
-}  // namespace imageproc
+}

@@ -11,7 +11,7 @@ namespace Tests {
 using namespace imageproc;
 
 TEST(ContentSpanFinderTestSuite, test_empty_input) {
-  ContentSpanFinder spanFinder;
+  const ContentSpanFinder spanFinder;
 
   std::vector<Span> spans;
   spanFinder.find(SlicedHistogram(), [&](const Span& span) { spans.push_back(span); });

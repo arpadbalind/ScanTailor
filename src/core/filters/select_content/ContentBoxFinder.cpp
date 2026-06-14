@@ -698,8 +698,8 @@ imageproc::BinaryImage ContentBoxFinder::estimateTextMask(const imageproc::Binar
     // based on despeckled content image.
     rasterOp<RopAnd<RopSrc, RopDst>>(contentImg, ccImg);
 
-    const SlicedHistogram hist(contentImg, SlicedHistogram::ROWS);
-    const SlicedHistogram blockHist(ccImg, SlicedHistogram::ROWS);
+    const SlicedHistogram hist(contentImg, SlicedHistogram::Type::ROWS);
+    const SlicedHistogram blockHist(ccImg, SlicedHistogram::Type::ROWS);
 
     assert(hist.size() != 0);
 
@@ -873,7 +873,7 @@ QRect ContentBoxFinder::trimLeft(const imageproc::BinaryImage& content,
                                  const QRect& area,
                                  Garbage& garbage,
                                  DebugImages* const dbg) {
-  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::COLS);
+  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::Type::COLS);
 
   size_t start = 0;
   while (start < hist.size()) {
@@ -918,7 +918,7 @@ QRect ContentBoxFinder::trimRight(const imageproc::BinaryImage& content,
                                   const QRect& area,
                                   Garbage& garbage,
                                   DebugImages* const dbg) {
-  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::COLS);
+  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::Type::COLS);
 
   auto start = static_cast<int>(hist.size() - 1);
   while (start >= 0) {
@@ -963,7 +963,7 @@ QRect ContentBoxFinder::trimTop(const imageproc::BinaryImage& content,
                                 const QRect& area,
                                 Garbage& garbage,
                                 DebugImages* const dbg) {
-  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::ROWS);
+  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::Type::ROWS);
 
   size_t start = 0;
   while (start < hist.size()) {
@@ -1008,7 +1008,7 @@ QRect ContentBoxFinder::trimBottom(const imageproc::BinaryImage& content,
                                    const QRect& area,
                                    Garbage& garbage,
                                    DebugImages* const dbg) {
-  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::ROWS);
+  const SlicedHistogram hist(contentBlocks, area, SlicedHistogram::Type::ROWS);
 
   auto start = static_cast<int>(hist.size() - 1);
   while (start >= 0) {
