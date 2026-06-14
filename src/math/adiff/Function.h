@@ -22,6 +22,7 @@ class Function;
 template <>
 class Function<2> {
   // Member-wise copying is OK.
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
  public:
   /** The value of the function. */
   double value;
@@ -57,9 +58,9 @@ class Function<2> {
    */
   Function(std::size_t argIdx, double val, const SparseMap<2>& sparseMap);
 
-  VecT<double> gradient(const SparseMap<2>& sparseMap) const;
+  [[nodiscard]] VecT<double> gradient(const SparseMap<2>& sparseMap) const;
 
-  MatT<double> hessian(const SparseMap<2>& sparseMap) const;
+  [[nodiscard]] MatT<double> hessian(const SparseMap<2>& sparseMap) const;
 
   void swap(Function& other) noexcept;
 
@@ -68,6 +69,7 @@ class Function<2> {
   Function& operator-=(const Function& other);
 
   Function& operator*=(double scalar);
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 
 

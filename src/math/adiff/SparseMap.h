@@ -35,7 +35,7 @@ class SparseMap<2> {
   /**
    * Returns N for an NxN Hessian.
    */
-  std::size_t numVars() const { return m_numVars; }
+  [[nodiscard]] std::size_t numVars() const { return m_numVars; }
 
   /**
    * \brief Marks an element at (i, j) as non-zero.
@@ -56,14 +56,14 @@ class SparseMap<2> {
   /**
    * Returns the number of elements marked as non-zero.
    */
-  std::size_t numNonZeroElements() const { return m_numNonZeroElements; }
+  [[nodiscard]] std::size_t numNonZeroElements() const { return m_numNonZeroElements; }
 
   /**
    * Returns an index in the range of [0, numNonZeroElements)
    * associated with the element, or ZERO_ELEMENT, if the element
    * wasn't marked non-zero.
    */
-  std::size_t nonZeroElementIdx(std::size_t i, std::size_t j) const;
+  [[nodiscard]] std::size_t nonZeroElementIdx(std::size_t i, std::size_t j) const;
 
  private:
   std::size_t m_numVars;

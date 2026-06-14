@@ -17,7 +17,7 @@
  */
 template <typename T>
 class DynamicPool {
-
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
  public:
   static constexpr size_t OVERALLOCATION_FACTOR { 3 };
   static constexpr size_t OVERALLOCATION_LIMIT { 256 };
@@ -55,7 +55,9 @@ class DynamicPool {
   };
 
   struct DeleteDisposer {
+    // NOLINTBEGIN(cppcoreguidelines-owning-memory)
     void operator()(Chunk* chunk) { delete chunk; }
+    // NOLINTEND(cppcoreguidelines-owning-memory)
   };
 
   using ChunkList = boost::intrusive::list<Chunk, boost::intrusive::constant_time_size<false>>;
@@ -63,6 +65,7 @@ class DynamicPool {
   static size_t adviseChunkSize(size_t numElements);
 
   ChunkList m_chunkList;
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 
 

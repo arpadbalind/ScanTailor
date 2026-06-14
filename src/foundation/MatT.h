@@ -77,13 +77,13 @@ class MatT {
 
   ~MatT() = default;
 
-  size_t rows() const { return m_rows; }
+  [[nodiscard]] size_t rows() const { return m_rows; }
 
-  size_t cols() const { return m_cols; }
+  [[nodiscard]] size_t cols() const { return m_cols; }
 
-  const T* data() const { return m_data.data(); }
+  [[nodiscard]] const T* data() const { return m_data.data(); }
 
-  T* data() { return m_data.data(); }
+  [[nodiscard]] T* data() { return m_data.data(); }
 
   const T& operator()(size_t row, size_t col) const {
     assert(row < m_rows && col < m_cols);

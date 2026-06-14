@@ -8,7 +8,7 @@
 #endif
 
 class NonCopyable {
- protected:
+ public:
   NonCopyable() = default;
   ~NonCopyable() = default;
 

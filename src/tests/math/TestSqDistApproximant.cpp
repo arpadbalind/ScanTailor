@@ -17,7 +17,7 @@
 namespace spfit::tests {
 
 TEST(SqDistApproximantTestSuite, test_point_distance) {
-  std::mt19937 rng{12345}; // deterministic test seed
+  std::mt19937 rng(std::random_device{}());
 
   std::uniform_real_distribution<double> dist(-50.0, 50.0);
 
@@ -37,7 +37,7 @@ TEST(SqDistApproximantTestSuite, test_point_distance) {
 }
 
 TEST(SqDistApproximantTestSuite, test_line_distance) {
-  std::mt19937 rng{12345};
+  std::mt19937 rng(std::random_device{}());
 
   std::uniform_real_distribution<double> dist(-50.0, 50.0);
   std::uniform_real_distribution<double> angleDist(0.0, 2.0 * std::numbers::pi);
@@ -64,7 +64,7 @@ TEST(SqDistApproximantTestSuite, test_line_distance) {
 }
 
 TEST(SqDistApproximantTestSuite, test_general_case) {
-  std::mt19937 rng{12345};
+  std::mt19937 rng(std::random_device{}());
 
   std::uniform_real_distribution<double> dist(-50.0, 50.0);
   std::uniform_real_distribution<double> angleDist(0.0, 2.0 * std::numbers::pi);

@@ -9,8 +9,7 @@
 #include "MatT.h"
 #include "VecT.h"
 
-namespace adiff {
-namespace tests {
+namespace adiff::tests {
 
 TEST(AutomaticDifferentiationTestSuite, test1) {
   // F(x) = x^2  | x = 3
@@ -91,6 +90,4 @@ TEST(AutomaticDifferentiationTestSuite, test3) {
   ExpectClose(hessian(1, 0), 72, 1e-06);
   ExpectClose(hessian(1, 1), 16, 1e-06);
 }
-
-}  // namespace tests
-}  // namespace adiff
+}

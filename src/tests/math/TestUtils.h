@@ -1,11 +1,13 @@
 #pragma once
 #include <gtest/gtest.h>
-#include <cmath>
+#include <random>
+
 inline static constexpr double EPSILON{ 1e-6 };
 
-inline static double frand(double from, double to) {
-  const double rand01 = static_cast<double>(rand()) / static_cast<double>(RAND_MAX);
-  return from + ((to - from) * rand01);
+inline double frand(double from, double to) {
+  thread_local std::mt19937 rng{std::random_device{}()};
+  std::uniform_real_distribution<double> dist(from, to);
+  return dist(rng);
 }
 
 inline void ExpectClose(double val, double expected, double tol) {

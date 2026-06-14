@@ -98,7 +98,7 @@ class Mat {
 
   Mat operator-() const;
 
-  const T* rawData() const { return data; }
+  [[nodiscard]] const T* rawData() const { return data; }
 
  private:
   Mat(AbstractAllocator<T>* alloc, const T* data, int rows, int cols)

@@ -8,8 +8,7 @@
 #include "MatrixCalc.h"
 #include "TestUtils.h"
 
-namespace imageproc {
-namespace tests {
+namespace imageproc::tests {
 
 TEST(MatrixCalcSuite, test1) {
   constexpr std::array<double, 9> A{1, 1, 1, 2, 4, -3, 3, 6, -5};
@@ -73,6 +72,4 @@ TEST(MatrixCalcSuite, test4) {
     ExpectClose(mul[i], control[i], EPSILON);
   }
 }
-
-}  // namespace tests
-}  // namespace imageproc
+}

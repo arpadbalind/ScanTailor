@@ -74,11 +74,11 @@ class VecT {
 
   VecT& operator*=(T scalar);
 
-  size_t size() const { return m_size; }
+  [[nodiscard]] size_t size() const { return m_size; }
 
-  const T* data() const { return m_data.data(); }
+  [[nodiscard]] const T* data() const { return m_data.data(); }
 
-  T* data() { return m_data.data(); }
+  [[nodiscard]] T* data() { return m_data.data(); }
 
   const T& operator[](size_t idx) const {
     assert(idx < m_size);
