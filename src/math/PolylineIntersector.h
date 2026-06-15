@@ -29,11 +29,11 @@ class PolylineIntersector {
   QPointF intersect(const QLineF& line, Hint& hint) const;
 
  private:
-  bool intersectsSegment(const QLineF& normal, int segment) const;
+  [[nodiscard]] bool intersectsSegment(const QLineF& normal, int segment) const;
 
   static bool intersectsSpan(const QLineF& normal, const QLineF& span);
 
-  QPointF intersectWithSegment(const QLineF& line, int segment) const;
+  [[nodiscard]] QPointF intersectWithSegment(const QLineF& line, int segment) const;
 
   bool tryIntersectingOutsideOfPolyline(const QLineF& line, QPointF& intersection, Hint& hint) const;
 

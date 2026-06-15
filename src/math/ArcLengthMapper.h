@@ -16,6 +16,7 @@
  * to be monotonously increasing, that is we consider adjacent samples
  * to be connected by straight lines.
  */
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 class ArcLengthMapper {
   // Member-wise copying is OK.
  public:
@@ -46,7 +47,7 @@ class ArcLengthMapper {
   /**
    * \brief Returns the total arc length from the first to the last sample.
    */
-  double totalArcLength() const;
+  [[nodiscard]] double totalArcLength() const;
 
   /**
    * \brief Scales arc lengths at every sample so that the
@@ -78,14 +79,15 @@ class ArcLengthMapper {
     Sample(double x, double arcLen) : x(x), arcLen(arcLen) {}
   };
 
-  bool checkSegmentForArcLen(double arcLen, int segment) const;
+  [[nodiscard]] bool checkSegmentForArcLen(double arcLen, int segment) const;
 
-  bool checkSegmentForX(double x, int segment) const;
+  [[nodiscard]] bool checkSegmentForX(double x, int segment) const;
 
-  double interpolateArcLenInSegment(double arcLen, int segment) const;
+  [[nodiscard]] double interpolateArcLenInSegment(double arcLen, int segment) const;
 
-  double interpolateXInSegment(double x, int segment) const;
+  [[nodiscard]] double interpolateXInSegment(double x, int segment) const;
 
   std::vector<Sample> m_samples;
   double m_prevFX{ 0.0 };
 };
+// NOLINTEND(misc-non-private-member-variables-in-classes)

@@ -22,6 +22,7 @@
 #include "VecNT.h"
 #include "VirtualFunction.h"
 
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 struct XSpline::TensionDerivedParams {
   static const double t0;
   static const double t1;
@@ -42,16 +43,15 @@ struct XSpline::TensionDerivedParams {
   TensionDerivedParams(double tension1, double tension2);
 };
 
-
 class XSpline::GBlendFunc {
  public:
   GBlendFunc(double q, double p);
 
-  double value(double u) const;
+  [[nodiscard]] double value(double u) const;
 
-  double firstDerivative(double u) const;
+  [[nodiscard]] double firstDerivative(double u) const;
 
-  double secondDerivative(double u) const;
+  [[nodiscard]] double secondDerivative(double u) const;
 
  private:
   double m_c1;
@@ -66,11 +66,11 @@ class XSpline::HBlendFunc {
  public:
   explicit HBlendFunc(double q);
 
-  double value(double u) const;
+  [[nodiscard]] double value(double u) const;
 
-  double firstDerivative(double u) const;
+  [[nodiscard]] double firstDerivative(double u) const;
 
-  double secondDerivative(double u) const;
+  [[nodiscard]] double secondDerivative(double u) const;
 
  private:
   double m_c1;
@@ -87,7 +87,7 @@ struct XSpline::DecomposedDerivs {
   std::array<double,4> controlPoints;
   int numControlPoints;
 
-  bool hasNonZeroCoeffs(int idx) const {
+  [[nodiscard]] bool hasNonZeroCoeffs(int idx) const {
     const double sum = std::fabs(zeroDerivCoeffs[idx]) + std::fabs(firstDerivCoeffs[idx]) + std::fabs(secondDerivCoeffs[idx]);
     return sum > std::numeric_limits<double>::epsilon();
   }
@@ -202,6 +202,7 @@ void XSpline::sample(const VirtualFunction<void, const QPointF&, double, SampleF
   sink(toPt, toT, SampleFlags::TAIL_SAMPLE);
 }  // XSpline::sample
 
+// NOLINTBEGIN(misc-no-recursion)
 void XSpline::maybeAddMoreSamples(const VirtualFunction<void, const QPointF&, double, SampleFlags>& sink,
                                   double maxSqdistToSpline,
                                   double maxSqdistBetweenSamples,
@@ -218,7 +219,6 @@ void XSpline::maybeAddMoreSamples(const VirtualFunction<void, const QPointF&, do
   }
 
   SampleFlags flags = SampleFlags::DEFAULT_SAMPLE;
-  // NOLINTNEXTLINE(readability-magic-numbers)
   double midT = 0.5 * (prevT + nextT);
   const double nearbyJunctionT = std::floor(midT * numSegments + 0.5) * rNumSegments;
 
@@ -248,6 +248,7 @@ void XSpline::maybeAddMoreSamples(const VirtualFunction<void, const QPointF&, do
   maybeAddMoreSamples(sink, maxSqdistToSpline, maxSqdistBetweenSamples, numSegments, rNumSegments, midT, midPt, nextT,
                       nextPt);
 }  // XSpline::maybeAddMoreSamples
+// NOLINTEND(misc-no-recursion)
 
 void XSpline::linearCombinationAt(double t, std::vector<LinearCoefficient>& coeffs) const {
   assert(t >= 0 && t <= 1);
@@ -606,7 +607,6 @@ QuadraticFunction XSpline::controlPointsAttractionForce(int segBegin, int segEnd
   }
 
   QuadraticFunction f(static_cast<std::size_t>(numControlPoints) * 2);
-  // NOLINTNEXTLINE(readability-magic-numbers)
   f.A = 0.5 * force.hessian(sparseMap);
   f.b = force.gradient(sparseMap);
   f.c = force.value;
@@ -663,7 +663,6 @@ QuadraticFunction XSpline::junctionPointsAttractionForce(int segBegin, int segEn
   }
 
   QuadraticFunction f(static_cast<std::size_t>(numControlPoints) * 2);
-  // NOLINTNEXTLINE(readability-magic-numbers)
   f.A = 0.5 * force.hessian(sparseMap);
   f.b = force.gradient(sparseMap);
   f.c = force.value;
@@ -675,7 +674,7 @@ QPointF XSpline::pointClosestTo(const QPointF to, double* t, double accuracy) co
     if (t != nullptr) {
       *t = 0;
     }
-    return QPointF();
+    return {};
   }
 
   const int numSegments = this->numSegments();
@@ -793,16 +792,14 @@ XSpline::TensionDerivedParams::TensionDerivedParams(const double tension1, const
   auto square = [](double v) {
     return v * v;
   };
-  // NOLINTBEGIN(readability-magic-numbers)
+
   p[0] = 2.0 * square(t0 - T0p);
   p[1] = 2.0 * square(t1 - T1p);
   p[2] = 2.0 * square(t2 - T2m);
   p[3] = 2.0 * square(t3 - T3m);
-  // NOLINTEND(readability-magic-numbers)
 }
 
 /*========================== GBlendFunc ==========================*/
-// NOLINTBEGIN(readability-magic-numbers)
 XSpline::GBlendFunc::GBlendFunc(double q, double p)
     : m_c1(q),
       // See formula 20 in [1].
@@ -810,7 +807,7 @@ XSpline::GBlendFunc::GBlendFunc(double q, double p)
       m_c3(10 - 12 * q - p),
       m_c4(2 * p + 14 * q - 15),
       m_c5(6 - 5 * q - p) {}
-// NOLINTEND(readability-magic-numbers)
+
 double XSpline::GBlendFunc::value(double u) const {
   const double u2 = u * u;
   const double u3 = u2 * u;
@@ -823,26 +820,23 @@ double XSpline::GBlendFunc::firstDerivative(double u) const {
   const double u2 = u * u;
   const double u3 = u2 * u;
   const double u4 = u3 * u;
-  // NOLINTNEXTLINE(readability-magic-numbers)
   return m_c1 + 2 * m_c2 * u + 3 * m_c3 * u2 + 4 * m_c4 * u3 + 5 * m_c5 * u4;
 }
 
 double XSpline::GBlendFunc::secondDerivative(double u) const {
   const double u2 = u * u;
   const double u3 = u2 * u;
-  // NOLINTNEXTLINE(readability-magic-numbers)
   return 2 * m_c2 + 6 * m_c3 * u + 12 * m_c4 * u2 + 20 * m_c5 * u3;
 }
 
 /*========================== HBlendFunc ==========================*/
-// NOLINTBEGIN(readability-magic-numbers)
 XSpline::HBlendFunc::HBlendFunc(double q)
     : m_c1(q),
       // See formula 20 in [1].
       m_c2(2 * q),
       m_c4(-2 * q),
       m_c5(-q) {}
-// NOLINTEND(readability-magic-numbers)
+
 double XSpline::HBlendFunc::value(double u) const {
   const double u2 = u * u;
   const double u3 = u2 * u;
@@ -855,14 +849,12 @@ double XSpline::HBlendFunc::firstDerivative(double u) const {
   const double u2 = u * u;
   const double u3 = u2 * u;
   const double u4 = u3 * u;
-  // NOLINTNEXTLINE(readability-magic-numbers)
   return m_c1 + 2 * m_c2 * u + 4 * m_c4 * u3 + 5 * m_c5 * u4;
 }
 
 double XSpline::HBlendFunc::secondDerivative(double u) const {
   const double u2 = u * u;
   const double u3 = u2 * u;
-  // NOLINTNEXTLINE(readability-magic-numbers)
   return 2 * m_c2 + 12 * m_c4 * u2 + 20 * m_c5 * u3;
 }
 
@@ -873,3 +865,4 @@ double XSpline::PointAndDerivs::signedCurvature() const {
   const double tlen = std::sqrt(firstDeriv.x() * firstDeriv.x() + firstDeriv.y() * firstDeriv.y());
   return cross / (tlen * tlen * tlen);
 }
+// NOLINTEND(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)

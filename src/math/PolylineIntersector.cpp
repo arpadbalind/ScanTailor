@@ -7,6 +7,7 @@
 #include <QPointF>
 
 #include <cmath>
+#include <numeric>
 #include <vector>
 
 #include "ToLineProjector.h"
@@ -32,13 +33,15 @@ QPointF PolylineIntersector::intersect(const QLineF& line, Hint& hint) const {
   int segment{ 0 };
 
   // Check the next segment in direction provided by hint.
-  if (intersectsSegment(normal, (segment = hint.m_lastSegment + hint.m_direction))) {
+  segment = hint.m_lastSegment + hint.m_direction;
+  if (intersectsSegment(normal, segment)) {
     hint.update(segment);
     return intersectWithSegment(line, segment);
   }
 
   // Check the next segment in opposite direction.
-  if (intersectsSegment(normal, (segment = hint.m_lastSegment - hint.m_direction))) {
+  segment = hint.m_lastSegment - hint.m_direction;
+  if (intersectsSegment(normal, segment)) {
     hint.update(segment);
     return intersectWithSegment(line, segment);
   }
@@ -56,7 +59,7 @@ QPointF PolylineIntersector::intersect(const QLineF& line, Hint& hint) const {
   double leftDot = nv.dot(Vec2d(m_polyline[leftIdx] - origin));
 
   while (leftIdx + 1 < rightIdx) {
-    const int midIdx = (leftIdx + rightIdx) >> 1;
+    const int midIdx = std::midpoint(leftIdx, rightIdx);
     const double midDot = nv.dot(Vec2d(m_polyline[midIdx] - origin));
 
     if (midDot * leftDot <= 0) {
@@ -96,7 +99,7 @@ QPointF PolylineIntersector::intersectWithSegment(const QLineF& line, int segmen
     // Considering we were called for a reason, the segment must
     // be on the same line as our subject line.  Just return segment
     // midpoint in this case.
-    // NOLINTNEXTLINE(readability-magic-numbers)
+    // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
     return segLine.pointAt(0.5);
   }
   return intersection;
