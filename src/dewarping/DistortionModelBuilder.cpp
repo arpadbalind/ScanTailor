@@ -102,11 +102,11 @@ void DistortionModelBuilder::addHorizontalCurve(const std::vector<QPointF>& poly
 void DistortionModelBuilder::transform(const QTransform& xform) {
   assert(xform.isAffine());
 
-  const QLineF downLine(xform.map(QLineF(QPointF(0, 0), m_downDirection)));
-  const QLineF rightLine(xform.map(QLineF(QPointF(0, 0), m_rightDirection)));
+  const QLineF downLine(xform.map(QLineF(QPointF(0, 0), QPointF(m_downDirection))));
+  const QLineF rightLine(xform.map(QLineF(QPointF(0, 0), QPointF(m_rightDirection))));
 
-  m_downDirection = downLine.p2() - downLine.p1();
-  m_rightDirection = rightLine.p2() - rightLine.p1();
+  m_downDirection = Vec2d(downLine.p2() - downLine.p1());
+  m_rightDirection = Vec2d(rightLine.p2() - rightLine.p1());
   m_bound1 = xform.map(m_bound1);
   m_bound2 = xform.map(m_bound2);
 
@@ -207,7 +207,7 @@ Vec2d DistortionModelBuilder::centroid(const std::vector<QPointF>& polyline) {
   }
 
   Vec2d accum(0, 0);
-  double totalWeight = 0;
+  double totalWeight{ 0.0 };
 
   for (int i = 1; i < numPoints; ++i) {
     const QLineF segment(polyline[i - 1], polyline[i]);
@@ -220,7 +220,7 @@ Vec2d DistortionModelBuilder::centroid(const std::vector<QPointF>& polyline) {
   if (totalWeight < 1e-06) {
     return Vec2d(polyline.front());
   } else {
-    return accum / totalWeight;
+    return Vec2d(QPointF(accum) / totalWeight);
   }
 }
 
@@ -303,6 +303,7 @@ XSpline DistortionModelBuilder::fitExtendedSpline(const std::vector<QPointF>& po
                                                   [[maybe_unused]] const Vec2d& centroid,
                                                   const std::pair<QLineF, QLineF>& bounds) {
   using namespace spfit;
+  using namespace enumflags;
 
   const QLineF chord(polyline.front(), polyline.back());
   XSpline spline;
@@ -326,14 +327,14 @@ XSpline DistortionModelBuilder::fitExtendedSpline(const std::vector<QPointF>& po
                                       Flags polylineFlags,
                                       const FrenetFrame& frenetFrame,
                                       double signedCurvature) const override {
-      if (polylineFlags & (POLYLINE_FRONT | POLYLINE_BACK)) {
-        if (sampleFlags & FittableSpline::JUNCTION_SAMPLE) {
+      if (enumflags::has_any(polylineFlags, (Flags::POLYLINE_FRONT | Flags::POLYLINE_BACK))) {
+        if (enumflags::has_any(sampleFlags, FittableSpline::SampleFlags::JUNCTION_SAMPLE)) {
           return SqDistApproximant::pointDistance(frenetFrame.origin());
         } else {
           return SqDistApproximant();
         }
       } else {
-        return SqDistApproximant::curveDistance(pt, frenetFrame, signedCurvature);
+        return SqDistApproximant::curveDistance(Vec2d(pt), frenetFrame, signedCurvature);
       }
     }
   };

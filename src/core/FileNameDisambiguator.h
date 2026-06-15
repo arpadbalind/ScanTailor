@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_FILENAMEDISAMBIGUATOR_H_
-#define SCANTAILOR_CORE_FILENAMEDISAMBIGUATOR_H_
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -22,8 +21,7 @@ class QDomDocument;
  *
  * \note This class is thread-safe.
  */
-class FileNameDisambiguator {
-  DECLARE_NON_COPYABLE(FileNameDisambiguator)
+class FileNameDisambiguator : private NonCopyable {
 
  public:
   FileNameDisambiguator();
@@ -74,6 +72,3 @@ class FileNameDisambiguator {
 
   std::unique_ptr<Impl> m_impl;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_FILENAMEDISAMBIGUATOR_H_

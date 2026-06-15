@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_ARCLENGTHMAPPER_H_
-#define SCANTAILOR_MATH_ARCLENGTHMAPPER_H_
+#pragma once
 
 #include <vector>
 
@@ -24,17 +23,17 @@ class ArcLengthMapper {
     friend class ArcLengthMapper;
 
    public:
-    Hint();
+    Hint() = default;
 
    private:
     void update(int newSegment);
 
-    int m_lastSegment;
-    int m_direction;
+    int m_lastSegment{ 0 };
+    int m_direction { 1 };
   };
 
 
-  ArcLengthMapper();
+  ArcLengthMapper() = default;
 
   /**
    * \brief Adds an x -> f(x) sample.
@@ -88,8 +87,5 @@ class ArcLengthMapper {
   double interpolateXInSegment(double x, int segment) const;
 
   std::vector<Sample> m_samples;
-  double m_prevFX;
+  double m_prevFX{ 0.0 };
 };
-
-
-#endif  // ifndef SCANTAILOR_MATH_ARCLENGTHMAPPER_H_

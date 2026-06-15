@@ -659,7 +659,7 @@ void despeckleImpl(BinaryImage& image,
                    const Settings& settings,
                    const TaskStatus& status,
                    DebugImages* const dbg) {
-  ConnectivityMap cmap(image, CONN8);
+  ConnectivityMap cmap(image, Connectivity::CONN8);
   if (cmap.maxLabel() == 0) {
     // Completely white image?
     return;

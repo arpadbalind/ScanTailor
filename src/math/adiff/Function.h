@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_ADIFF_FUNCTION_H_
-#define SCANTAILOR_ADIFF_FUNCTION_H_
+#pragma once
 
 #include <cstddef>
 
@@ -23,6 +22,7 @@ class Function;
 template <>
 class Function<2> {
   // Member-wise copying is OK.
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
  public:
   /** The value of the function. */
   double value;
@@ -42,7 +42,7 @@ class Function<2> {
   /**
    * Constructs the "f(x1, x2, ...) = 0" function.
    */
-  explicit Function(size_t numNonZeroVars);
+  explicit Function(std::size_t numNonZeroVars);
 
   /**
    * Constructs the "f(x1, x2, ...) = 0" function.
@@ -56,23 +56,24 @@ class Function<2> {
    * \param val Argument value.
    * \param sparseMap Tells which derivatives to compute.
    */
-  Function(size_t argIdx, double val, const SparseMap<2>& sparseMap);
+  Function(std::size_t argIdx, double val, const SparseMap<2>& sparseMap);
 
-  VecT<double> gradient(const SparseMap<2>& sparseMap) const;
+  [[nodiscard]] VecT<double> gradient(const SparseMap<2>& sparseMap) const;
 
-  MatT<double> hessian(const SparseMap<2>& sparseMap) const;
+  [[nodiscard]] MatT<double> hessian(const SparseMap<2>& sparseMap) const;
 
-  void swap(Function& other);
+  void swap(Function& other) noexcept;
 
   Function& operator+=(const Function& other);
 
   Function& operator-=(const Function& other);
 
   Function& operator*=(double scalar);
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 
 
-inline void swap(Function<2>& f1, Function<2>& f2) {
+inline void swap(Function<2>& f1, Function<2>& f2) noexcept {
   f1.swap(f2);
 }
 
@@ -88,4 +89,3 @@ Function<2> operator*(double scalar, const Function<2>& f);
 
 Function<2> operator/(const Function<2>& num, const Function<2>& den);
 }  // namespace adiff
-#endif  // ifndef SCANTAILOR_ADIFF_FUNCTION_H_

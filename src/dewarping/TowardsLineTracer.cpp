@@ -28,7 +28,7 @@ TowardsLineTracer::TowardsLineTracer(const imageproc::SEDM* dm,
       m_lastOutputPos(initialPos),
       m_numSteps(0),
       m_finished(false) {
-  if (sidesOfLine(m_line, initialPos, line.p1() + m_normalTowardsLine) > 0) {
+  if (sidesOfLine(m_line, initialPos, QPointF(Vec2d(line.p1()) + m_normalTowardsLine)) > 0) {
     // It points the wrong way -> fix that.
     m_normalTowardsLine = -m_normalTowardsLine;
   }
@@ -139,7 +139,7 @@ void TowardsLineTracer::setupSteps() {
 
   m_numSteps = 0;
   for (const QPoint dir : all_directions) {
-    if (m_normalTowardsLine.dot(QPointF(dir)) > 0.0) {
+    if (m_normalTowardsLine.dot(Vec2d(QPointF(dir))) > 0.0) {
       Step& step = m_steps[m_numSteps];
       step.vec = dir;
       step.unitVec = Vec2d(step.vec.x(), step.vec.y());

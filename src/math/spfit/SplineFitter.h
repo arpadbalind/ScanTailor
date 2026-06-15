@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_SPLINEFITTER_H_
-#define SCANTAILOR_SPFIT_SPLINEFITTER_H_
+#pragma once
 
 #include <vector>
 
@@ -19,9 +18,7 @@ struct SqDistApproximant;
 
 class OptimizationResult;
 
-class SplineFitter {
-  DECLARE_NON_COPYABLE(SplineFitter)
-
+class SplineFitter : private NonCopyable {
  public:
   explicit SplineFitter(FittableSpline* spline);
 
@@ -36,8 +33,7 @@ class SplineFitter {
 
   void setSamplingParams(const FittableSpline::SamplingParams& samplingParams);
 
-  void addAttractionForce(const Vec2d& splinePoint,
-                          const std::vector<FittableSpline::LinearCoefficient>& coeffs,
+  void addAttractionForce(const std::vector<FittableSpline::LinearCoefficient>& coeffs,
                           const SqDistApproximant& sqdistApprox);
 
   void addAttractionForces(const ModelShape& modelShape, double fromT = 0.0, double toT = 1.0);
@@ -48,7 +44,7 @@ class SplineFitter {
 
   void addInternalForce(const QuadraticFunction& force);
 
-  void addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparceMap);
+  void addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap);
 
   /** \see Optimizer::externalForce() */
   double externalForce() const { return m_optimizer.externalForce(); }
@@ -69,4 +65,3 @@ class SplineFitter {
   std::vector<FittableSpline::LinearCoefficient> m_tempCoeffs;
 };
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_SPLINEFITTER_H_

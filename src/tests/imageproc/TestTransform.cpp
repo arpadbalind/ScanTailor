@@ -1,21 +1,21 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <Grayscale.h>
-#include <Transform.h>
-
+// NOLINTBEGIN(misc-include-cleaner)
+#include <QColor>
 #include <QImage>
 #include <QSize>
+
+#include <algorithm>
 #include <gtest/gtest.h>
-#include <cmath>
+#include <cstddef>
 #include <cstdint>
-#include <cstdlib>
+#include <random>
 
-#include "Utils.h"
+#include "Grayscale.h"
+#include "Transform.h"
 
-namespace imageproc {
-namespace tests {
-using namespace utils;
+namespace imageproc::tests {
 
 TEST(TransformTestSuite, test_null_image) {
   const QImage nullImg;
@@ -28,19 +28,23 @@ TEST(TransformTestSuite, test_null_image) {
 
 TEST(TransformTestSuite, test_random_image) {
   GrayImage img(QSize(100, 100));
+
+  static thread_local std::mt19937 engine{std::random_device{}()};
+  static thread_local std::uniform_int_distribution<int> dist{0, 255};
+
   uint8_t* line = img.data();
-  for (int y = 0; y < img.height(); ++y) {
-    for (int x = 0; x < img.width(); ++x) {
-      line[x] = static_cast<uint8_t>(rand() % 256);
-    }
-    line += img.stride();
-  }
+  const int stride = img.stride();
+  const int height = img.height();
+
+  std::generate(line, line + static_cast<std::ptrdiff_t>(stride) * height, [&]() {
+    return static_cast<uint8_t>(dist(engine));
+  });
 
   const QColor bgcolor(0xff, 0xff, 0xff);
   const OutsidePixels outsidePixels(OutsidePixels::assumeColor(bgcolor));
 
   const QTransform nullXform;
-  EXPECT_TRUE(transformToGray(img, nullXform, img.rect(), outsidePixels) == img);
+  EXPECT_TRUE(transformToGray(static_cast<const QImage&>(img), nullXform, img.rect(), outsidePixels) == img);
 }
-}  // namespace tests
-}  // namespace imageproc
+}
+// NOLINTEND(misc-include-cleaner)

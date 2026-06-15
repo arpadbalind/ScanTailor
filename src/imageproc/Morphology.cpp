@@ -666,7 +666,7 @@ BinaryImage dilateBrick(const BinaryImage& src,
 
   TemplateRasterOp<RopOr<RopSrc, RopDst>> rop;
   BinaryImage dst(dstArea.size());
-  dilateOrErodeBrick(dst, src, brick, dstArea, srcSurroundings, rop, BLACK);
+  dilateOrErodeBrick(dst, src, brick, dstArea, srcSurroundings, rop, BWColor::BLACK);
   return dst;
 }
 
@@ -712,7 +712,7 @@ BinaryImage erodeBrick(const BinaryImage& src,
 
   TemplateRasterOp<RopAnd<RopSrc, RopDst>> rop;
   BinaryImage dst(dstArea.size());
-  dilateOrErodeBrick(dst, src, brick, dstArea, srcSurroundings, rop, WHITE);
+  dilateOrErodeBrick(dst, src, brick, dstArea, srcSurroundings, rop, BWColor::WHITE);
   return dst;
 }
 
@@ -752,10 +752,10 @@ BinaryImage openBrick(const BinaryImage& src, const QSize& brick, const QRect& d
 
   QRect tmpArea;
 
-  if (srcSurroundings == WHITE) {
+  if (srcSurroundings == BWColor::WHITE) {
     tmpArea = shrinkByBrick(src.rect(), actualBrick);
     if (tmpArea.isEmpty()) {
-      return BinaryImage(dstArea.size(), WHITE);
+      return BinaryImage(dstArea.size(), BWColor::WHITE);
     }
   } else {
     tmpArea = extendByBrick(src.rect(), actualBrick);
@@ -822,10 +822,10 @@ BinaryImage closeBrick(const BinaryImage& src,
 
   QRect tmpArea;
 
-  if (srcSurroundings == BLACK) {
+  if (srcSurroundings == BWColor::BLACK) {
     tmpArea = shrinkByBrick(src.rect(), actualBrick);
     if (tmpArea.isEmpty()) {
-      return BinaryImage(dstArea.size(), BLACK);
+      return BinaryImage(dstArea.size(), BWColor::BLACK);
     }
   } else {
     tmpArea = extendByBrick(src.rect(), actualBrick);
@@ -898,16 +898,16 @@ BinaryImage hitMissMatch(const BinaryImage& src,
     if (first) {
       first = false;
       rasterOp<RopSrc>(dst, dstRect, src, srcRect.topLeft());
-      if (srcSurroundings == BLACK) {
-        dst.fillExcept(dstRect, BLACK);
+      if (srcSurroundings == BWColor::BLACK) {
+        dst.fillExcept(dstRect, BWColor::BLACK);
       }
     } else {
       rasterOp<RopAnd<RopSrc, RopDst>>(dst, dstRect, src, srcRect.topLeft());
     }
 
-    if (srcSurroundings == WHITE) {
+    if (srcSurroundings == BWColor::WHITE) {
       // No hits on white surroundings.
-      dst.fillExcept(dstRect, WHITE);
+      dst.fillExcept(dstRect, BWColor::WHITE);
     }
   }
 
@@ -919,21 +919,21 @@ BinaryImage hitMissMatch(const BinaryImage& src,
     if (first) {
       first = false;
       rasterOp<RopNot<RopSrc>>(dst, dstRect, src, srcRect.topLeft());
-      if (srcSurroundings == WHITE) {
-        dst.fillExcept(dstRect, BLACK);
+      if (srcSurroundings == BWColor::WHITE) {
+        dst.fillExcept(dstRect, BWColor::BLACK);
       }
     } else {
       rasterOp<RopAnd<RopNot<RopSrc>, RopDst>>(dst, dstRect, src, srcRect.topLeft());
     }
 
-    if (srcSurroundings == BLACK) {
+    if (srcSurroundings == BWColor::BLACK) {
       // No misses on black surroundings.
-      dst.fillExcept(dstRect, WHITE);
+      dst.fillExcept(dstRect, BWColor::WHITE);
     }
   }
 
   if (first) {
-    dst.fill(WHITE);  // No matches.
+    dst.fill(BWColor::WHITE);  // No matches.
   }
   return dst;
 }  // hitMissMatch

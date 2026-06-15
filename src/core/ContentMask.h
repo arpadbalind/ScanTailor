@@ -1,8 +1,7 @@
 // Copyright (C) 2020  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_CONTENTMASK_H_
-#define SCANTAILOR_CORE_CONTENTMASK_H_
+#pragma once
 
 #include <imageproc/BinaryImage.h>
 
@@ -35,6 +34,3 @@ class ContentMask {
   QTransform m_originalToContentXform;
   QTransform m_contentToOriginalXform;
 };
-
-
-#endif  // SCANTAILOR_CORE_CONTENTMASK_H_

@@ -43,7 +43,7 @@ void TextLineTracer::trace(const GrayImage& input,
                            DebugImages* dbg) {
   GrayImage downscaled(downscale(input, dpi));
   if (dbg) {
-    dbg->add(downscaled, "downscaled");
+    dbg->add(static_cast<const QImage&>(downscaled), "downscaled");
   }
 
   const int downscaledWidth = downscaled.width();
@@ -55,9 +55,8 @@ void TextLineTracer::trace(const GrayImage& input,
   toOrig.scale(1.0 / downscaleXFactor, 1.0 / downscaleYFactor);
 
   const QRect downscaledContentRect(toOrig.inverted().mapRect(contentRect));
-  const Dpi downscaledDpi(qRound(dpi.horizontal() * downscaleXFactor), qRound(dpi.vertical() * downscaleYFactor));
 
-  BinaryImage binarized(binarizeWolf(downscaled, QSize(31, 31)));
+  BinaryImage binarized(binarizeWolf(static_cast<const QImage&>(downscaled), QSize(31, 31)));
   if (dbg) {
     dbg->add(binarized, "binarized");
   }
@@ -75,13 +74,13 @@ void TextLineTracer::trace(const GrayImage& input,
   std::list<std::vector<QPointF>> polylines;
   extractTextLines(polylines, stretchGrayRange(downscaled), vertBounds, dbg);
   if (dbg) {
-    dbg->add(visualizePolylines(downscaled, polylines), "traced");
+    dbg->add(visualizePolylines(static_cast<const QImage&>(downscaled), polylines), "traced");
   }
 
   filterShortCurves(polylines, vertBounds.first, vertBounds.second);
   filterOutOfBoundsCurves(polylines, vertBounds.first, vertBounds.second);
   if (dbg) {
-    dbg->add(visualizePolylines(downscaled, polylines), "filtered1");
+    dbg->add(visualizePolylines(static_cast<const QImage&>(downscaled), polylines), "filtered1");
   }
 
   Vec2f unitDownVector(calcAvgUnitVector(vertBounds));
@@ -94,7 +93,7 @@ void TextLineTracer::trace(const GrayImage& input,
 
   filterEdgyCurves(polylines);
   if (dbg) {
-    dbg->add(visualizePolylines(downscaled, polylines), "filtered2");
+    dbg->add(visualizePolylines(static_cast<const QImage&>(downscaled), polylines), "filtered2");
   }
 
 
@@ -124,18 +123,18 @@ GrayImage TextLineTracer::downscale(const GrayImage& input, const Dpi& dpi) {
 
 void TextLineTracer::sanitizeBinaryImage(BinaryImage& image, const QRect& contentRect) {
   // Kill connected components touching the borders.
-  BinaryImage seed(image.size(), WHITE);
-  seed.fillExcept(seed.rect().adjusted(1, 1, -1, -1), BLACK);
+  BinaryImage seed(image.size(), BWColor::WHITE);
+  seed.fillExcept(seed.rect().adjusted(1, 1, -1, -1), BWColor::BLACK);
 
-  BinaryImage touchingBorder(seedFill(seed.release(), image, CONN8));
+  BinaryImage touchingBorder(seedFill(seed.release(), image, Connectivity::CONN8));
   rasterOp<RopSubtract<RopDst, RopSrc>>(image, touchingBorder.release());
 
   // Poor man's despeckle.
-  BinaryImage contentSeeds(openBrick(image, QSize(2, 3), WHITE));
-  rasterOp<RopOr<RopSrc, RopDst>>(contentSeeds, openBrick(image, QSize(3, 2), WHITE));
-  image = seedFill(contentSeeds.release(), image, CONN8);
+  BinaryImage contentSeeds(openBrick(image, QSize(2, 3), BWColor::WHITE));
+  rasterOp<RopOr<RopSrc, RopDst>>(contentSeeds, openBrick(image, QSize(3, 2), BWColor::WHITE));
+  image = seedFill(contentSeeds.release(), image, Connectivity::CONN8);
   // Clear margins.
-  image.fillExcept(contentRect, WHITE);
+  image.fillExcept(contentRect, BWColor::WHITE);
 }
 
 /**
@@ -290,7 +289,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   [direction](auto& dest_val, const auto& src_val) {dest_val = dest_val * direction[0] + src_val * direction[1]; });
 
   if (dbg) {
-    dbg->add(visualizeGradient(image, mainGrid), "first_dir_deriv");
+    dbg->add(visualizeGradient(static_cast<const QImage&>(image), mainGrid), "first_dir_deriv");
   }
 
   gaussBlurGeneric(size, 6.0f, 6.0f, mainGrid.data(), mainGrid.stride(),
@@ -298,7 +297,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
       mainGrid.data(), mainGrid.stride(), [](auto& dest_val, const auto& src_val) { dest_val = src_val; });
 
   if (dbg) {
-    dbg->add(visualizeGradient(image, mainGrid), "first_dir_deriv_blurred");
+    dbg->add(visualizeGradient(static_cast<const QImage&>(image), mainGrid), "first_dir_deriv_blurred");
   }
 
   horizontalSobel<float>(width, height, mainGrid.data(), mainGrid.stride(),
@@ -318,7 +317,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   rasterOpGeneric(auxGrid.data(), auxGrid.stride(), size, mainGrid.data(), mainGrid.stride(),
                   [direction](const auto& src_val, auto& dest_val) { dest_val = src_val * direction[0] + dest_val * direction[1]; });
   if (dbg) {
-    dbg->add(visualizeGradient(image, mainGrid), "second_dir_deriv");
+    dbg->add(visualizeGradient(static_cast<const QImage&>(image), mainGrid), "second_dir_deriv");
   }
 
   float max = 0;
@@ -342,7 +341,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
       [](auto& dest_val, const auto& src_val) { dest_val = std::fabs(src_val); });
 
   if (dbg) {
-    dbg->add(visualizeGradient(image, auxGrid), "abs");
+    dbg->add(visualizeGradient(static_cast<const QImage&>(image), auxGrid), "abs");
   }
 
   gaussBlurGeneric(size, 12.0f, 12.0f, auxGrid.data(), auxGrid.stride(),
@@ -350,14 +349,14 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
       [](auto& dest_val, const auto& src_val) { dest_val = src_val; });
 
   if (dbg) {
-    dbg->add(visualizeGradient(image, auxGrid), "blurred");
+    dbg->add(visualizeGradient(static_cast<const QImage&>(image), auxGrid), "blurred");
   }
 
   rasterOpGeneric(mainGrid.data(), mainGrid.stride(), size, auxGrid.data(), auxGrid.stride(),
       [](auto& dest_val, const auto& src_val) { dest_val += src_val - std::fabs(src_val); });
 
   if (dbg) {
-    dbg->add(visualizeGradient(image, auxGrid), "+= diff");
+    dbg->add(visualizeGradient(static_cast<const QImage&>(image), auxGrid), "+= diff");
   }
 
   BinaryImage postBinarization(image.size());
@@ -398,7 +397,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   findMidLineSeeds(sedm, midLine, seeds);
 
   if (dbg) {
-    dbg->add(visualizeMidLineSeeds(image, postBinarization, bounds, midLine, seeds), "seeds");
+    dbg->add(visualizeMidLineSeeds(static_cast<const QImage&>(image), postBinarization, bounds, midLine, seeds), "seeds");
   }
 
   postBinarization.release();  // Save memory.
@@ -444,7 +443,7 @@ BinaryImage TextLineTracer::closeWithObstacles(const BinaryImage& image,
                                                const QSize& brick) {
   BinaryImage mask(closeBrick(image, brick));
   rasterOp<RopSubtract<RopDst, RopSrc>>(mask, obstacles);
-  return seedFill(image, mask, CONN4);
+  return seedFill(image, mask, Connectivity::CONN4);
 }
 
 void TextLineTracer::findMidLineSeeds(const SEDM& sedm, QLineF midLine, std::vector<QPoint>& seeds) {
@@ -488,7 +487,7 @@ QLineF TextLineTracer::calcMidLine(const QLineF& line1, const QLineF& line2) {
     Vec2d v2(line2.p2() - line2.p1());
     v1 /= std::sqrt(v1.squaredNorm());
     v2 /= std::sqrt(v2.squaredNorm());
-    return QLineF(intersection, intersection + 0.5 * (v1 + v2));
+    return QLineF(intersection, QPointF(Vec2d(intersection) + 0.5 * (v1 + v2)));
   }
 }
 

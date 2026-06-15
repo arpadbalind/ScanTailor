@@ -165,7 +165,7 @@ GrayImage stretchGrayRange(const GrayImage& src, const double blackClipFraction,
   int blackClipPixels = qRound(blackClipFraction * numPixels);
   int whiteClipPixels = qRound(whiteClipFraction * numPixels);
 
-  const GrayscaleHistogram hist(dst);
+  const GrayscaleHistogram hist(static_cast<const QImage&>(dst));
 
   int min = 0;
   if (blackClipFraction >= 1.0) {

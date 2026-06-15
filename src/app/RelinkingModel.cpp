@@ -104,7 +104,7 @@ int RelinkingModel::rowCount(const QModelIndex& parent) const {
 }
 
 QVariant RelinkingModel::data(const QModelIndex& index, int role) const {
-  const Item& item = m_items[index.row()];
+  const Item& item = m_items[static_cast<std::size_t>(index.row())];
 
   switch (role) {
     case TypeRole:
@@ -131,8 +131,6 @@ QVariant RelinkingModel::data(const QModelIndex& index, int role) const {
 }
 
 void RelinkingModel::addPath(const RelinkablePath& path) {
-  const QString& normalizedPath(path.normalizedPath());
-
   const std::pair<std::set<QString>::iterator, bool> ins(m_origPathSet.insert(path.normalizedPath()));
   if (!ins.second) {
     // Not inserted because identical path is already there.
@@ -282,7 +280,7 @@ void RelinkingModel::ensureEndsWithSlash(QString& str) {
 void RelinkingModel::requestStatusUpdate(const QModelIndex& index) {
   assert(index.isValid());
 
-  Item& item = m_items[index.row()];
+  Item& item = m_items[static_cast<std::size_t>(index.row())];
   item.uncommittedStatus = StatusUpdatePending;
 
   m_statusUpdateThread->requestStatusUpdate(item.uncommittedPath, index.row());
@@ -298,7 +296,7 @@ void RelinkingModel::customEvent(QEvent* event) {
     return;
   }
 
-  Item& item = m_items[response.row()];
+  Item& item = m_items[static_cast<std::size_t>(response.row())];
   if (item.uncommittedPath == response.path()) {
     item.uncommittedStatus = response.status();
   }

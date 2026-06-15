@@ -103,7 +103,7 @@ Skew SkewFinder::findSkew(const BinaryImage& image) const {
 
   for (int i = 0; i <= numCoarseSteps; ++i) {
     const double angle = -m_maxAngle + (i * coarseStep);
-    const double score = process(coarseReduced, skewed, angle);
+    const double score = process(static_cast<BinaryImage>(coarseReduced), skewed, angle);
     sumCoarseScores += score;
     ++numCoarseScores;
     if (score > bestCoarseScore) {
@@ -130,17 +130,17 @@ Skew SkewFinder::findSkew(const BinaryImage& image) const {
   // Fine binary search.
   double anglePlus = bestCoarseAngle + 0.5 * coarseStep;
   double angleMinus = bestCoarseAngle - 0.5 * coarseStep;
-  double scorePlus = process(fineReduced, skewed, anglePlus);
-  double scoreMinus = process(fineReduced, skewed, angleMinus);
+  double scorePlus = process(static_cast<BinaryImage>(fineReduced), skewed, anglePlus);
+  double scoreMinus = process(static_cast<BinaryImage>(fineReduced), skewed, angleMinus);
   const double fineScore1 = scorePlus;
   const double fineScore2 = scoreMinus;
   while (anglePlus - angleMinus > m_accuracy) {
     if (scorePlus > scoreMinus) {
       angleMinus = 0.5 * (anglePlus + angleMinus);
-      scoreMinus = process(fineReduced, skewed, angleMinus);
+      scoreMinus = process(static_cast<BinaryImage>(fineReduced), skewed, angleMinus);
     } else if (scorePlus < scoreMinus) {
       anglePlus = 0.5 * (anglePlus + angleMinus);
-      scorePlus = process(fineReduced, skewed, anglePlus);
+      scorePlus = process(static_cast<BinaryImage>(fineReduced), skewed, anglePlus);
     } else {
       // This protects us from unreasonably low m_accuracy.
       break;
@@ -181,7 +181,7 @@ Skew SkewFinder::findSkew(const BinaryImage& image) const {
 double SkewFinder::process(const BinaryImage& src, BinaryImage& dst, const double angle) const {
   const double tg = std::tan(angle * constants::DEG2RAD);
   const double xCenter = 0.5 * dst.width();
-  vShearFromTo(src, dst, tg / m_resolutionRatio, xCenter, WHITE);
+  vShearFromTo(src, dst, tg / m_resolutionRatio, xCenter, BWColor::WHITE);
   return calcScore(dst);
 }
 

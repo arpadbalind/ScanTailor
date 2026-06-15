@@ -9,13 +9,13 @@
 
 namespace imageproc {
 GrayImage morphGradientDetectDarkSide(const GrayImage& image, const QSize& area) {
-  GrayImage lighter(erodeGray(image, area, 0x00));
+  GrayImage lighter(erodeGray(image, Brick(area), 0x00));
   grayRasterOp<GRopUnclippedSubtract<GRopDst, GRopSrc>>(lighter, image);
   return lighter;
 }
 
 GrayImage morphGradientDetectLightSide(const GrayImage& image, const QSize& area) {
-  GrayImage darker(dilateGray(image, area, 0xff));
+  GrayImage darker(dilateGray(image, Brick(area), 0xff));
   grayRasterOp<GRopUnclippedSubtract<GRopSrc, GRopDst>>(darker, image);
   return darker;
 }

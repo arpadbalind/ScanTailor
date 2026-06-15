@@ -425,7 +425,7 @@ void dewarpGeneric(const PixelType* const srcData,
     const double modelX = (dstX - modelDomainLeft) * modelXScale;
     const CylindricalSurfaceDewarper::Generatrix generatrix(distortionModel.mapGeneratrix(modelX, state));
 
-    const HomographicTransform<1, float> homog(generatrix.pln2img.mat());
+    const HomographicTransform<1, float> homog(VecNT<4, float>(generatrix.pln2img.mat()));
     const Vec2f origin(generatrix.imgLine.p1());
     const Vec2f vec(generatrix.imgLine.p2() - generatrix.imgLine.p1());
     for (int dstY = 0; dstY <= dstHeight; ++dstY) {

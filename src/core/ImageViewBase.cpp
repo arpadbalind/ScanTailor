@@ -31,8 +31,7 @@
 using namespace core;
 using namespace imageproc;
 
-class ImageViewBase::HqTransformTask : public AbstractCommand<std::shared_ptr<AbstractCommand<void>>>, public QObject {
-  DECLARE_NON_COPYABLE(HqTransformTask)
+class ImageViewBase::HqTransformTask : public AbstractCommand<std::shared_ptr<AbstractCommand<void>>>, public QObject, private NonCopyable {
 
  public:
   HqTransformTask(ImageViewBase* imageView, const QImage& image, const QTransform& xform, const QSize& targetSize);

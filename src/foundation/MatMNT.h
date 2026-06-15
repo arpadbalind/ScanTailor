@@ -1,12 +1,12 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_MATMNT_H_
-#define SCANTAILOR_FOUNDATION_MATMNT_H_
-
+#pragma once
+#include <algorithm>
+#include <array>
 #include <cstddef>
 
-template <size_t M, size_t N, typename T>
+template <std::size_t M, std::size_t N, typename T>
 class MatMNT;
 
 using Mat22f = MatMNT<2, 2, float>;
@@ -21,11 +21,12 @@ using Mat44d = MatMNT<4, 4, double>;
  *
  * \note The memory layout is always column-major, as that's what MatrixCalc uses.
  */
-template <size_t M, size_t N, typename T>
+template <std::size_t M, std::size_t N, typename T>
 class MatMNT {
  public:
   using type = T;
-  enum { ROWS = static_cast<int>(M), COLS = static_cast<int>(N) };
+  static constexpr std::size_t ROWS{ M };
+  static constexpr std::size_t COLS{ N };
 
   /**
    * \brief Initializes matrix elements to T().
@@ -54,46 +55,40 @@ class MatMNT {
    * Conversion is done by static casts.
    */
   template <typename OT>
-  MatMNT& operator=(const MatMNT<M, N, OT>& other);
+  auto operator=(const MatMNT<M, N, OT>& other) -> MatMNT&;
 
-  const T* data() const { return m_data; }
+  [[nodiscard]] auto data() const -> const T* { return m_data.data(); }
 
-  T* data() { return m_data; }
+  auto data() -> T* { return m_data.data(); }
 
-  const T& operator()(int i, int j) const { return m_data[i + j * M]; }
+  auto operator()(int i, int j) const -> const T& { return m_data[i + (j * M)]; }
 
-  T& operator()(int i, int j) { return m_data[i + j * M]; }
+  auto operator()(int i, int j) -> T& { return m_data[i + (j * M)]; }
 
  private:
-  T m_data[M * N];
+  std::array<T, M * N> m_data;
 };
 
 
-template <size_t M, size_t N, typename T>
+template <std::size_t M, std::size_t N, typename T>
 MatMNT<M, N, T>::MatMNT() {
-  const size_t len = ROWS * COLS;
-  for (size_t i = 0; i < len; ++i) {
-    m_data[i] = T();
+  for (auto& x : m_data) {
+    x = T();
   }
 }
 
-template <size_t M, size_t N, typename T>
+template <std::size_t M, std::size_t N, typename T>
 template <typename OT>
 MatMNT<M, N, T>::MatMNT(const OT* data) {
-  const size_t len = ROWS * COLS;
-  for (size_t i = 0; i < len; ++i) {
-    m_data[i] = static_cast<T>(data[i]);
-  }
+  std::transform(data, data + (ROWS * COLS), m_data.begin(),
+                 [](const OT& v) { return static_cast<T>(v); });
 }
 
-template <size_t M, size_t N, typename T>
+template <std::size_t M, std::size_t N, typename T>
 template <typename OT>
 MatMNT<M, N, T>::MatMNT(const MatMNT<M, N, OT>& other) {
-  const OT* data = other.data();
-  const size_t len = ROWS * COLS;
-  for (size_t i = 0; i < len; ++i) {
-    m_data[i] = static_cast<T>(data[i]);
-  }
+  std::transform(other.data(),
+                 other.data() + (ROWS * COLS),
+                 m_data.begin(),
+                 [](const OT& v) { return static_cast<T>(v); });
 }
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_MATMNT_H_

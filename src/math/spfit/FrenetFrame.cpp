@@ -2,15 +2,16 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "FrenetFrame.h"
+#include "VecNT.h"
 
 #include <cmath>
 
 namespace spfit {
 FrenetFrame::FrenetFrame(const Vec2d& origin, const Vec2d& tangentVector, YAxisDirection ydir) : m_origin(origin) {
   const double sqlen = tangentVector.squaredNorm();
-  if (sqlen > 1e-6) {
-    m_unitTangent = tangentVector / std::sqrt(sqlen);
-    if (ydir == Y_POINTS_UP) {
+  if (sqlen > epsilon) {
+    m_unitTangent = Vec2d(QPointF(tangentVector) / std::sqrt(sqlen));
+    if (ydir == FrenetFrame::YAxisDirection::Y_POINTS_UP) {
       m_unitNormal[0] = -m_unitTangent[1];
       m_unitNormal[1] = m_unitTangent[0];
     } else {

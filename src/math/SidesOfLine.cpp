@@ -2,12 +2,14 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "SidesOfLine.h"
+#include <QLineF>
+#include <QPointF>
 
-qreal sidesOfLine(const QLineF& line, const QPointF& p1, const QPointF& p2) {
+float sidesOfLine(const QLineF& line, const QPointF& p1, const QPointF& p2) {
   const QPointF normal(line.normalVector().p2() - line.p1());
   const QPointF vec1(p1 - line.p1());
   const QPointF vec2(p2 - line.p1());
-  const qreal dot1 = normal.x() * vec1.x() + normal.y() * vec1.y();
-  const qreal dot2 = normal.x() * vec2.x() + normal.y() * vec2.y();
+  const float dot1 = normal.x() * vec1.x() + normal.y() * vec1.y();
+  const float dot2 = normal.x() * vec2.x() + normal.y() * vec2.y();
   return dot1 * dot2;
 }

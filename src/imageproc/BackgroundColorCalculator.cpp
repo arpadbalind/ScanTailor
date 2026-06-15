@@ -177,8 +177,8 @@ QColor BackgroundColorCalculator::calcDominantBackgroundColor(const QImage& img,
     throw std::invalid_argument("BackgroundColorCalculator: the cropping area is wrong.");
   }
 
-  BinaryImage mask(img.size(), BLACK);
-  PolygonRasterizer::fillExcept(mask, WHITE, cropArea, Qt::WindingFill);
+  BinaryImage mask(img.size(), BWColor::BLACK);
+  PolygonRasterizer::fillExcept(mask, BWColor::WHITE, cropArea, Qt::WindingFill);
   return calcDominantBackgroundColor(img, mask);
 }
 

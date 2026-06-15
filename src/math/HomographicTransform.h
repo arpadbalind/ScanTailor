@@ -1,18 +1,17 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_HOMOGRAPHICTRANSFORM_H_
-#define SCANTAILOR_MATH_HOMOGRAPHICTRANSFORM_H_
+#pragma once
 
 #include <cstddef>
 
 #include "MatrixCalc.h"
 #include "VecNT.h"
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 class HomographicTransform;
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 class HomographicTransformBase {
  public:
   using Vec = VecNT<N, T>;
@@ -31,7 +30,7 @@ class HomographicTransformBase {
 };
 
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 class HomographicTransform : public HomographicTransformBase<N, T> {
  public:
   explicit HomographicTransform(const typename HomographicTransformBase<N, T>::Mat& mat)
@@ -53,7 +52,7 @@ class HomographicTransform<1, T> : public HomographicTransformBase<1, T> {
 };
 
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 HomographicTransform<N, T> HomographicTransformBase<N, T>::inv() const {
   StaticMatrixCalc<T, 4 * (N + 1) * (N + 1), N + 1> mc;
   Mat invMat;
@@ -61,7 +60,7 @@ HomographicTransform<N, T> HomographicTransformBase<N, T>::inv() const {
   return HomographicTransform<N, T>(invMat);
 }
 
-template <size_t N, typename T>
+template <std::size_t N, typename T>
 typename HomographicTransformBase<N, T>::Vec HomographicTransformBase<N, T>::operator()(const Vec& from) const {
   StaticMatrixCalc<T, N + 1, 1> mc;
   const VecNT<N + 1, T> hsrc(from, T(1));
@@ -78,5 +77,3 @@ T HomographicTransform<1, T>::operator()(T from) const {
   const T* m = this->mat().data();
   return (from * m[0] + m[2]) / (from * m[1] + m[3]);
 }
-
-#endif  // ifndef SCANTAILOR_MATH_HOMOGRAPHICTRANSFORM_H_

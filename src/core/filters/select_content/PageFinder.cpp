@@ -41,10 +41,10 @@ QRectF PageFinder::findPageBox([[maybe_unused]] const TaskStatus& status,
 #endif
 
   const GrayImage dataGrayImage = data.grayImageBlackOnWhite();
-  const uint8_t darkestGrayLevel = imageproc::darkestGrayLevel(dataGrayImage);
+  const uint8_t darkestGrayLevel = imageproc::darkestGrayLevel(static_cast<const QImage&>(dataGrayImage));
   const QColor outsideColor(darkestGrayLevel, darkestGrayLevel, darkestGrayLevel);
 
-  QImage gray150(transformToGray(dataGrayImage, xform150dpi.transform(), xform150dpi.resultingRect().toRect(),
+  QImage gray150(transformToGray(static_cast<const QImage&>(dataGrayImage), xform150dpi.transform(), xform150dpi.resultingRect().toRect(),
                                  OutsidePixels::assumeColor(outsideColor)));
   if (dbg) {
     dbg->add(gray150, "gray150");

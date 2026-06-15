@@ -214,7 +214,7 @@ BinaryImage ConnectivityMap::getBinaryMask() const {
     return BinaryImage();
   }
 
-  BinaryImage dst(m_size, WHITE);
+  BinaryImage dst(m_size, BWColor::WHITE);
 
   const int width = m_size.width();
   const int height = m_size.height();
@@ -306,10 +306,10 @@ void ConnectivityMap::assignIds(const Connectivity conn) {
   std::vector<uint32_t> table(numInitialTags, 0);
 
   switch (conn) {
-    case CONN4:
+    case Connectivity::CONN4:
       spreadMin4();
       break;
-    case CONN8:
+    case Connectivity::CONN8:
       spreadMin8();
       break;
   }

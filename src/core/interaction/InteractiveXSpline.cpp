@@ -198,9 +198,9 @@ void InteractiveXSpline::controlPointMoveRequest(int idx, const QPointF& pos, Qt
         (mc(mat, 2, 2) * mc(pt, 2, 1)).write(pt);
 
         if (!modified) {  // default behavior
-          m_spline.moveControlPoint(i, pt + origin);
+          m_spline.moveControlPoint(i, QPointF(pt) + origin);
         } else {  // Ctrl or Shift is pressed
-          Vec2d shift = storagePt - oldPos;
+          QPointF shift = storagePt - oldPos;
           QPointF newPosition = m_spline.controlPointPosition(i) + shift;
 
           if (!swapSides) {

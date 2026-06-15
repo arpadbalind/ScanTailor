@@ -1,9 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_SEDM_H_
-#define SCANTAILOR_IMAGEPROC_SEDM_H_
-
+#pragma once
 #include <FlagOps.h>
 
 #include <QSize>
@@ -31,7 +29,7 @@ class SEDM {
   /**
    * \brief The type of distance to compute.
    */
-  enum DistType {
+  enum class DistType : std::uint8_t {
     /**
      * For every black pixel, the distance to the nearest
      * white one is computed.
@@ -48,7 +46,7 @@ class SEDM {
   /**
    * \brief Determines whether to compute the distance to borders.
    */
-  enum Borders {
+  enum class Borders : std::uint8_t {
     DIST_TO_NO_BORDERS = 0,
     DIST_TO_TOP_BORDER = 1,
     DIST_TO_LEFT_BORDER = 2,
@@ -90,7 +88,7 @@ class SEDM {
    *        distance to particular borders.  The borders
    *        are assumed to lie one pixel off the image area.
    */
-  explicit SEDM(const BinaryImage& image, DistType distType = DIST_TO_WHITE, Borders borders = DIST_TO_ALL_BORDERS);
+  explicit SEDM(const BinaryImage& image, DistType distType = DistType::DIST_TO_WHITE, Borders borders = Borders::DIST_TO_ALL_BORDERS);
 
   /**
    * \brief Build a distance map from a connectivity map.
@@ -105,23 +103,29 @@ class SEDM {
    */
   explicit SEDM(ConnectivityMap& cmap);
 
+  virtual ~SEDM() = default;
+
   SEDM(const SEDM& other);
+
+  SEDM(SEDM&& other) noexcept;
 
   SEDM& operator=(const SEDM& other);
 
-  void swap(SEDM& other);
+  SEDM& operator=(SEDM&& other) noexcept;
+
+  void swap(SEDM& other) noexcept;
 
   /**
    * \brief Return the dimensions of the distance map.
    */
-  QSize size() const { return m_size; }
+  [[nodiscard]] QSize size() const { return m_size; }
 
   /**
    * \brief Return the number of 32bit words in a line.
    *
    * This value is going to be size().width() + 2.
    */
-  int stride() const { return m_stride; }
+  [[nodiscard]] int stride() const { return m_stride; }
 
   /**
    * \brief Return a matrix of squared distances in row-major order.
@@ -131,7 +135,7 @@ class SEDM {
   /**
    * \brief Return a matrix of squared distances in row-major order.
    */
-  const uint32_t* data() const { return m_plainData; }
+  [[nodiscard]] const uint32_t* data() const { return m_plainData; }
 
   /**
    * \brief Finds peaks on the distance map, altering it in the process.
@@ -164,7 +168,7 @@ class SEDM {
 
   void processRows(ConnectivityMap& cmap);
 
-  BinaryImage findPeakCandidatesNonPadded() const;
+  [[nodiscard]] BinaryImage findPeakCandidatesNonPadded() const;
 
   BinaryImage buildEqualMapNonPadded(const uint32_t* src1, const uint32_t* src2) const;
 
@@ -183,10 +187,7 @@ class SEDM {
 };
 
 
-inline void swap(SEDM& o1, SEDM& o2) {
+inline void swap(SEDM& o1, SEDM& o2) noexcept {
   o1.swap(o2);
 }
-
-DEFINE_FLAG_OPS(SEDM::Borders)
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_SEDM_H_

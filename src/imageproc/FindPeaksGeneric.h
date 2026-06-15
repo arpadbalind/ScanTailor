@@ -52,7 +52,7 @@ void raiseAllButPeaks(MostSignificantSelector mostSignificant,
   // Slightly raise the mask relative to toBeRaised.
   std::transform(mask.begin(), mask.end(), mask.begin(), increaseSignificance);
 
-  seedFillGenericInPlace(mostSignificant, leastSignificant, CONN8, &toBeRaised[0], toBeRaisedStride, size, &mask[0],
+  seedFillGenericInPlace(mostSignificant, leastSignificant, Connectivity::CONN8, &toBeRaised[0], toBeRaisedStride, size, &mask[0],
                          maskStride);
 }
 }  // namespace find_peaks
@@ -158,7 +158,7 @@ BinaryImage findPeaksGeneric(MostSignificantSelector mostSignificant,
   detail::find_peaks::raiseAllButPeaks(mostSignificant, leastSignificant, increaseSignificance, peakNeighborhood,
                                        outsideValues, data, stride, size, &raised[0], raisedStride);
 
-  BinaryImage peaks(size, WHITE);
+  BinaryImage peaks(size, BWColor::WHITE);
   uint32_t* peaksLine = peaks.data();
   const int peaksStride = peaks.wordsPerLine();
   const T* dataLine = data;

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_TASK_H_
-#define SCANTAILOR_OUTPUT_TASK_H_
+#pragma once
 
 #include <QColor>
 #include <QImage>
@@ -32,9 +31,7 @@ namespace output {
 class Filter;
 class Settings;
 
-class Task {
-  DECLARE_NON_COPYABLE(Task)
-
+class Task : private NonCopyable {
  public:
   Task(std::shared_ptr<Filter> filter,
        std::shared_ptr<Settings> settings,
@@ -65,4 +62,3 @@ class Task {
   bool m_debug;
 };
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_TASK_H_

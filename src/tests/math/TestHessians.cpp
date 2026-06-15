@@ -2,13 +2,14 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "TestUtils.h"
-#include <adiff/Function.h>
 #include <gtest/gtest.h>
-#include <cmath>
-#include <cstdlib>
 
-namespace adiff {
-namespace tests {
+#include "adiff/Function.h"
+#include "adiff/SparseMap.h"
+#include "MatT.h"
+#include "VecT.h"
+
+namespace adiff::tests {
 
 TEST(AutomaticDifferentiationTestSuite, test1) {
   // F(x) = x^2  | x = 3
@@ -89,6 +90,4 @@ TEST(AutomaticDifferentiationTestSuite, test3) {
   ExpectClose(hessian(1, 0), 72, 1e-06);
   ExpectClose(hessian(1, 1), 16, 1e-06);
 }
-
-}  // namespace tests
-}  // namespace adiff
+}

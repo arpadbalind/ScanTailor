@@ -10,9 +10,8 @@
 
 #include "NonCopyable.h"
 
-class OutOfMemoryHandler : public QObject {
+class OutOfMemoryHandler : public QObject, private NonCopyable {
   Q_OBJECT
-  DECLARE_NON_COPYABLE(OutOfMemoryHandler)
 
  public:
   static OutOfMemoryHandler& instance();

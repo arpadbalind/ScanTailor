@@ -4,8 +4,9 @@
 #include "LinearFunction.h"
 
 #include <algorithm>
+#include <cstddef>
 
-LinearFunction::LinearFunction(size_t numVars) : a(numVars), b(0) {}
+LinearFunction::LinearFunction(std::size_t numVars) : a(numVars) {}
 
 void LinearFunction::reset() {
   a.fill(0);
@@ -13,16 +14,16 @@ void LinearFunction::reset() {
 }
 
 double LinearFunction::evaluate(const double* x) const {
-  const size_t numVars = this->numVars();
+  const std::size_t numVars = this->numVars();
 
   double sum = b;
-  for (size_t i = 0; i < numVars; ++i) {
+  for (std::size_t i = 0; i < numVars; ++i) {
     sum += a[i] * x[i];
   }
   return sum;
 }
 
-void LinearFunction::swap(LinearFunction& other) {
+void LinearFunction::swap(LinearFunction& other) noexcept {
   a.swap(other.a);
   std::swap(b, other.b);
 }

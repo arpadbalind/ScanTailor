@@ -71,27 +71,33 @@ class MatT {
 
   MatT& operator*=(T scalar);
 
-  size_t rows() const { return m_rows; }
+  MatT(MatT&&) = default;
 
-  size_t cols() const { return m_cols; }
+  MatT& operator=(MatT&&) = default;
 
-  const T* data() const { return m_data.data(); }
+  ~MatT() = default;
 
-  T* data() { return m_data.data(); }
+  [[nodiscard]] size_t rows() const { return m_rows; }
+
+  [[nodiscard]] size_t cols() const { return m_cols; }
+
+  [[nodiscard]] const T* data() const { return m_data.data(); }
+
+  [[nodiscard]] T* data() { return m_data.data(); }
 
   const T& operator()(size_t row, size_t col) const {
     assert(row < m_rows && col < m_cols);
-    return m_data[row + col * m_rows];
+    return m_data[row + (col * m_rows)];
   }
 
   T& operator()(size_t row, size_t col) {
     assert(row < m_rows && col < m_cols);
-    return m_data[row + col * m_rows];
+    return m_data[row + (col * m_rows)];
   }
 
   void fill(const T& value);
 
-  void swap(MatT& other);
+  void swap(MatT& other) noexcept;
 
  private:
   size_t m_rows;
@@ -198,7 +204,7 @@ void MatT<T>::fill(const T& value) {
 }
 
 template <typename T>
-void MatT<T>::swap(MatT& other) {
+void MatT<T>::swap(MatT& other) noexcept {
   size_t tmp = m_rows;
   m_rows = other.m_rows;
   other.m_rows = tmp;
@@ -211,7 +217,7 @@ void MatT<T>::swap(MatT& other) {
 }
 
 template <typename T>
-void swap(const MatT<T>& o1, const MatT<T>& o2) {
+void swap(const MatT<T>& o1, const MatT<T>& o2) noexcept {
   o1.swap(o2);
 }
 

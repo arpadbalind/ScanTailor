@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_INTERACTION_OBJECTDRAGHANDLER_H_
-#define SCANTAILOR_INTERACTION_OBJECTDRAGHANDLER_H_
+#pragma once
 
 #include <QPointF>
 #include <set>
@@ -17,8 +16,6 @@ class QCursor;
 class QString;
 
 class ObjectDragHandler : public InteractionHandler {
-  DECLARE_NON_COPYABLE(ObjectDragHandler)
-
  public:
   explicit ObjectDragHandler(DraggableObject* obj = nullptr);
 
@@ -61,6 +58,3 @@ class ObjectDragHandler : public InteractionHandler {
   std::set<Qt::KeyboardModifiers> m_keyboardModifiersSet;
   Qt::KeyboardModifiers m_activeKeyboardModifiers;
 };
-
-
-#endif  // ifndef SCANTAILOR_INTERACTION_OBJECTDRAGHANDLER_H_

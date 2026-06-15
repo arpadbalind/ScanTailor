@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_REDUCETHRESHOLD_H_
-#define SCANTAILOR_IMAGEPROC_REDUCETHRESHOLD_H_
+#pragma once
 
 #include "BinaryImage.h"
 
@@ -42,12 +41,12 @@ class ReduceThreshold {
   /**
    * \brief Implicit conversion to BinaryImage.
    */
-  operator const BinaryImage&() const { return m_image; }
+  explicit operator const BinaryImage&() const { return m_image; }
 
   /**
    * \brief Returns a reference to the reduced image.
    */
-  const BinaryImage& image() const { return m_image; }
+  [[nodiscard]] const BinaryImage& image() const { return m_image; }
 
   /**
    * \brief Performs a reduction and returns *this.
@@ -70,4 +69,3 @@ class ReduceThreshold {
   BinaryImage m_image;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_REDUCETHRESHOLD_H_

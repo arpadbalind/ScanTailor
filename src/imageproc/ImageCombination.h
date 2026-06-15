@@ -19,7 +19,7 @@ void combineImages(QImage& mixedImage, const QImage& foreground);
 
 void combineImages(QImage& mixedImage, const QImage& foreground, const BinaryImage& mask);
 
-void applyMask(QImage& image, const BinaryImage& bwMask, BWColor fillingColor = WHITE);
+void applyMask(QImage& image, const BinaryImage& bwMask, BWColor fillingColor = BWColor::WHITE);
 }  // namespace imageproc
 
 

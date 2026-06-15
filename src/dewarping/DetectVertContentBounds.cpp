@@ -297,7 +297,7 @@ QLineF SequentialColumnProcessor::interpolateSegments(const std::vector<Segment>
   assert(accumWeight != 0);
   accumVec /= accumWeight;
 
-  QLineF line(m_path.front(), m_path.front() + accumVec);
+  QLineF line(m_path.front(), QPointF(Vec2d(m_path.front()) + accumVec));
   Vec2d normal(-accumVec[1], accumVec[0]);
   if ((m_leftOrRight == RIGHT) != (normal[0] < 0)) {
     normal = -normal;
@@ -305,9 +305,9 @@ QLineF SequentialColumnProcessor::interpolateSegments(const std::vector<Segment>
   // normal now points *inside* the image, towards the other bound.
   // Now find the vertex in m_path through which our line should pass.
   for (const QPoint& pt : m_path) {
-    if (normal.dot(pt - line.p1()) < 0) {
+    if (normal.dot(Vec2d(pt - line.p1())) < 0) {
       line.setP1(pt);
-      line.setP2(line.p1() + accumVec);
+      line.setP2(line.p1() + QPointF(accumVec));
     }
   }
   return line;

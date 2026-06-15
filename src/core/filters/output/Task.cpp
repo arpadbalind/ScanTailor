@@ -381,7 +381,7 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data, 
       // Even if despeckling didn't actually take place, we still need
       // to write an empty speckles file.  Making it a special case
       // is simply not worth it.
-      BinaryImage(outImg.size(), WHITE).swap(specklesImg);
+      BinaryImage(outImg.size(), BWColor::WHITE).swap(specklesImg);
     }
 
     if (writeAutomask) {

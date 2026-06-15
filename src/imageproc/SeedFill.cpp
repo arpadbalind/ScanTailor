@@ -406,7 +406,7 @@ BinaryImage seedFill(const BinaryImage& seed, const BinaryImage& mask, const Con
 
   do {
     prev = img;
-    if (connectivity == CONN4) {
+    if (connectivity == Connectivity::CONN4) {
       seedFill4Iteration(img, mask);
     } else {
       seedFill8Iteration(img, mask);
@@ -437,7 +437,7 @@ void seedFillGrayInPlace(GrayImage& seed, const GrayImage& mask, const Connectiv
 GrayImage seedFillGraySlow(const GrayImage& seed, const GrayImage& mask, const Connectivity connectivity) {
   GrayImage img(seed);
 
-  if (connectivity == CONN4) {
+  if (connectivity == Connectivity::CONN4) {
     while (seedFillGray4SlowIteration(img, mask)) {
       // Continue until done.
     }

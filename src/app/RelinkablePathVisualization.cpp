@@ -10,6 +10,8 @@
 #include <QStyleOption>
 #include <QStylePainter>
 
+#include <cstddef>
+
 #include "ColorSchemeManager.h"
 #include "RelinkablePath.h"
 
@@ -18,10 +20,10 @@ struct RelinkablePathVisualization::PathComponent {
   QString prefixPath;         // Including the component itself.
   QString suffixPath;         // Rest of the path.
   RelinkablePath::Type type;  // File or Dir.
-  bool exists;
+  bool exists{ false };
 
-  PathComponent(const QString& lbl, const QString& prefixPath, const QString& suffixPath, RelinkablePath::Type t)
-      : label(lbl), prefixPath(prefixPath), suffixPath(suffixPath), type(t), exists(false) {}
+  PathComponent(const QString& pLabel, const QString& pPrefixPath, const QString& pSuffixPath, RelinkablePath::Type t)
+      : label(pLabel), prefixPath(pPrefixPath), suffixPath(pSuffixPath), type(t) {}
 };
 
 
@@ -69,7 +71,7 @@ void RelinkablePathVisualization::setPath(const RelinkablePath& path, bool click
   }
 
   std::vector<PathComponent> pathComponents;
-  pathComponents.reserve(components.size());
+  pathComponents.reserve(static_cast<std::size_t>(components.size()));
 
   for (QStringList::const_iterator it(components.begin()); it != components.end(); ++it) {
     const QString& component = *it;
@@ -236,10 +238,12 @@ void RelinkablePathVisualization::checkForExistence(std::vector<PathComponent>& 
     return;
   }
 
-  int left = -1;                                         // Existing component (unless -1).
-  auto right = static_cast<int>(components.size() - 1);  // Non-existing component (we checked it above).
-  while (right - left > 1) {
-    const int mid = (left + right + 1) >> 1;
+  std::size_t left = std::numeric_limits<std::size_t>::max(); // "invalid" sentinel
+  std::size_t right = components.size();                       // first invalid index
+
+  while (right > left + 1) {
+    const std::size_t mid = left + (right - left) / 2;
+
     if (QFile::exists(components[mid].prefixPath)) {
       left = mid;
     } else {
@@ -247,7 +251,7 @@ void RelinkablePathVisualization::checkForExistence(std::vector<PathComponent>& 
     }
   }
 
-  for (auto i = static_cast<int>(components.size() - 1); i >= 0; --i) {
+  for (std::size_t i{ 0 }; i < components.size(); ++i) {
     components[i].exists = (i < right);
   }
 }  // RelinkablePathVisualization::checkForExistence

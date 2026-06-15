@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_INTERACTION_INTERACTIONHANDLER_H_
-#define SCANTAILOR_INTERACTION_INTERACTIONHANDLER_H_
+#pragma once
 
 #include <boost/intrusive/list.hpp>
 #include <memory>
@@ -18,9 +17,7 @@ class QContextMenuEvent;
 class QPointF;
 
 class InteractionHandler
-    : public boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::auto_unlink>> {
-  DECLARE_NON_COPYABLE(InteractionHandler)
-
+    : public boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::auto_unlink>>, private NonCopyable {
  public:
   InteractionHandler();
 
@@ -88,6 +85,3 @@ class InteractionHandler
   std::shared_ptr<HandlerList> m_preceeders;
   std::shared_ptr<HandlerList> m_followers;
 };
-
-
-#endif  // ifndef SCANTAILOR_INTERACTION_INTERACTIONHANDLER_H_

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_CONTENTSPANFINDER_H_
-#define SCANTAILOR_CORE_CONTENTSPANFINDER_H_
+#pragma once
 
 #include "Span.h"
 #include "VirtualFunction.h"
@@ -14,7 +13,7 @@ class SlicedHistogram;
 class ContentSpanFinder {
   // Member-wise copying is OK.
  public:
-  ContentSpanFinder() : m_minContentWidth(1), m_minWhitespaceWidth(1) {}
+  ContentSpanFinder() = default;
 
   void setMinContentWidth(int value) { m_minContentWidth = value; }
 
@@ -33,8 +32,8 @@ class ContentSpanFinder {
  private:
   void findImpl(const imageproc::SlicedHistogram& histogram, const VirtualFunction<void, const Span&>& handler) const;
 
-  int m_minContentWidth;
-  int m_minWhitespaceWidth;
+  int m_minContentWidth{ 1 };
+  int m_minWhitespaceWidth{ 1 };
 };
 
 
@@ -42,5 +41,3 @@ template <typename Callable>
 void ContentSpanFinder::find(const imageproc::SlicedHistogram& histogram, Callable handler) const {
   findImpl(histogram, ProxyFunction<Callable, void, const Span&>(handler));
 }
-
-#endif  // ifndef SCANTAILOR_CORE_CONTENTSPANFINDER_H_

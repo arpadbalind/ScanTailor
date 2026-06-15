@@ -298,7 +298,7 @@ void PolygonRasterizer::Rasterizer::fillBinary(BinaryImage& image, const BWColor
 
   uint32_t* line = image.data();
   const int wpl = image.wordsPerLine();
-  const uint32_t pattern = (color == WHITE) ? 0 : ~uint32_t(0);
+  const uint32_t pattern = (color == BWColor::WHITE) ? 0 : ~uint32_t(0);
 
   int i = qRound(m_boundingBox.top());
   line += i * wpl;

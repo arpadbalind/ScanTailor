@@ -506,7 +506,7 @@ void fillExcept(BinaryImage& image, const BinaryImage& bwMask, const BWColor col
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (!(bwMaskLine[x >> 5] & (msb >> (x & 31)))) {
-        if (color == BLACK) {
+        if (color == BWColor::BLACK) {
           imageLine[x >> 5] |= (msb >> (x & 31));
         } else {
           imageLine[x >> 5] &= ~(msb >> (x & 31));
@@ -528,7 +528,7 @@ void fillMarginsInPlace(QImage& image,
 
   if ((image.format() == QImage::Format_Mono) || (image.format() == QImage::Format_MonoLSB)) {
     BinaryImage binaryImage(image);
-    PolygonRasterizer::fillExcept(binaryImage, (color == Qt::black) ? BLACK : WHITE, contentPoly, Qt::WindingFill);
+    PolygonRasterizer::fillExcept(binaryImage, (color == Qt::black) ? BWColor::BLACK : BWColor::WHITE, contentPoly, Qt::WindingFill);
     image = binaryImage.toQImage();
     return;
   }
@@ -581,7 +581,7 @@ void fillMarginsInPlace(QImage& image, const BinaryImage& contentMask, const QCo
 
   if ((image.format() == QImage::Format_Mono) || (image.format() == QImage::Format_MonoLSB)) {
     BinaryImage binaryImage(image);
-    fillExcept(binaryImage, contentMask, (color == Qt::black) ? BLACK : WHITE);
+    fillExcept(binaryImage, contentMask, (color == Qt::black) ? BWColor::BLACK : BWColor::WHITE);
     image = binaryImage.toQImage();
     return;
   }
@@ -661,7 +661,7 @@ void applyFillZonesInPlace(BinaryImage& img,
 
   for (const Zone& zone : zones) {
     const QColor color(zone.properties().locateOrDefault<FillColorProperty>()->color());
-    const BWColor bwColor = qGray(color.rgb()) < 128 ? BLACK : WHITE;
+    const BWColor bwColor = qGray(color.rgb()) < 128 ? BWColor::BLACK : BWColor::WHITE;
     const QPolygonF poly(zone.spline().transformed(origToOutput).toPolygon());
     PolygonRasterizer::fill(img, bwColor, poly, Qt::WindingFill);
   }
@@ -708,7 +708,7 @@ void applyFillZonesToMixedInPlace(QImage& img,
 void applyFillZonesToMask(BinaryImage& mask,
                           const ZoneSet& zones,
                           const std::function<QPointF(const QPointF&)>& origToOutput,
-                          const BWColor fillColor = BLACK) {
+                          const BWColor fillColor = BWColor::BLACK) {
   if (zones.empty()) {
     return;
   }
@@ -722,7 +722,7 @@ void applyFillZonesToMask(BinaryImage& mask,
 void applyFillZonesToMask(BinaryImage& mask,
                           const ZoneSet& zones,
                           const QTransform& transform,
-                          const BWColor fillColor = BLACK) {
+                          const BWColor fillColor = BWColor::BLACK) {
   applyFillZonesToMask(mask, zones,
       [transform](const QPointF& point) {return transform.map(point);},
       fillColor
@@ -774,7 +774,7 @@ std::vector<QRect> findRectAreas(const BinaryImage& mask, BWColor contentColor, 
   const int lastWordBits = w - (lastWordIdx << 5);
   const int lastWordUnusedBits = 32 - lastWordBits;
   const uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
-  const uint32_t modifier = (contentColor == WHITE) ? ~uint32_t(0) : 0;
+  const uint32_t modifier = (contentColor == BWColor::WHITE) ? ~uint32_t(0) : 0;
   const uint32_t* const data = mask.data();
 
   const uint32_t* line = data;
@@ -902,7 +902,7 @@ std::vector<QRect> findRectAreas(const BinaryImage& mask, BWColor contentColor, 
         int mword = 0;
 
         for (int y = top; y < bottom; y++) {
-          if (WHITE == mask.getPixel(x, y)) {
+          if (BWColor::WHITE == mask.getPixel(x, y)) {
             mword++;
           }
         }
@@ -917,7 +917,7 @@ std::vector<QRect> findRectAreas(const BinaryImage& mask, BWColor contentColor, 
         int mword = 0;
 
         for (int y = top; y < bottom; y++) {
-          if (WHITE == mask.getPixel(x, y)) {
+          if (BWColor::WHITE == mask.getPixel(x, y)) {
             mword++;
           }
         }
@@ -945,7 +945,7 @@ void applyAffineTransform(BinaryImage& image, const QTransform& xform, const BWC
   if (xform.isIdentity()) {
     return;
   }
-  const QColor color = (outsideColor == BLACK) ? Qt::black : Qt::white;
+  const QColor color = (outsideColor == BWColor::BLACK) ? Qt::black : Qt::white;
   QImage converted = image.toQImage();
   applyAffineTransform(converted, xform, color);
   image = BinaryImage(converted);
@@ -955,7 +955,7 @@ void hitMissReplaceAllDirections(BinaryImage& img,
                                  const char* const pattern,
                                  const int patternWidth,
                                  const int patternHeight) {
-  hitMissReplaceInPlace(img, WHITE, pattern, patternWidth, patternHeight);
+  hitMissReplaceInPlace(img, BWColor::WHITE, pattern, patternWidth, patternHeight);
 
   std::vector<char> patternData(static_cast<unsigned long long int>(patternWidth * patternHeight), ' ');
   char* const newPattern = &patternData[0];
@@ -971,7 +971,7 @@ void hitMissReplaceAllDirections(BinaryImage& img,
       newPattern[newY * newWidth + newX] = *p;
     }
   }
-  hitMissReplaceInPlace(img, WHITE, newPattern, newWidth, newHeight);
+  hitMissReplaceInPlace(img, BWColor::WHITE, newPattern, newWidth, newHeight);
 
   // Rotate upside down.
   p = pattern;
@@ -984,7 +984,7 @@ void hitMissReplaceAllDirections(BinaryImage& img,
       newPattern[newY * newWidth + newX] = *p;
     }
   }
-  hitMissReplaceInPlace(img, WHITE, newPattern, newWidth, newHeight);
+  hitMissReplaceInPlace(img, BWColor::WHITE, newPattern, newWidth, newHeight);
   // Rotate 90 degrees counter-clockwise.
   p = pattern;
   newWidth = patternHeight;
@@ -996,7 +996,7 @@ void hitMissReplaceAllDirections(BinaryImage& img,
       newPattern[newY * newWidth + newX] = *p;
     }
   }
-  hitMissReplaceInPlace(img, WHITE, newPattern, newWidth, newHeight);
+  hitMissReplaceInPlace(img, BWColor::WHITE, newPattern, newWidth, newHeight);
 }
 
 QSize calcLocalWindowSize(const Dpi& dpi) {
@@ -1018,12 +1018,12 @@ void movePointToTopMargin(BinaryImage& bwImage, XSpline& spline, int idx) {
   QPointF pos = spline.controlPointPosition(idx);
 
   for (int j = 0; j < pos.y(); j++) {
-    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == WHITE) {
+    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == BWColor::WHITE) {
       int count = 0;
       int checkNum = 16;
 
       for (int jj = j; jj < (j + checkNum); jj++) {
-        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == WHITE) {
+        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == BWColor::WHITE) {
           count++;
         }
       }
@@ -1041,12 +1041,12 @@ void movePointToBottomMargin(BinaryImage& bwImage, XSpline& spline, int idx) {
   QPointF pos = spline.controlPointPosition(idx);
 
   for (int j = bwImage.height() - 1; j > pos.y(); j--) {
-    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == WHITE) {
+    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == BWColor::WHITE) {
       int count = 0;
       int checkNum = 16;
 
       for (int jj = j; jj > (j - checkNum); jj--) {
-        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == WHITE) {
+        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == BWColor::WHITE) {
           count++;
         }
       }
@@ -1078,12 +1078,12 @@ void movePointToTopMargin(BinaryImage& bwImage, std::vector<QPointF>& polyline, 
   QPointF& pos = polyline[idx];
 
   for (int j = 0; j < pos.y(); j++) {
-    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == WHITE) {
+    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == BWColor::WHITE) {
       int count = 0;
       int checkNum = 16;
 
       for (int jj = j; jj < (j + checkNum); jj++) {
-        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == WHITE) {
+        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == BWColor::WHITE) {
           count++;
         }
       }
@@ -1101,12 +1101,12 @@ void movePointToBottomMargin(BinaryImage& bwImage, std::vector<QPointF>& polylin
   QPointF& pos = polyline[idx];
 
   for (int j = bwImage.height() - 1; j > pos.y(); j--) {
-    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == WHITE) {
+    if (bwImage.getPixel(static_cast<int>(pos.x()), j) == BWColor::WHITE) {
       int count = 0;
       int checkNum = 16;
 
       for (int jj = j; jj > (j - checkNum); jj--) {
-        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == WHITE) {
+        if (bwImage.getPixel(static_cast<int>(pos.x()), jj) == BWColor::WHITE) {
           count++;
         }
       }
@@ -1165,7 +1165,7 @@ QSize to300dpi(const QSize& size, const Dpi& sourceDpi) {
 std::unique_ptr<OutputImage> OutputGenerator::Processor::buildEmptyImage() const {
   OutputImageBuilder imageBuilder;
 
-  BinaryImage emptyImage(m_targetSize, WHITE);
+  BinaryImage emptyImage(m_targetSize, BWColor::WHITE);
   imageBuilder.setImage(emptyImage.toQImage());
   if (m_renderParams.splitOutput()) {
     imageBuilder.setForegroundMask(emptyImage);
@@ -1211,7 +1211,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processImpl(ZoneSet& pi
   }
 
   m_outsideBackgroundColor = BackgroundColorCalculator::calcDominantBackgroundColor(
-      m_colorOriginal ? m_inputOrigImage : m_inputGrayImage, m_outCropAreaInOriginalCs);
+      m_colorOriginal ? m_inputOrigImage : static_cast<const QImage&>(m_inputGrayImage), m_outCropAreaInOriginalCs);
 
   if ((m_dewarpingOptions.dewarpingMode() == AUTO) || (m_dewarpingOptions.dewarpingMode() == MARGINAL)
       || ((m_dewarpingOptions.dewarpingMode() == MANUAL) && distortionModel.isValid())) {
@@ -1270,7 +1270,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
       m_status.throwIfCancelled();
     }
 
-    BinaryImage dst(m_targetSize, WHITE);
+    BinaryImage dst(m_targetSize, BWColor::WHITE);
     rasterOp<RopSrc>(dst, m_croppedContentRect, bwContent, m_contentRectInWorkingCs.topLeft());
     bwContent.release();  // Save memory.
 
@@ -1325,7 +1325,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
   BinaryImage bwContentMaskOutput;
   BinaryImage bwContentOutput;
   if (m_renderParams.mixedOutput()) {
-    BinaryImage bwMask(m_workingBoundingRect.size(), BLACK);
+    BinaryImage bwMask(m_workingBoundingRect.size(), BWColor::BLACK);
     processPictureZones(bwMask, pictureZones, GrayImage(maybeNormalized));
     if (m_dbg) {
       m_dbg->add(bwMask, "bwMask");
@@ -1336,13 +1336,13 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
       if (autoPictureMask->size() != m_targetSize) {
         BinaryImage(m_targetSize).swap(*autoPictureMask);
       }
-      autoPictureMask->fill(BLACK);
+      autoPictureMask->fill(BWColor::BLACK);
       rasterOp<RopSrc>(*autoPictureMask, m_croppedContentRect, bwMask, m_contentRectInWorkingCs.topLeft());
     }
     m_status.throwIfCancelled();
 
     modifyBinarizationMask(bwMask, m_workingBoundingRect, pictureZones);
-    fillMarginsInPlace(bwMask, m_contentAreaInWorkingCs, BLACK);
+    fillMarginsInPlace(bwMask, m_contentAreaInWorkingCs, BWColor::BLACK);
     if (m_dbg) {
       m_dbg->add(bwMask, "bwMask with zones");
     }
@@ -1361,7 +1361,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
       }
 
       BinaryImage bwMaskFilled(bwMask);
-      fillMarginsInPlace(bwMaskFilled, m_contentAreaInWorkingCs, WHITE);
+      fillMarginsInPlace(bwMaskFilled, m_contentAreaInWorkingCs, BWColor::WHITE);
       BinaryImage bwContent = binarize(maybeSmoothed, bwMaskFilled);
       bwMaskFilled.release();
       maybeSmoothed = QImage();  // Save memory.
@@ -1383,7 +1383,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
 
       if (!m_renderParams.normalizeIlluminationColor()) {
         m_outsideBackgroundColor = BackgroundColorCalculator::calcDominantBackgroundColor(
-            m_colorOriginal ? m_inputOrigImage : m_inputGrayImage, m_outCropAreaInOriginalCs);
+            m_colorOriginal ? m_inputOrigImage : static_cast<const QImage&>(m_inputGrayImage), m_outCropAreaInOriginalCs);
         maybeNormalized = transformToWorkingCs(false);
       }
 
@@ -1418,12 +1418,12 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
       m_status.throwIfCancelled();
 
       if (m_renderParams.originalBackground()) {
-        bwContentOutput = BinaryImage(m_targetSize, WHITE);
+        bwContentOutput = BinaryImage(m_targetSize, BWColor::WHITE);
         rasterOp<RopSrc>(bwContentOutput, m_croppedContentRect, bwContent, m_contentRectInWorkingCs.topLeft());
       }
     }
 
-    bwContentMaskOutput = BinaryImage(m_targetSize, BLACK);
+    bwContentMaskOutput = BinaryImage(m_targetSize, BWColor::BLACK);
     rasterOp<RopSrc>(bwContentMaskOutput, m_croppedContentRect, bwMask, m_contentRectInWorkingCs.topLeft());
   }
 
@@ -1497,10 +1497,10 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
   // This image corresponds to the area of workingBoundingRect.
   GrayImage warpedGrayOutput;
   if (!m_renderParams.normalizeIllumination()) {
-    warpedGrayOutput = transformToGray(m_inputGrayImage, m_xform.transform(), m_workingBoundingRect,
+    warpedGrayOutput = transformToGray(static_cast<const QImage&>(m_inputGrayImage), m_xform.transform(), m_workingBoundingRect,
                                        OutsidePixels::assumeWeakColor(m_outsideBackgroundColor));
   } else {
-    warpedGrayOutput = normalizeIlluminationGray(m_inputGrayImage, m_preCropAreaInOriginalCs, m_xform.transform(),
+    warpedGrayOutput = normalizeIlluminationGray(static_cast<const QImage&>(m_inputGrayImage), m_preCropAreaInOriginalCs, m_xform.transform(),
                                                  m_workingBoundingRect);
   }
 
@@ -1512,15 +1512,15 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
   const QTransform workingToOrig
       = QTransform().translate(m_workingBoundingRect.left(), m_workingBoundingRect.top()) * m_xform.transformBack();
   if (!m_renderParams.normalizeIllumination()) {
-    normalizedOriginal = (m_colorOriginal) ? m_inputOrigImage : m_inputGrayImage;
+    normalizedOriginal = (m_colorOriginal) ? m_inputOrigImage : static_cast<const QImage&>(m_inputGrayImage);
   } else {
-    GrayImage normalizedGray = transformToGray(warpedGrayOutput, workingToOrig, m_inputOrigImage.rect(),
+    GrayImage normalizedGray = transformToGray(static_cast<const QImage&>(warpedGrayOutput), workingToOrig, m_inputOrigImage.rect(),
                                                OutsidePixels::assumeWeakColor(m_outsideBackgroundColor));
     if (!m_colorOriginal) {
-      normalizedOriginal = normalizedGray;
+      normalizedOriginal = static_cast<const QImage&>(normalizedGray);
     } else {
       normalizedOriginal = m_inputOrigImage;
-      adjustBrightnessGrayscale(normalizedOriginal, normalizedGray);
+      adjustBrightnessGrayscale(normalizedOriginal, static_cast<const QImage&>(normalizedGray));
       if (m_dbg) {
         m_dbg->add(normalizedOriginal, "norm_illum_color");
       }
@@ -1536,7 +1536,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
   // warpedGrayOutput.  Only built for Mixed mode.
   BinaryImage warpedBwMask;
   if (m_renderParams.mixedOutput()) {
-    warpedBwMask = BinaryImage(m_workingBoundingRect.size(), BLACK);
+    warpedBwMask = BinaryImage(m_workingBoundingRect.size(), BWColor::BLACK);
     processPictureZones(warpedBwMask, pictureZones, warpedGrayOutput);
     if (m_dbg) {
       m_dbg->add(warpedBwMask, "warpedBwMask");
@@ -1547,7 +1547,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
       if (autoPictureMask->size() != m_targetSize) {
         BinaryImage(m_targetSize).swap(*autoPictureMask);
       }
-      autoPictureMask->fill(BLACK);
+      autoPictureMask->fill(BWColor::BLACK);
       rasterOp<RopSrc>(*autoPictureMask, m_croppedContentRect, warpedBwMask, m_contentRectInWorkingCs.topLeft());
     }
     m_status.throwIfCancelled();
@@ -1597,13 +1597,13 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
   const std::function<QPointF(const QPointF&)> origToOutput(
       [mapper](const QPointF& point) {return mapper->mapToDewarpedSpace(point);});
 
-  BinaryImage dewarpingContentAreaMask(m_inputGrayImage.size(), BLACK);
+  BinaryImage dewarpingContentAreaMask(m_inputGrayImage.size(), BWColor::BLACK);
   {
-    fillMarginsInPlace(dewarpingContentAreaMask, m_contentAreaInOriginalCs, WHITE);
+    fillMarginsInPlace(dewarpingContentAreaMask, m_contentAreaInOriginalCs, BWColor::WHITE);
     dewarpingContentAreaMask = BinaryImage(dewarp(QTransform(), dewarpingContentAreaMask.toQImage(),
                                                   m_xform.transform(), distortionModel, depthPerception, Qt::white));
   }
-  applyAffineTransform(dewarpingContentAreaMask, rotateXform, WHITE);
+  applyAffineTransform(dewarpingContentAreaMask, rotateXform, BWColor::WHITE);
 
   if (m_renderParams.binaryOutput()) {
     QImage dewarpedAndMaybeSmoothed;
@@ -1682,8 +1682,8 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
     dewarpedBwMask = BinaryImage(dewarp(origToWorkingCs, warpedBwMask.toQImage(), workingToOutputCs, distortionModel,
                                         depthPerception, Qt::black));
     warpedBwMask.release();
-    applyAffineTransform(dewarpedBwMask, rotateXform, BLACK);
-    fillMarginsInPlace(dewarpedBwMask, dewarpingContentAreaMask, BLACK);
+    applyAffineTransform(dewarpedBwMask, rotateXform, BWColor::BLACK);
+    fillMarginsInPlace(dewarpedBwMask, dewarpingContentAreaMask, BWColor::BLACK);
     if (m_dbg) {
       m_dbg->add(dewarpedBwMask, "dewarpedBwMask");
     }
@@ -1702,7 +1702,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
       }
 
       BinaryImage dewarpedBwMaskFilled(dewarpedBwMask);
-      fillMarginsInPlace(dewarpedBwMaskFilled, dewarpingContentAreaMask, WHITE);
+      fillMarginsInPlace(dewarpedBwMaskFilled, dewarpingContentAreaMask, BWColor::WHITE);
       dewarpedBwContent = binarize(dewarpedAndMaybeSmoothed, dewarpedBwMaskFilled);
       dewarpedBwMaskFilled.release();
       dewarpedAndMaybeSmoothed = QImage();  // Save memory.
@@ -1723,14 +1723,14 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
 
       if (!m_renderParams.normalizeIlluminationColor()) {
         m_outsideBackgroundColor = BackgroundColorCalculator::calcDominantBackgroundColor(
-            m_colorOriginal ? m_inputOrigImage : m_inputGrayImage, m_outCropAreaInOriginalCs);
+            m_colorOriginal ? m_inputOrigImage : static_cast<const QImage&>(m_inputGrayImage), m_outCropAreaInOriginalCs);
 
         {
           QImage origWithoutIllumination;
           if (m_colorOriginal) {
             origWithoutIllumination = m_inputOrigImage;
           } else {
-            origWithoutIllumination = m_inputGrayImage;
+            origWithoutIllumination = static_cast<const QImage&>(m_inputGrayImage);
           }
           dewarped = dewarp(QTransform(), origWithoutIllumination, m_xform.transform(), distortionModel,
                             depthPerception, m_outsideBackgroundColor);
@@ -1820,7 +1820,7 @@ GrayImage OutputGenerator::Processor::normalizeIlluminationGray(const QImage& in
                                                                 GrayImage* background) const {
   GrayImage toBeNormalized = transformToGray(input, xform, targetRect, OutsidePixels::assumeWeakNearest());
   if (m_dbg) {
-    m_dbg->add(toBeNormalized, "toBeNormalized");
+    m_dbg->add(static_cast<const QImage&>(toBeNormalized), "toBeNormalized");
   }
 
   m_status.throwIfCancelled();
@@ -1833,7 +1833,7 @@ GrayImage OutputGenerator::Processor::normalizeIlluminationGray(const QImage& in
 
   GrayImage bgImg(bgPs.render(toBeNormalized.size()));
   if (m_dbg) {
-    m_dbg->add(bgImg, "background");
+    m_dbg->add(static_cast<const QImage&>(bgImg), "background");
   }
   if (background) {
     *background = bgImg;
@@ -1842,7 +1842,7 @@ GrayImage OutputGenerator::Processor::normalizeIlluminationGray(const QImage& in
 
   grayRasterOp<RaiseAboveBackground>(bgImg, toBeNormalized);
   if (m_dbg) {
-    m_dbg->add(bgImg, "normalized_illumination");
+    m_dbg->add(static_cast<const QImage&>(bgImg), "normalized_illumination");
   }
   m_status.throwIfCancelled();
   return bgImg;
@@ -1892,7 +1892,7 @@ BinaryImage OutputGenerator::Processor::estimateBinarizationMask(const GrayImage
   const BinaryThreshold threshold(48);
   // Scale back to original size.
   pictureAreas = scaleToGray(pictureAreas, sourceSubRect.size());
-  return BinaryImage(pictureAreas, threshold);
+  return BinaryImage(static_cast<const QImage&>(pictureAreas), threshold);
 }
 
 void OutputGenerator::Processor::modifyBinarizationMask(BinaryImage& bwMask,
@@ -1907,7 +1907,7 @@ void OutputGenerator::Processor::modifyBinarizationMask(BinaryImage& bwMask,
   for (const Zone& zone : zones) {
     if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER1) {
       const QPolygonF poly(zone.spline().toPolygon());
-      PolygonRasterizer::fill(bwMask, BLACK, xform.map(poly), Qt::WindingFill);
+      PolygonRasterizer::fill(bwMask, BWColor::BLACK, xform.map(poly), Qt::WindingFill);
     }
   }
 
@@ -1915,7 +1915,7 @@ void OutputGenerator::Processor::modifyBinarizationMask(BinaryImage& bwMask,
   for (const Zone& zone : zones) {
     if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::PAINTER2) {
       const QPolygonF poly(zone.spline().toPolygon());
-      PolygonRasterizer::fill(bwMask, WHITE, xform.map(poly), Qt::WindingFill);
+      PolygonRasterizer::fill(bwMask, BWColor::WHITE, xform.map(poly), Qt::WindingFill);
     }
   }
 
@@ -1923,7 +1923,7 @@ void OutputGenerator::Processor::modifyBinarizationMask(BinaryImage& bwMask,
   for (const Zone& zone : zones) {
     if (zone.properties().locateOrDefault<PLP>()->layer() == PLP::ERASER3) {
       const QPolygonF poly(zone.spline().toPolygon());
-      PolygonRasterizer::fill(bwMask, BLACK, xform.map(poly), Qt::WindingFill);
+      PolygonRasterizer::fill(bwMask, BWColor::BLACK, xform.map(poly), Qt::WindingFill);
     }
   }
 }
@@ -1998,7 +1998,7 @@ QImage OutputGenerator::Processor::dewarp(const QTransform& origToSrc,
   if (modelDomain.isEmpty()) {
     GrayImage out(src.size());
     out.fill(0xff);  // white
-    return out;
+    return static_cast<const QImage&>(out);
   }
   return RasterDewarper::dewarp(src, m_outRect.size(), dewarper, modelDomain, bgColor);
 }
@@ -2011,21 +2011,21 @@ GrayImage OutputGenerator::Processor::detectPictures(const GrayImage& input300dp
   // font will be considered a picture.
   GrayImage stretched(stretchGrayRange(input300dpi, 0.01, 0.01));
   if (m_dbg) {
-    m_dbg->add(stretched, "stretched");
+    m_dbg->add(static_cast<const QImage&>(stretched), "stretched");
   }
 
   m_status.throwIfCancelled();
 
-  GrayImage eroded(erodeGray(stretched, QSize(3, 3), 0x00));
+  GrayImage eroded(erodeGray(stretched, Brick(QSize(3, 3)), 0x00));
   if (m_dbg) {
-    m_dbg->add(eroded, "eroded");
+    m_dbg->add(static_cast<const QImage&>(eroded), "eroded");
   }
 
   m_status.throwIfCancelled();
 
-  GrayImage dilated(dilateGray(stretched, QSize(3, 3), 0xff));
+  GrayImage dilated(dilateGray(stretched, Brick(QSize(3, 3)), 0xff));
   if (m_dbg) {
-    m_dbg->add(dilated, "dilated");
+    m_dbg->add(static_cast<const QImage&>(dilated), "dilated");
   }
 
   stretched = GrayImage();  // Save memory.
@@ -2036,45 +2036,45 @@ GrayImage OutputGenerator::Processor::detectPictures(const GrayImage& input300dp
   dilated = GrayImage();
   eroded = GrayImage();
   if (m_dbg) {
-    m_dbg->add(grayGradient, "grayGradient");
+    m_dbg->add(static_cast<const QImage&>(grayGradient), "grayGradient");
   }
 
   m_status.throwIfCancelled();
 
-  GrayImage marker(erodeGray(grayGradient, QSize(35, 35), 0x00));
+  GrayImage marker(erodeGray(grayGradient, Brick(QSize(35, 35)), 0x00));
   if (m_dbg) {
-    m_dbg->add(marker, "marker");
+    m_dbg->add(static_cast<const QImage&>(marker), "marker");
   }
 
   m_status.throwIfCancelled();
 
-  seedFillGrayInPlace(marker, grayGradient, CONN8);
+  seedFillGrayInPlace(marker, grayGradient, Connectivity::CONN8);
   GrayImage reconstructed(marker);
   marker = GrayImage();
   if (m_dbg) {
-    m_dbg->add(reconstructed, "reconstructed");
+    m_dbg->add(static_cast<const QImage&>(reconstructed), "reconstructed");
   }
 
   m_status.throwIfCancelled();
 
   grayRasterOp<GRopInvert<GRopSrc>>(reconstructed, reconstructed);
   if (m_dbg) {
-    m_dbg->add(reconstructed, "reconstructed_inverted");
+    m_dbg->add(static_cast<const QImage&>(reconstructed), "reconstructed_inverted");
   }
 
   m_status.throwIfCancelled();
 
   GrayImage holesFilled(createFramedImage(reconstructed.size()));
-  seedFillGrayInPlace(holesFilled, reconstructed, CONN8);
+  seedFillGrayInPlace(holesFilled, reconstructed, Connectivity::CONN8);
   reconstructed = GrayImage();
   if (m_dbg) {
-    m_dbg->add(holesFilled, "holesFilled");
+    m_dbg->add(static_cast<const QImage&>(holesFilled), "holesFilled");
   }
 
   if (m_pictureShapeOptions.isHigherSearchSensitivity()) {
     GrayImage stretched2(stretchGrayRange(holesFilled, 5.0, 0.01));
     if (m_dbg) {
-      m_dbg->add(stretched2, "stretched2");
+      m_dbg->add(static_cast<const QImage&>(stretched2), "stretched2");
     }
     return stretched2;
   }
@@ -2082,7 +2082,7 @@ GrayImage OutputGenerator::Processor::detectPictures(const GrayImage& input300dp
 }
 
 BinaryThreshold OutputGenerator::Processor::adjustThreshold(BinaryThreshold threshold) const {
-  const int adjusted = threshold + m_colorParams.blackWhiteOptions().thresholdAdjustment();
+  const int adjusted = static_cast<int>(threshold) + m_colorParams.blackWhiteOptions().thresholdAdjustment();
 
   // Hard-bounding threshold values is necessary for example
   // if all the content went into the picture mask.
@@ -2104,9 +2104,9 @@ BinaryThreshold OutputGenerator::Processor::calcBinarizationThreshold(const QIma
   if (path.contains(image.rect())) {
     return adjustThreshold(BinaryThreshold::otsuThreshold(image));
   } else {
-    BinaryImage modifiedMask(image.size(), BLACK);
-    PolygonRasterizer::fillExcept(modifiedMask, WHITE, cropArea, Qt::WindingFill);
-    modifiedMask = erodeBrick(modifiedMask, QSize(3, 3), WHITE);
+    BinaryImage modifiedMask(image.size(), BWColor::BLACK);
+    PolygonRasterizer::fillExcept(modifiedMask, BWColor::WHITE, cropArea, Qt::WindingFill);
+    modifiedMask = erodeBrick(modifiedMask, Brick(QSize(3, 3)), BWColor::WHITE);
 
     if (mask) {
       rasterOp<RopAnd<RopSrc, RopDst>>(modifiedMask, *mask);
@@ -2252,9 +2252,9 @@ BinaryImage OutputGenerator::Processor::binarize(const QImage& image,
   if (path.contains(image.rect()) && !mask) {
     return binarize(image);
   } else {
-    BinaryImage modifiedMask(image.size(), BLACK);
-    PolygonRasterizer::fillExcept(modifiedMask, WHITE, cropArea, Qt::WindingFill);
-    modifiedMask = erodeBrick(modifiedMask, QSize(3, 3), WHITE);
+    BinaryImage modifiedMask(image.size(), BWColor::BLACK);
+    PolygonRasterizer::fillExcept(modifiedMask, BWColor::WHITE, cropArea, Qt::WindingFill);
+    modifiedMask = erodeBrick(modifiedMask, Brick(QSize(3, 3)), BWColor::WHITE);
 
     if (mask) {
       rasterOp<RopAnd<RopSrc, RopDst>>(modifiedMask, *mask);
@@ -2298,7 +2298,7 @@ void OutputGenerator::Processor::maybeDespeckleInPlace(BinaryImage& image,
   const QRect dstRect(maskRect);
 
   if (specklesImg) {
-    BinaryImage(m_outRect.size(), WHITE).swap(*specklesImg);
+    BinaryImage(m_outRect.size(), BWColor::WHITE).swap(*specklesImg);
     if (!maskRect.isEmpty()) {
       rasterOp<RopSrc>(*specklesImg, dstRect, image, srcRect.topLeft());
     }
@@ -2345,7 +2345,7 @@ QImage OutputGenerator::Processor::segmentImage(const BinaryImage& image, const 
     if (m_colorOriginal) {
       segmented = segmenter.segment(image, colorImage);
     } else {
-      segmented = segmenter.segment(image, GrayImage(colorImage));
+      segmented = static_cast<const QImage&>(segmenter.segment(image, GrayImage(colorImage)));
     }
   }
 
@@ -2383,7 +2383,7 @@ void OutputGenerator::Processor::processPictureZones(BinaryImage& mask, ZoneSet&
     m_settings->setOutputProcessingParams(m_pageId, m_outputProcessingParams);
   }
   if ((m_pictureShapeOptions.getPictureShape() == RECTANGULAR_SHAPE) && !m_outputProcessingParams.isAutoZonesFound()) {
-    std::vector<QRect> areas = findRectAreas(mask, WHITE, m_pictureShapeOptions.getSensitivity());
+    std::vector<QRect> areas = findRectAreas(mask, BWColor::WHITE, m_pictureShapeOptions.getSensitivity());
 
     const QTransform fromWorkingCs = [this]() {
       QTransform toWorkingCs = m_xform.transform();
@@ -2398,7 +2398,7 @@ void OutputGenerator::Processor::processPictureZones(BinaryImage& mask, ZoneSet&
     m_outputProcessingParams.setAutoZonesFound(true);
     m_settings->setOutputProcessingParams(m_pageId, m_outputProcessingParams);
 
-    mask.fill(BLACK);
+    mask.fill(BWColor::BLACK);
   }
 }
 
@@ -2417,8 +2417,8 @@ ForegroundType OutputGenerator::Processor::getForegroundType() const {
 QImage OutputGenerator::Processor::transformToWorkingCs(bool normalize) const {
   QImage dst;
   if (normalize) {
-    dst = normalizeIlluminationGray(m_inputGrayImage, m_preCropAreaInOriginalCs, m_xform.transform(),
-                                    m_workingBoundingRect);
+    dst = static_cast<const QImage&>(normalizeIlluminationGray(static_cast<const QImage&>(m_inputGrayImage), m_preCropAreaInOriginalCs, m_xform.transform(),
+                                    m_workingBoundingRect));
     if (m_colorOriginal) {
       assert(dst.format() == QImage::Format_Indexed8);
       QImage colorImg = transform(m_inputOrigImage, m_xform.transform(), m_workingBoundingRect,
@@ -2428,8 +2428,8 @@ QImage OutputGenerator::Processor::transformToWorkingCs(bool normalize) const {
     }
   } else {
     if (!m_colorOriginal) {
-      dst = transformToGray(m_inputGrayImage, m_xform.transform(), m_workingBoundingRect,
-                            OutsidePixels::assumeColor(m_outsideBackgroundColor));
+      dst = static_cast<const QImage&>(transformToGray(static_cast<const QImage&>(m_inputGrayImage), m_xform.transform(), m_workingBoundingRect,
+                            OutsidePixels::assumeColor(m_outsideBackgroundColor)));
     } else {
       dst = transform(m_inputOrigImage, m_xform.transform(), m_workingBoundingRect,
                       OutsidePixels::assumeColor(m_outsideBackgroundColor));
@@ -2453,7 +2453,7 @@ DistortionModel OutputGenerator::Processor::buildAutoDistortionModel(const GrayI
     setupTrivialDistortionModel(distortionModel);
   }
 
-  BinaryImage bwImage(m_inputGrayImage, BinaryThreshold(64));
+  BinaryImage bwImage(static_cast<const QImage&>(m_inputGrayImage), BinaryThreshold(64));
 
   QTransform transform = m_xform.preRotation().transform(bwImage.size());
   QTransform invTransform = transform.inverted();
@@ -2556,7 +2556,7 @@ DistortionModel OutputGenerator::Processor::buildAutoDistortionModel(const GrayI
 }
 
 DistortionModel OutputGenerator::Processor::buildMarginalDistortionModel() const {
-  BinaryImage bwImage(m_inputGrayImage, BinaryThreshold(64));
+  BinaryImage bwImage(static_cast<const QImage&>(m_inputGrayImage), BinaryThreshold(64));
 
   QTransform transform = m_xform.preRotation().transform(bwImage.size());
   QTransform invTransform = transform.inverted();

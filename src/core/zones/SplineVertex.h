@@ -70,8 +70,7 @@ class SplineVertex : public std::enable_shared_from_this<SplineVertex> {
 };
 
 
-class SentinelSplineVertex : public SplineVertex {
-  DECLARE_NON_COPYABLE(SentinelSplineVertex)
+class SentinelSplineVertex : public SplineVertex, private NonCopyable {
  public:
   SentinelSplineVertex();
 
@@ -114,8 +113,7 @@ class SentinelSplineVertex : public SplineVertex {
 };
 
 
-class RealSplineVertex : public SplineVertex {
-  DECLARE_NON_COPYABLE(RealSplineVertex)
+class RealSplineVertex : public SplineVertex, private NonCopyable {
  public:
   RealSplineVertex(const QPointF& pt, SplineVertex* prev, SplineVertex* next);
 

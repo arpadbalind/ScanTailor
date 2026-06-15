@@ -77,7 +77,7 @@ void Task::updateFilterData(FilterData& data) {
   if (const std::unique_ptr<ImageSettings::PageParams> params = m_imageSettings->getPageParams(m_pageId)) {
     data.updateImageParams(*params);
   } else {
-    ImageSettings::PageParams newParams(BinaryThreshold::otsuThreshold(data.grayImage()), true);
+    ImageSettings::PageParams newParams(BinaryThreshold::otsuThreshold(static_cast<const QImage&>(data.grayImage())), true);
 
     m_imageSettings->setPageParams(m_pageId, newParams);
     data.updateImageParams(newParams);

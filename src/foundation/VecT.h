@@ -62,17 +62,23 @@ class VecT {
   template <typename OT>
   VecT& operator=(const VecT<OT>& other);
 
+  VecT(VecT&&) = default;
+
+  VecT& operator=(VecT&&) = default;
+
+  ~VecT() = default;
+
   VecT& operator+=(const VecT& rhs);
 
   VecT& operator-=(const VecT& rhs);
 
   VecT& operator*=(T scalar);
 
-  size_t size() const { return m_size; }
+  [[nodiscard]] size_t size() const { return m_size; }
 
-  const T* data() const { return m_data.data(); }
+  [[nodiscard]] const T* data() const { return m_data.data(); }
 
-  T* data() { return m_data.data(); }
+  [[nodiscard]] T* data() { return m_data.data(); }
 
   const T& operator[](size_t idx) const {
     assert(idx < m_size);
@@ -86,7 +92,7 @@ class VecT {
 
   void fill(const T& value);
 
-  void swap(VecT& other);
+  void swap(VecT& other) noexcept;
 
  private:
   std::vector<T> m_data;
@@ -181,15 +187,15 @@ void VecT<T>::fill(const T& value) {
 }
 
 template <typename T>
-void VecT<T>::swap(VecT& other) {
-  size_t tmp = m_size;
+void VecT<T>::swap(VecT& other) noexcept {
+  const size_t tmp = m_size;
   m_size = other.m_size;
   other.m_size = tmp;
   m_data.swap(other.m_data);
 }
 
 template <typename T>
-void swap(const VecT<T>& o1, const VecT<T>& o2) {
+void swap(const VecT<T>& o1, const VecT<T>& o2) noexcept {
   o1.swap(o2);
 }
 

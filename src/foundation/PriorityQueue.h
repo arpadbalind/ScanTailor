@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_PRIORITYQUEUE_H_
-#define SCANTAILOR_FOUNDATION_PRIORITYQUEUE_H_
+#pragma once
 
 #include <algorithm>
 #include <cassert>
@@ -26,14 +25,16 @@
 template <typename T, typename SubClass>
 class PriorityQueue {
   // Member-wise copying is OK.
+ private:
+  PriorityQueue() = default;
+  friend T;
+  friend SubClass;
  public:
-  PriorityQueue() {}
-
   void reserve(size_t capacity) { m_index.reserve(capacity); }
 
-  bool empty() const { return m_index.empty(); }
+  [[nodiscard]] bool empty() const { return m_index.empty(); }
 
-  size_t size() const { return m_index.size(); }
+  [[nodiscard]] size_t size() const { return m_index.size(); }
 
   /**
    * \brief Provides access to the head of priority queue.
@@ -45,7 +46,7 @@ class PriorityQueue {
    */
   T& front() { return m_index.front(); }
 
-  const T& front() const { return m_index.front(); }
+  [[nodiscard]] const T& front() const { return m_index.front(); }
 
   void push(const T& obj);
 
@@ -81,7 +82,7 @@ class PriorityQueue {
 
   SubClass* subClass() { return static_cast<SubClass*>(this); }
 
-  const SubClass* subClass() const { return static_cast<SubClass*>(this); }
+  [[nodiscard]] const SubClass* subClass() const { return static_cast<SubClass*>(this); }
 
   size_t bubbleUp(size_t idx);
 
@@ -92,7 +93,7 @@ class PriorityQueue {
 
 
 template <typename T, typename SubClass>
-inline void swap(PriorityQueue<T, SubClass>& o1, PriorityQueue<T, SubClass>& o2) {
+inline void swap(PriorityQueue<T, SubClass>& o1, PriorityQueue<T, SubClass>& o2) noexcept {
   o1.swap(o2);
 }
 
@@ -106,22 +107,18 @@ void PriorityQueue<T, SubClass>::push(const T& obj) {
 
 template <typename T, typename SubClass>
 void PriorityQueue<T, SubClass>::pushDestructive(T& obj) {
-  using namespace std;
-
   const size_t idx = m_index.size();
   m_index.push_back(T());
-  swap(m_index.back(), obj);
+  std::swap(m_index.back(), obj);
   subClass()->setIndex(m_index.back(), idx);
   bubbleUp(idx);
 }
 
 template <typename T, typename SubClass>
 void PriorityQueue<T, SubClass>::pop() {
-  using namespace std;
-
   assert(!empty());
 
-  swap(m_index.front(), m_index.back());
+  std::swap(m_index.front(), m_index.back());
   subClass()->setIndex(m_index.front(), 0);
 
   m_index.pop_back();
@@ -132,12 +129,10 @@ void PriorityQueue<T, SubClass>::pop() {
 
 template <typename T, typename SubClass>
 void PriorityQueue<T, SubClass>::retrieveFront(T& obj) {
-  using namespace std;
-
   assert(!empty());
 
-  swap(m_index.front(), obj);
-  swap(m_index.front(), m_index.back());
+  std::swap(m_index.front(), obj);
+  std::swap(m_index.front(), m_index.back());
   subClass()->setIndex(m_index.front(), 0);
 
   m_index.pop_back();
@@ -148,9 +143,7 @@ void PriorityQueue<T, SubClass>::retrieveFront(T& obj) {
 
 template <typename T, typename SubClass>
 void PriorityQueue<T, SubClass>::erase(const size_t idx) {
-  using namespace std;
-
-  swap(m_index[idx], m_index.back());
+  std::swap(m_index[idx], m_index.back());
   subClass()->setIndex(m_index[idx], idx);
 
   m_index.pop_back();
@@ -164,8 +157,6 @@ void PriorityQueue<T, SubClass>::reposition(const size_t idx) {
 
 template <typename T, typename SubClass>
 size_t PriorityQueue<T, SubClass>::bubbleUp(size_t idx) {
-  using namespace std;
-
   // Iteratively swap the element with its parent,
   // if it's greater than the parent.
 
@@ -176,7 +167,7 @@ size_t PriorityQueue<T, SubClass>::bubbleUp(size_t idx) {
     if (!subClass()->higherThan(m_index[idx], m_index[parentIdx])) {
       break;
     }
-    swap(m_index[idx], m_index[parentIdx]);
+    std::swap(m_index[idx], m_index[parentIdx]);
     subClass()->setIndex(m_index[idx], idx);
     subClass()->setIndex(m_index[parentIdx], parentIdx);
     idx = parentIdx;
@@ -186,8 +177,6 @@ size_t PriorityQueue<T, SubClass>::bubbleUp(size_t idx) {
 
 template <typename T, typename SubClass>
 size_t PriorityQueue<T, SubClass>::bubbleDown(size_t idx) {
-  using namespace std;
-
   const size_t len = m_index.size();
   assert(idx < len);
 
@@ -197,7 +186,7 @@ size_t PriorityQueue<T, SubClass>::bubbleDown(size_t idx) {
   while (true) {
     const size_t lft = left(idx);
     const size_t rgt = right(idx);
-    size_t bestChild;
+    size_t bestChild{ 0 };
 
     if (rgt < len) {
       bestChild = subClass()->higherThan(m_index[lft], m_index[rgt]) ? lft : rgt;
@@ -208,7 +197,7 @@ size_t PriorityQueue<T, SubClass>::bubbleDown(size_t idx) {
     }
 
     if (subClass()->higherThan(m_index[bestChild], m_index[idx])) {
-      swap(m_index[idx], m_index[bestChild]);
+      std::swap(m_index[idx], m_index[bestChild]);
       subClass()->setIndex(m_index[idx], idx);
       subClass()->setIndex(m_index[bestChild], bestChild);
       idx = bestChild;
@@ -218,5 +207,3 @@ size_t PriorityQueue<T, SubClass>::bubbleDown(size_t idx) {
   }
   return idx;
 }  // >::bubbleDown
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_PRIORITYQUEUE_H_

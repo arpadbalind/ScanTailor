@@ -1,10 +1,10 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_SLICEDHISTOGRAM_H_
-#define SCANTAILOR_IMAGEPROC_SLICEDHISTOGRAM_H_
+#pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 
 class QRect;
@@ -19,7 +19,7 @@ class BinaryImage;
 class SlicedHistogram {
   // Member-wise copying is OK.
  public:
-  enum Type {
+  enum class Type : std::uint8_t {
     ROWS, /**< Process horizontal lines. */
     COLS  /**< Process vertical lines. */
   };
@@ -52,7 +52,7 @@ class SlicedHistogram {
    */
   SlicedHistogram(const BinaryImage& image, const QRect& area, Type type);
 
-  size_t size() const { return m_data.size(); }
+  [[nodiscard]] size_t size() const { return m_data.size(); }
 
   void setSize(size_t size) { m_data.resize(size); }
 
@@ -68,4 +68,3 @@ class SlicedHistogram {
   std::vector<int> m_data;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_SLICEDHISTOGRAM_H_

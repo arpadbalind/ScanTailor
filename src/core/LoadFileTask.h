@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_LOADFILETASK_H_
-#define SCANTAILOR_CORE_LOADFILETASK_H_
+#pragma once
 
 #include <memory>
 
@@ -21,8 +20,7 @@ namespace fix_orientation {
 class Task;
 }
 
-class LoadFileTask : public BackgroundTask {
-  DECLARE_NON_COPYABLE(LoadFileTask)
+class LoadFileTask : public BackgroundTask, private NonCopyable {
 
  public:
   LoadFileTask(Type type,
@@ -50,6 +48,3 @@ class LoadFileTask : public BackgroundTask {
   const std::shared_ptr<ProjectPages> m_pages;
   const std::shared_ptr<fix_orientation::Task> m_nextTask;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_LOADFILETASK_H_

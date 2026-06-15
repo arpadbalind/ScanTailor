@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_FITTABLESPLINE_H_
-#define SCANTAILOR_SPFIT_FITTABLESPLINE_H_
+#pragma once
 
 #include <QPointF>
 #include <vector>
@@ -12,18 +11,23 @@
 #include "VirtualFunction.h"
 
 namespace spfit {
+
 /**
  * \brief Implementing this interface allows a spline to be fitted to a polyline.
  */
 class FittableSpline {
  public:
-  enum SampleFlags {
+  inline static constexpr double MAXDISTANCE{ 0.2 };
+  enum class SampleFlags : std::uint8_t {
     DEFAULT_SAMPLE = 0,
     HEAD_SAMPLE = 1 << 0,    /**< Start point of an open spline. */
     TAIL_SAMPLE = 1 << 1,    /**< End point of an open spline. */
-    JUNCTION_SAMPLE = 1 << 2 /**< Point on the boundary of two segments. */
+    JUNCTION_SAMPLE = 1 << 2, /**< Point on the boundary of two segments. */
+    HEAD_TAIL = HEAD_SAMPLE | TAIL_SAMPLE,
+    HEAD_JUNCTION = HEAD_SAMPLE | JUNCTION_SAMPLE,
+    TAIL_JUNCTION = TAIL_SAMPLE | JUNCTION_SAMPLE,
+    MASK_ALL = HEAD_SAMPLE | TAIL_SAMPLE | JUNCTION_SAMPLE
   };
-
   /**
    * For a spline to be fittable, any point on a spline must be representable
    * as a linear combination of spline's control points.  The linear coefficients
@@ -54,7 +58,7 @@ class FittableSpline {
      */
     double maxDistBetweenSamples;
 
-    explicit SamplingParams(double maxDistFromSpline = 0.2, double maxDistBetweenSamples = NumericTraits<double>::max())
+    explicit SamplingParams(double maxDistFromSpline = MAXDISTANCE, double maxDistBetweenSamples = NumericTraits<double>::max())
         : maxDistFromSpline(maxDistFromSpline), maxDistBetweenSamples(maxDistBetweenSamples) {}
   };
 
@@ -94,8 +98,8 @@ class FittableSpline {
                       double fromT = 0.0,
                       double toT = 1.0) const = 0;
 };
-
-
-DEFINE_FLAG_OPS(FittableSpline::SampleFlags)
+constexpr FittableSpline::SampleFlags operator|(FittableSpline::SampleFlags a, FittableSpline::SampleFlags b) noexcept {
+  // NOLINTNEXTLINE(clang-analyzer-optin.core.EnumCastOutOfRange)
+  return static_cast<FittableSpline::SampleFlags>(static_cast<std::uint8_t>(a) | static_cast<std::uint8_t>(b));
+}
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_FITTABLESPLINE_H_

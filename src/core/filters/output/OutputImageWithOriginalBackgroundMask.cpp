@@ -27,7 +27,7 @@ QImage OutputImageWithOriginalBackgroundMask::getBackgroundImage() const {
 
 QImage OutputImageWithOriginalBackgroundMask::getOriginalBackgroundImage() const {
   QImage originalBackground = OutputImageWithForegroundMask::getBackgroundImage();
-  applyMask(originalBackground, m_backgroundMask.inverted(), BLACK);
+  applyMask(originalBackground, m_backgroundMask.inverted(), BWColor::BLACK);
   return originalBackground;
 }
 

@@ -3,7 +3,11 @@
 
 #include "ToLineProjector.h"
 
+#include <QLineF>
+#include <QPointF>
+
 #include <cmath>
+#include <limits>
 
 ToLineProjector::ToLineProjector(const QLineF& line) : m_origin(line.p1()), m_vec(line.p2() - line.p1()), m_mat(m_vec) {
   using namespace std;

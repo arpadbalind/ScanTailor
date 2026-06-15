@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_OPTIMIZER_H_
-#define SCANTAILOR_SPFIT_OPTIMIZER_H_
+#pragma once
 
 #include <list>
 #include <vector>
@@ -18,10 +17,11 @@
 #include "VirtualFunction.h"
 
 namespace spfit {
+
 class Optimizer {
   // Member-wise copying is OK.
  public:
-  explicit Optimizer(size_t numVars = 0);
+  explicit Optimizer(std::size_t numVars = 0);
 
   /**
    * Sets linear constraints in the form of b^T * x + c = 0
@@ -41,7 +41,7 @@ class Optimizer {
 
   void addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap);
 
-  size_t numVars() const { return m_numVars; }
+  std::size_t numVars() const { return m_numVars; }
 
   /**
    * Get the external force accumulated from calls to addAttractionForce().
@@ -55,7 +55,7 @@ class Optimizer {
    */
   double internalForce() const { return m_internalForce.c; }
 
-  OptimizationResult optimize(double internalExternalRatio);
+  OptimizationResult optimize(double internalForceWeight);
 
   const double* displacementVector() const { return m_x.data(); }
 
@@ -65,12 +65,12 @@ class Optimizer {
    */
   void undoLastStep();
 
-  void swap(Optimizer& other);
+  void swap(Optimizer& other) noexcept;
 
  private:
   void adjustConstraints(double direction);
 
-  size_t m_numVars;
+  std::size_t m_numVars;
   MatT<double> m_A;
   VecT<double> m_b;
   VecT<double> m_x;
@@ -79,8 +79,7 @@ class Optimizer {
 };
 
 
-inline void swap(Optimizer& o1, Optimizer& o2) {
+inline void swap(Optimizer& o1, Optimizer& o2) noexcept {
   o1.swap(o2);
 }
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_OPTIMIZER_H_

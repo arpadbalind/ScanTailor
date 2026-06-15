@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_TRANSFORM_H_
-#define SCANTAILOR_IMAGEPROC_TRANSFORM_H_
+#pragma once
 
 #include <QColor>
 #include <QSizeF>
@@ -16,43 +15,50 @@ namespace imageproc {
 class GrayImage;
 
 class OutsidePixels {
-  // Member-wise copying is OK.
  public:
-  enum Flags { COLOR = 1 << 0, NEAREST = 1 << 1, WEAK = 1 << 2 };
+  enum class Flags : std::uint8_t {
+    COLOR = 0x01,
+    NEAREST = 0x02,
+    WEAK = 0x04,
 
+    COLOR_NEAREST = 0x03,
+    COLOR_WEAK = 0x05,
+    NEAREST_WEAK = 0x06,
+    MASK_ALL = 0x07
+  };
+  constexpr OutsidePixels(Flags flags, QRgb rgba)
+      : m_flags(flags), m_rgba(rgba) {}
   /**
    * \brief Outside pixels are assumed to be of particular color.
    *
    * Outside pixels may be blended with inside pixels near the edges.
    */
-  static OutsidePixels assumeColor(const QColor& color) { return OutsidePixels(COLOR, color.rgba()); }
+  static OutsidePixels assumeColor(const QColor& color) { return {Flags::COLOR, color.rgba()}; }
 
   /**
    * \brief Outside pixels are assumed to be of particular color.
    *
    * Outside pixels won't participate in blending operations.
    */
-  static OutsidePixels assumeWeakColor(const QColor& color) { return OutsidePixels(WEAK | COLOR, color.rgba()); }
+  static OutsidePixels assumeWeakColor(const QColor& color) { return {Flags::COLOR_WEAK, color.rgba()}; }
 
   /**
    * \brief An outside pixel is assumed to be the same as the nearest inside pixel.
    *
    * Outside pixels won't participate in blending operations.
    */
-  static OutsidePixels assumeWeakNearest() { return OutsidePixels(WEAK | NEAREST, 0xff000000); }
+  static OutsidePixels assumeWeakNearest() { return {Flags::NEAREST_WEAK, 0xff000000}; }
 
-  int flags() const { return m_flags; }
+  [[nodiscard]] Flags flags() const { return m_flags; }
 
-  QRgb rgba() const { return m_rgba; }
+  [[nodiscard]] QRgb rgba() const { return m_rgba; }
 
-  QRgb rgb() const { return m_rgba | 0xff000000; }
+  [[nodiscard]] QRgb rgb() const { return m_rgba | 0xff000000; }
 
-  uint8_t grayLevel() const { return static_cast<uint8_t>(qGray(m_rgba)); }
+  [[nodiscard]] uint8_t grayLevel() const { return static_cast<uint8_t>(qGray(m_rgba)); }
 
  private:
-  OutsidePixels(int flags, QRgb rgba) : m_flags(flags), m_rgba(rgba) {}
-
-  int m_flags;
+  Flags m_flags;
   QRgb m_rgba;
 };
 
@@ -99,4 +105,3 @@ GrayImage transformToGray(const QImage& src,
                           OutsidePixels outsidePixels,
                           const QSizeF& minMappingArea = QSizeF(0.9, 0.9));
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_TRANSFORM_H_

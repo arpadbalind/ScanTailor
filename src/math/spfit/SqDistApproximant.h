@@ -1,17 +1,14 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_SPFIT_SQDISTAPPROXIMANT_H_
-#define SCANTAILOR_SPFIT_SQDISTAPPROXIMANT_H_
-
-#include <QLineF>
+#pragma once
 
 #include "MatMNT.h"
 #include "VecNT.h"
 
+class QLineF;
 namespace spfit {
 class FrenetFrame;
-
 /**
  * A quadratic function of the form:\n
  * F(x) = x^T * A * x + b^T * x + c\n
@@ -29,15 +26,8 @@ class FrenetFrame;
  * \see Eq 8 in [1], Fig 4, 5 in [2].
  */
 struct SqDistApproximant {
-  Mat22d A;
-  Vec2d b;
-  double c;
-
-  /**
-   * Constructs a distance function that always evaluates to zero.
-   * Passing it to Optimizer::addSample() will have no effect.
-   */
-  SqDistApproximant() : c(0) {}
+  inline static constexpr double epsilon{ 1e-6 };
+  SqDistApproximant() = default;
 
   /**
    * \brief The general case constructor.
@@ -72,7 +62,11 @@ struct SqDistApproximant {
                                                  double signedCurvature,
                                                  double weight);
 
-  double evaluate(const Vec2d& pt) const;
+  [[nodiscard]] double evaluate(const Vec2d& pt) const;
+   // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
+  Mat22d A;
+  Vec2d b;
+  double c{ 0.0};
+   // NOLINTEND(misc-non-private-member-variables-in-classes)
 };
 }  // namespace spfit
-#endif  // ifndef SCANTAILOR_SPFIT_SQDISTAPPROXIMANT_H_

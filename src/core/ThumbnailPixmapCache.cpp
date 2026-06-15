@@ -641,7 +641,7 @@ QImage ThumbnailPixmapCache::Impl::makeThumbnail(const QImage& image, const QSiz
 
   if ((image.format() == QImage::Format_Indexed8) && image.isGrayscale()) {
     // This will be faster than QImage::scale().
-    return scaleToGray(GrayImage(image), toSize);
+    return static_cast<const QImage&>(scaleToGray(GrayImage(static_cast<const QImage&>(image)), toSize));
   }
   return image.scaled(toSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }

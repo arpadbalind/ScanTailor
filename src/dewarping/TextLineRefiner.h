@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_DEWARPING_TEXTLINEREFINER_H_
-#define SCANTAILOR_DEWARPING_TEXTLINEREFINER_H_
+#pragma once
 
 #include <GrayImage.h>
 
@@ -76,4 +75,3 @@ class TextLineRefiner {
   Vec2f m_unitDownVec;
 };
 }  // namespace dewarping
-#endif  // ifndef SCANTAILOR_DEWARPING_TEXTLINEREFINER_H_

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_PAGE_SPLIT_SETTINGS_H_
-#define SCANTAILOR_PAGE_SPLIT_SETTINGS_H_
+#pragma once
 
 #include <QMutex>
 #include <memory>
@@ -19,9 +18,7 @@
 class AbstractRelinker;
 
 namespace page_split {
-class Settings {
-  DECLARE_NON_COPYABLE(Settings)
-
+class Settings : private NonCopyable {
  private:
   class BaseRecord {
     // Member-wise copying is OK.
@@ -170,4 +167,3 @@ class Settings {
   LayoutType m_defaultLayoutType;
 };
 }  // namespace page_split
-#endif  // ifndef SCANTAILOR_PAGE_SPLIT_SETTINGS_H_

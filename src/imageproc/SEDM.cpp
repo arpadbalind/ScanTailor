@@ -11,6 +11,7 @@
 #include "SeedFill.h"
 
 namespace imageproc {
+using namespace enumflags;
 // Note that -1 is an implementation detail.
 // It exists to make sure INF_DIST + 1 doesn't overflow.
 const uint32_t SEDM::INF_DIST = ~uint32_t(0) - 1;
@@ -30,20 +31,20 @@ SEDM::SEDM(const BinaryImage& image, const DistType distType, const Borders bord
   m_stride = width + 2;
   m_plainData = &m_data[0] + m_stride + 1;
 
-  if (borders & DIST_TO_TOP_BORDER) {
+  if (enumflags::has_any(borders, Borders::DIST_TO_TOP_BORDER)) {
     memset(&m_data[0], 0, m_stride * sizeof(m_data[0]));
   }
-  if (borders & DIST_TO_BOTTOM_BORDER) {
+  if (enumflags::has_any(borders, Borders::DIST_TO_BOTTOM_BORDER)) {
     memset(&m_data[m_data.size() - m_stride], 0, m_stride * sizeof(m_data[0]));
   }
-  if (borders & (DIST_TO_LEFT_BORDER | DIST_TO_RIGHT_BORDER)) {
+  if (enumflags::has_any(borders, (Borders::DIST_TO_LEFT_BORDER | Borders::DIST_TO_RIGHT_BORDER))) {
     const int last = m_stride - 1;
     uint32_t* line = &m_data[0];
     for (int todo = height + 2; todo > 0; --todo) {
-      if (borders & DIST_TO_LEFT_BORDER) {
+      if (enumflags::has_any(borders, Borders::DIST_TO_LEFT_BORDER)) {
         line[0] = 0;
       }
-      if (borders & DIST_TO_RIGHT_BORDER) {
+      if (enumflags::has_any(borders, Borders::DIST_TO_RIGHT_BORDER)) {
         line[last] = 0;
       }
       line += m_stride;
@@ -51,7 +52,7 @@ SEDM::SEDM(const BinaryImage& image, const DistType distType, const Borders bord
   }
 
   uint32_t initial_distance[2];
-  if (distType == DIST_TO_WHITE) {
+  if (distType == DistType::DIST_TO_WHITE) {
     initial_distance[0] = 0;         // white
     initial_distance[1] = INF_DIST;  // black
   } else {
@@ -111,12 +112,31 @@ SEDM::SEDM(const SEDM& other)
   }
 }
 
+SEDM::SEDM(SEDM&& other) noexcept
+    : m_data(std::move(other.m_data)),
+      m_plainData(other.m_plainData),
+      m_size(std::move(other.m_size)),
+      m_stride(other.m_stride) {
+  other.m_plainData = nullptr;
+}
+
 SEDM& SEDM::operator=(const SEDM& other) {
   SEDM(other).swap(*this);
   return *this;
 }
 
-void SEDM::swap(SEDM& other) {
+SEDM& SEDM::operator=(SEDM&& other) noexcept {
+  if (this != &other) {
+    m_data = std::move(other.m_data);
+    m_size = std::move(other.m_size);
+    m_stride = other.m_stride;
+    m_plainData = other.m_plainData;
+    other.m_plainData = nullptr;
+  }
+  return *this;
+}
+
+void SEDM::swap(SEDM& other) noexcept {
   m_data.swap(other.m_data);
   std::swap(m_plainData, other.m_plainData);
   std::swap(m_size, other.m_size);
@@ -132,7 +152,7 @@ BinaryImage SEDM::findPeaksDestructive() {
   // To check if a peak candidate is really a peak, we have to check
   // that every cell in its neighborhood has a lower value than that
   // candidate.  We are working with 3x3 neighborhoods.
-  BinaryImage neighborhoodMask(dilateBrick(peakCandidates, QSize(3, 3), peakCandidates.rect().adjusted(-1, -1, 1, 1)));
+  BinaryImage neighborhoodMask(dilateBrick(peakCandidates, Brick(QSize(3, 3)), peakCandidates.rect().adjusted(-1, -1, 1, 1)));
   rasterOp<RopXor<RopSrc, RopDst>>(neighborhoodMask, neighborhoodMask.rect().adjusted(1, 1, -1, -1), peakCandidates,
                                    QPoint(0, 0));
 
@@ -154,7 +174,7 @@ BinaryImage SEDM::findPeaksDestructive() {
   // If a bin that has changed its state was a part of a peak candidate,
   // it means a neighboring bin went from equal to a greater value,
   // which indicates that such candidate is not a peak.
-  const BinaryImage notPeaks(seedFill(diff, peakCandidates, CONN8));
+  const BinaryImage notPeaks(seedFill(diff, peakCandidates, Connectivity::CONN8));
   diff.release();
 
   rasterOp<RopXor<RopSrc, RopDst>>(peakCandidates, notPeaks);
@@ -355,7 +375,7 @@ BinaryImage SEDM::buildEqualMapNonPadded(const uint32_t* src1, const uint32_t* s
   const int width = m_size.width();
   const int height = m_size.height();
 
-  BinaryImage dst(width, height, WHITE);
+  BinaryImage dst(width, height, BWColor::WHITE);
   uint32_t* dstLine = dst.data();
   const int dstWpl = dst.wordsPerLine();
   const int srcStride = m_stride;

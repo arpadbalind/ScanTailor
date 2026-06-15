@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_APP_PROJECTOPENINGCONTEXT_H_
-#define SCANTAILOR_APP_PROJECTOPENINGCONTEXT_H_
+#pragma once
 
 #include <QObject>
 #include <QPointer>
@@ -18,9 +17,8 @@ class FixDpiDialog;
 class QWidget;
 class QDomDocument;
 
-class ProjectOpeningContext : public QObject {
+class ProjectOpeningContext : public QObject, private NonCopyable {
   Q_OBJECT
-  DECLARE_NON_COPYABLE(ProjectOpeningContext)
 
  public:
   ProjectOpeningContext(QWidget* parent, const QString& projectFile, const QDomDocument& doc);
@@ -51,6 +49,3 @@ class ProjectOpeningContext : public QObject {
   QPointer<FixDpiDialog> m_fixDpiDialog;
   QWidget* m_parent;
 };
-
-
-#endif  // ifndef SCANTAILOR_APP_PROJECTOPENINGCONTEXT_H_

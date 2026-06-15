@@ -4,7 +4,15 @@
 #include "SqDistApproximant.h"
 
 #include "FrenetFrame.h"
+#include "MatMNT.h"
 #include "MatrixCalc.h"
+#include "VecNT.h"
+
+#include <QLineF>
+
+#include <cassert>
+#include <cmath>
+#include <limits>
 
 namespace spfit {
 SqDistApproximant::SqDistApproximant(const Vec2d& origin, const Vec2d& u, const Vec2d& v, double m, double n) {
@@ -54,15 +62,15 @@ SqDistApproximant SqDistApproximant::lineDistance(const QLineF& line) {
 SqDistApproximant SqDistApproximant::weightedLineDistance(const QLineF& line, double weight) {
   Vec2d u(line.p2() - line.p1());
   const double sqlen = u.squaredNorm();
-  if (sqlen > 1e-6) {
+  if (sqlen > epsilon) {
     u /= std::sqrt(sqlen);
   } else {
-    return pointDistance(line.p1());
+    return pointDistance(Vec2d(line.p1()));
   }
 
   // Unit normal to line.
   const Vec2d v(-u[1], u[0]);
-  return SqDistApproximant(line.p1(), u, v, 0, weight);
+  return SqDistApproximant(Vec2d(line.p1()), Vec2d(u), Vec2d(v), 0, weight);
 }
 
 SqDistApproximant SqDistApproximant::curveDistance(const Vec2d& referencePoint,
@@ -89,6 +97,7 @@ SqDistApproximant SqDistApproximant::weightedCurveDistance(const Vec2d& referenc
 }
 
 double SqDistApproximant::evaluate(const Vec2d& pt) const {
+  // NOLINTNEXTLINE(readability-magic-numbers)
   StaticMatrixCalc<double, 8, 1> mc;
   return (mc(pt, 1, 2) * mc(A) * mc(pt, 2, 1) + mc(b, 1, 2) * mc(pt, 2, 1)).rawData()[0] + c;
 }

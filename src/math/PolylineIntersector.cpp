@@ -3,11 +3,16 @@
 
 #include "PolylineIntersector.h"
 
+#include <QLineF>
+#include <QPointF>
+
 #include <cmath>
+#include <vector>
 
 #include "ToLineProjector.h"
+#include "VecNT.h"
 
-PolylineIntersector::Hint::Hint() : m_lastSegment(0), m_direction(1) {}
+PolylineIntersector::Hint::Hint() = default;
 
 void PolylineIntersector::Hint::update(int newSegment) {
   m_direction = newSegment < m_lastSegment ? -1 : 1;
@@ -24,7 +29,7 @@ QPointF PolylineIntersector::intersect(const QLineF& line, Hint& hint) const {
     return intersectWithSegment(line, hint.m_lastSegment);
   }
 
-  int segment;
+  int segment{ 0 };
 
   // Check the next segment in direction provided by hint.
   if (intersectsSegment(normal, (segment = hint.m_lastSegment + hint.m_direction))) {
@@ -48,11 +53,11 @@ QPointF PolylineIntersector::intersect(const QLineF& line, Hint& hint) const {
   const Vec2d nv(normal.p2() - normal.p1());
   int leftIdx = 0;
   auto rightIdx = static_cast<int>(m_polyline.size() - 1);
-  double leftDot = nv.dot(m_polyline[leftIdx] - origin);
+  double leftDot = nv.dot(Vec2d(m_polyline[leftIdx] - origin));
 
   while (leftIdx + 1 < rightIdx) {
     const int midIdx = (leftIdx + rightIdx) >> 1;
-    const double midDot = nv.dot(m_polyline[midIdx] - origin);
+    const double midDot = nv.dot(Vec2d(m_polyline[midIdx] - origin));
 
     if (midDot * leftDot <= 0) {
       // Note: <= 0 vs < 0 is actually important for this branch.
@@ -77,7 +82,7 @@ bool PolylineIntersector::intersectsSegment(const QLineF& normal, int segment) c
   return intersectsSpan(normal, segLine);
 }
 
-bool PolylineIntersector::intersectsSpan(const QLineF& normal, const QLineF& span) const {
+bool PolylineIntersector::intersectsSpan(const QLineF& normal, const QLineF& span) {
   const Vec2d v1(normal.p2() - normal.p1());
   const Vec2d v2(span.p1() - normal.p1());
   const Vec2d v3(span.p2() - normal.p1());
@@ -91,6 +96,7 @@ QPointF PolylineIntersector::intersectWithSegment(const QLineF& line, int segmen
     // Considering we were called for a reason, the segment must
     // be on the same line as our subject line.  Just return segment
     // midpoint in this case.
+    // NOLINTNEXTLINE(readability-magic-numbers)
     return segLine.pointAt(0.5);
   }
   return intersection;

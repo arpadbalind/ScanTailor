@@ -19,8 +19,7 @@ extern "C" {
 namespace {
 /*======================== JpegDecompressionHandle =======================*/
 
-class JpegDecompressHandle {
-  DECLARE_NON_COPYABLE(JpegDecompressHandle)
+class JpegDecompressHandle : private NonCopyable {
 
  public:
   JpegDecompressHandle(jpeg_error_mgr* errMgr, jpeg_source_mgr* srcMgr);
@@ -48,8 +47,7 @@ JpegDecompressHandle::~JpegDecompressHandle() {
 
 /*============================ JpegSourceManager =========================*/
 
-class JpegSourceManager : public jpeg_source_mgr {
-  DECLARE_NON_COPYABLE(JpegSourceManager)
+class JpegSourceManager : public jpeg_source_mgr, private NonCopyable {
 
  public:
   explicit JpegSourceManager(QIODevice& ioDevice);
@@ -133,8 +131,7 @@ JpegSourceManager* JpegSourceManager::object(j_decompress_ptr cinfo) {
 
 /*============================= JpegErrorManager ===========================*/
 
-class JpegErrorManager : public jpeg_error_mgr {
-  DECLARE_NON_COPYABLE(JpegErrorManager)
+class JpegErrorManager : public jpeg_error_mgr, private NonCopyable {
 
  public:
   JpegErrorManager();

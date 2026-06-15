@@ -57,6 +57,7 @@ RastLineFinder::RastLineFinder(const std::vector<QPointF>& points, const RastLin
       m_angleToleranceRad(params.angleToleranceDeg() * constants::DEG2RAD),
       m_maxDistFromLine(params.maxDistFromLine()),
       m_minSupportPoints(params.minSupportPoints()),
+      m_orderedSearchSpaces(),
       m_firstLine(true) {
   std::string error;
   if (!params.validate(&error)) {
@@ -203,7 +204,7 @@ RastLineFinder::SearchSpace::SearchSpace(const RastLineFinder& owner,
   const Vec2d minTowardsMaxAngleVec(-minAngleUnitVec.y(), minAngleUnitVec.x());
   const Vec2d maxTowardsMinAngleVec(maxAngleUnitVec.y(), -maxAngleUnitVec.x());
 
-  for (unsigned idx : candidateIdxs) {
+  for (const auto& idx : candidateIdxs) {
     const Point& pnt = owner.m_points[idx];
     if (!pnt.available) {
       continue;
@@ -211,11 +212,11 @@ RastLineFinder::SearchSpace::SearchSpace(const RastLineFinder& owner,
 
     const Vec2d relPt(pnt.pt - origin);
 
-    if ((Vec2d(pnt.pt - minAngleInnerPt).dot(minAngleUnitVec) >= 0)
-        && (Vec2d(pnt.pt - maxAngleOuterPt).dot(maxAngleUnitVec) <= 0)) {
+    if ((Vec2d(pnt.pt - minAngleInnerPt).dot(Vec2d(minAngleUnitVec)) >= 0)
+        && (Vec2d(pnt.pt - maxAngleOuterPt).dot(Vec2d(maxAngleUnitVec)) <= 0)) {
       // Accepted.
-    } else if ((Vec2d(pnt.pt - maxAngleInnerPt).dot(maxAngleUnitVec) >= 0)
-               && (Vec2d(pnt.pt - minAngleOuterPt).dot(minAngleUnitVec) <= 0)) {
+    } else if ((Vec2d(pnt.pt - maxAngleInnerPt).dot(Vec2d(maxAngleUnitVec)) >= 0)
+               && (Vec2d(pnt.pt - minAngleOuterPt).dot(Vec2d(minAngleUnitVec)) <= 0)) {
       // Accepted.
     } else if ((minTowardsMaxAngleVec.dot(relPt) >= 0) && (maxTowardsMinAngleVec.dot(relPt) >= 0)
                && (relPt.squaredNorm() >= minSqdist) && (relPt.squaredNorm() <= maxSqdist)) {
@@ -295,7 +296,7 @@ void RastLineFinder::SearchSpace::pruneUnavailablePoints(PointUnavailablePred pr
   m_pointIdxs.resize(std::remove_if(m_pointIdxs.begin(), m_pointIdxs.end(), pred) - m_pointIdxs.begin());
 }
 
-void RastLineFinder::SearchSpace::swap(SearchSpace& other) {
+void RastLineFinder::SearchSpace::swap(SearchSpace& other) noexcept {
   std::swap(m_minDist, other.m_minDist);
   std::swap(m_maxDist, other.m_maxDist);
   std::swap(m_minAngleRad, other.m_minAngleRad);

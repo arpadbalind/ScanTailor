@@ -26,10 +26,10 @@ ContentMask::ContentMask(const GrayImage& grayImage, const ImageTransformation& 
   m_originalToContentXform = xform150dpi.transform();
   m_contentToOriginalXform = m_originalToContentXform.inverted();
 
-  QImage gray150(transformToGray(grayImage, xform150dpi.transform(), xform150dpi.resultingRect().toRect(),
+  QImage gray150(transformToGray(static_cast<const QImage&>(grayImage), xform150dpi.transform(), xform150dpi.resultingRect().toRect(),
                                  OutsidePixels::assumeColor(Qt::white)));
   m_image = binarizeWolf(gray150, QSize(51, 51), 50);
-  PolygonRasterizer::fillExcept(m_image, WHITE, xform150dpi.resultingPreCropArea(), Qt::WindingFill);
+  PolygonRasterizer::fillExcept(m_image, BWColor::WHITE, xform150dpi.resultingPreCropArea(), Qt::WindingFill);
   Despeckle::despeckleInPlace(m_image, Dpi(150, 150), Despeckle::NORMAL, status);
 }
 

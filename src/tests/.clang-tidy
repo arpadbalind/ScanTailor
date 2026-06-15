@@ -1,0 +1,5 @@
+# Inherit settings from the parent (root) .clang-tidy
+InheritParentConfig: true
+
+# Disable magic number checks specifically for this folder
+Checks: '-readability-magic-numbers, -cppcoreguidelines-avoid-magic-numbers'   

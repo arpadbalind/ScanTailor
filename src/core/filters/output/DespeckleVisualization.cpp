@@ -37,7 +37,7 @@ void DespeckleVisualization::colorizeSpeckles(QImage& image, const imageproc::Bi
   auto* imageLine = (uint32_t*) image.bits();
   const int imageStride = image.bytesPerLine() / 4;
 
-  const SEDM sedm(speckles, SEDM::DIST_TO_BLACK, SEDM::DIST_TO_NO_BORDERS);
+  const SEDM sedm(speckles, SEDM::DistType::DIST_TO_BLACK, SEDM::Borders::DIST_TO_NO_BORDERS);
   const uint32_t* sedmLine = sedm.data();
   const int sedmStride = sedm.stride();
 

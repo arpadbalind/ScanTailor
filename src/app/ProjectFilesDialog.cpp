@@ -42,9 +42,7 @@ class ProjectFilesDialog::Item {
 };
 
 
-class ProjectFilesDialog::FileList : private QAbstractListModel {
-  DECLARE_NON_COPYABLE(FileList)
-
+class ProjectFilesDialog::FileList : private QAbstractListModel, private NonCopyable {
  public:
   enum LoadStatus { LOAD_OK, LOAD_FAILED, NO_MORE_FILES };
 
@@ -93,8 +91,7 @@ class ProjectFilesDialog::FileList : private QAbstractListModel {
 };
 
 
-class ProjectFilesDialog::SortedFileList : private QSortFilterProxyModel {
-  DECLARE_NON_COPYABLE(SortedFileList)
+class ProjectFilesDialog::SortedFileList : private QSortFilterProxyModel, private NonCopyable {
 
  public:
   explicit SortedFileList(FileList& delegate);

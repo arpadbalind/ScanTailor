@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_MATRIXCALC_H_
-#define SCANTAILOR_MATH_MATRIXCALC_H_
+#pragma once
 
 #include <cassert>
 #include <cstddef>
@@ -23,21 +22,21 @@ namespace mcalc {
 template <typename T>
 class AbstractAllocator {
  public:
-  virtual T* allocT(size_t size) = 0;
-
-  virtual size_t* allocP(size_t size) = 0;
+  virtual ~AbstractAllocator() = default;
+  virtual T* allocT(std::size_t size) = 0;
+  virtual std::size_t* allocP(std::size_t size) = 0;
 };
 
 
-template <typename T, size_t TSize, size_t PSize>
+template <typename T, std::size_t TSize, std::size_t PSize>
 class StaticPoolAllocator : public AbstractAllocator<T> {
  public:
-  virtual T* allocT(size_t size) { return m_poolT.alloc(size); }
+  T* allocT(std::size_t size) override { return m_poolT.alloc(size); }
 
-  virtual size_t* allocP(size_t size) { return m_poolP.alloc(size); }
+  std::size_t* allocP(std::size_t size) override { return m_poolP.alloc(size); }
 
  private:
-  StaticPool<size_t, PSize> m_poolP;
+  StaticPool<std::size_t, PSize> m_poolP;
   StaticPool<T, TSize> m_poolT;
 };
 
@@ -45,12 +44,12 @@ class StaticPoolAllocator : public AbstractAllocator<T> {
 template <typename T>
 class DynamicPoolAllocator : public AbstractAllocator<T> {
  public:
-  virtual T* allocT(size_t size) { return m_poolT.alloc(size); }
+  T* allocT(std::size_t size) override { return m_poolT.alloc(size); }
 
-  virtual size_t* allocP(size_t size) { return m_poolP.alloc(size); }
+  std::size_t* allocP(std::size_t size) override { return m_poolP.alloc(size); }
 
  private:
-  DynamicPool<size_t> m_poolP;
+  DynamicPool<std::size_t> m_poolP;
   DynamicPool<T> m_poolT;
 };
 
@@ -89,17 +88,17 @@ class Mat {
 
   Mat write(T* buf) const;
 
-  template <size_t N>
+  template <std::size_t N>
   Mat write(VecNT<N, T>& vec) const;
 
   Mat transWrite(T* buf) const;
 
-  template <size_t N>
+  template <std::size_t N>
   Mat transWrite(VecNT<N, T>& vec) const;
 
   Mat operator-() const;
 
-  const T* rawData() const { return data; }
+  [[nodiscard]] const T* rawData() const { return data; }
 
  private:
   Mat(AbstractAllocator<T>* alloc, const T* data, int rows, int cols)
@@ -112,21 +111,21 @@ class Mat {
 };
 }  // namespace mcalc
 
+// NOLINTNEXTLINE(readability-magic-numbers)
 template <typename T, typename Alloc = mcalc::StaticPoolAllocator<T, 128, 9>>
-class MatrixCalc {
-  DECLARE_NON_COPYABLE(MatrixCalc)
+class MatrixCalc : private NonCopyable {
 
  public:
-  MatrixCalc() {}
+  MatrixCalc() = default;
 
   mcalc::Mat<T> operator()(const T* data, int rows, int cols) { return mcalc::Mat<T>(&m_alloc, data, rows, cols); }
 
-  template <size_t N>
+  template <std::size_t N>
   mcalc::Mat<T> operator()(const VecNT<N, T>& vec, int rows, int cols) {
     return mcalc::Mat<T>(&m_alloc, vec.data(), rows, cols);
   }
 
-  template <size_t M, size_t N>
+  template <std::size_t M, std::size_t N>
   mcalc::Mat<T> operator()(const MatMNT<M, N, T>& mat) {
     return mcalc::Mat<T>(&m_alloc, mat.data(), mat.ROWS, mat.COLS);
   }
@@ -135,7 +134,7 @@ class MatrixCalc {
     return mcalc::Mat<T>(&m_alloc, mat.data(), static_cast<int>(mat.rows()), static_cast<int>(mat.cols()));
   }
 
-  template <size_t N>
+  template <std::size_t N>
   mcalc::Mat<T> operator()(const VecNT<N, T>& vec) {
     return mcalc::Mat<T>(&m_alloc, vec.data(), vec.SIZE, 1);
   }
@@ -148,8 +147,8 @@ class MatrixCalc {
   Alloc m_alloc;
 };
 
-
-template <typename T, size_t TSize = 128, size_t PSize = 9>
+// NOLINTNEXTLINE(readability-magic-numbers)
+template <typename T, std::size_t TSize = 128, std::size_t PSize = 9>
 class StaticMatrixCalc : public MatrixCalc<T, mcalc::StaticPoolAllocator<T, TSize, PSize>> {};
 
 
@@ -165,7 +164,7 @@ Mat<T> Mat<T>::inv() const {
   assert(cols == rows);
 
   T* identData = alloc->allocT(rows * cols);
-  Mat ident(alloc, identData, rows, cols);
+  const Mat ident(alloc, identData, rows, cols);
   const int todo = rows * cols;
   for (int i = 0; i < todo; ++i) {
     identData[i] = T();
@@ -182,7 +181,7 @@ Mat<T> Mat<T>::solve(const Mat& b) const {
 
   T* xData = alloc->allocT(cols * b.cols);
   T* tbuffer = alloc->allocT(cols * (b.rows + b.cols));
-  size_t* pbuffer = alloc->allocP(rows);
+  std::size_t* pbuffer = alloc->allocP(rows);
   LinearSolver(rows, cols, b.cols).solve(data, xData, b.data, tbuffer, pbuffer);
   return Mat(alloc, xData, cols, b.cols);
 }
@@ -206,16 +205,16 @@ Mat<T> Mat<T>::trans() const {
 template <typename T>
 Mat<T> Mat<T>::write(T* buf) const {
   if (data && buf) {
-    const size_t size = static_cast<size_t>(rows * cols);
+    const std::size_t size = static_cast<std::size_t>(rows) * static_cast<std::size_t>(cols);
     std::copy(data, data + size, buf);
   }
   return *this;
 }
 
 template <typename T>
-template <size_t N>
+template <std::size_t N>
 Mat<T> Mat<T>::write(VecNT<N, T>& vec) const {
-  assert(N >= static_cast<size_t>(rows * cols));
+  assert(N >= static_cast<std::size_t>(rows * cols));
   return write(vec.data());
 }
 
@@ -234,7 +233,7 @@ Mat<T> Mat<T>::transWrite(T* buf) const {
 }
 
 template <typename T>
-template <size_t N>
+template <std::size_t N>
 Mat<T> Mat<T>::transWrite(VecNT<N, T>& vec) const {
   assert(N >= rows * cols);
   return transWrite(vec.data());
@@ -324,7 +323,6 @@ Mat<T> operator*(const Mat<T>& m, T scalar) {
 
 template <typename T>
 Mat<T> operator/(const Mat<T>& m, T scalar) {
-  return m * (1.0f / scalar);
+  return m * (1.0F / scalar);
 }
 }  // namespace mcalc
-#endif  // ifndef SCANTAILOR_MATH_MATRIXCALC_H_

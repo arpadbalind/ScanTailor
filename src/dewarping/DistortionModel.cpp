@@ -7,6 +7,7 @@
 #include <QRectF>
 #include <QTransform>
 
+#include <array>
 #include "CylindricalSurfaceDewarper.h"
 
 namespace dewarping {
@@ -31,8 +32,8 @@ bool DistortionModel::isValid() const {
     return false;
   }
 
-  const Vec2d poly[4] = {m_topCurve.polyline().front(), m_topCurve.polyline().back(), m_bottomCurve.polyline().back(),
-                         m_bottomCurve.polyline().front()};
+  const std::array<Vec2d, 4> poly = {Vec2d(m_topCurve.polyline().front()), Vec2d(m_topCurve.polyline().back()), Vec2d(m_bottomCurve.polyline().back()),
+                         Vec2d(m_bottomCurve.polyline().front())};
 
   double minDot = NumericTraits<double>::max();
   double maxDot = NumericTraits<double>::min();

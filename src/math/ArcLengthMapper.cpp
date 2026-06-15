@@ -6,14 +6,10 @@
 #include <cassert>
 #include <cmath>
 
-ArcLengthMapper::Hint::Hint() : m_lastSegment(0), m_direction(1) {}
-
 void ArcLengthMapper::Hint::update(int newSegment) {
   m_direction = newSegment < m_lastSegment ? -1 : 1;
   m_lastSegment = newSegment;
 }
-
-ArcLengthMapper::ArcLengthMapper() : m_prevFX() {}
 
 void ArcLengthMapper::addSample(double x, double fx) {
   double arcLen = 0;
@@ -48,18 +44,20 @@ void ArcLengthMapper::normalizeRange(double totalArcLen) {
 }
 
 double ArcLengthMapper::arcLenToX(double arcLen, Hint& hint) const {
-  switch (m_samples.size()) {
-    case 0:
-      return 0;
-    case 1:
-      return m_samples.front().x;
+  if (m_samples.empty()) {
+    return 0;
+  }
+  if (m_samples.size() == 1) {
+    return m_samples.front().x;
   }
 
   if (arcLen < 0) {
     // Beyond the first sample.
     hint.update(0);
     return interpolateArcLenInSegment(arcLen, 0);
-  } else if (arcLen > m_samples.back().arcLen) {
+  }
+
+  if (arcLen > m_samples.back().arcLen) {
     // Beyond the last sample.
     hint.update(static_cast<int>(m_samples.size() - 2));
     return interpolateArcLenInSegment(arcLen, hint.m_lastSegment);
@@ -69,13 +67,18 @@ double ArcLengthMapper::arcLenToX(double arcLen, Hint& hint) const {
   // or in an adjacent one.
   if (checkSegmentForArcLen(arcLen, hint.m_lastSegment)) {
     return interpolateArcLenInSegment(arcLen, hint.m_lastSegment);
-  } else if (checkSegmentForArcLen(arcLen, hint.m_lastSegment + hint.m_direction)) {
+  }
+
+  if (checkSegmentForArcLen(arcLen, hint.m_lastSegment + hint.m_direction)) {
     hint.update(hint.m_lastSegment + hint.m_direction);
     return interpolateArcLenInSegment(arcLen, hint.m_lastSegment);
-  } else if (checkSegmentForArcLen(arcLen, hint.m_lastSegment - hint.m_direction)) {
+  }
+
+  if (checkSegmentForArcLen(arcLen, hint.m_lastSegment - hint.m_direction)) {
     hint.update(hint.m_lastSegment - hint.m_direction);
     return interpolateArcLenInSegment(arcLen, hint.m_lastSegment);
   }
+
   // Do a binary search.
   int leftIdx = 0;
   auto rightIdx = static_cast<int>(m_samples.size() - 1);
@@ -98,18 +101,20 @@ double ArcLengthMapper::arcLenToX(double arcLen, Hint& hint) const {
 }  // ArcLengthMapper::arcLenToX
 
 double ArcLengthMapper::xToArcLen(double x, Hint& hint) const {
-  switch (m_samples.size()) {
-    case 0:
-      return 0;
-    case 1:
-      return m_samples.front().arcLen;
+  if (m_samples.empty()) {
+    return 0;
+  }
+  if (m_samples.size() == 1) {
+    return m_samples.front().arcLen;
   }
 
   if (x < m_samples.front().x) {
     // Beyond the first sample.
     hint.update(0);
     return interpolateXInSegment(x, 0);
-  } else if (x > m_samples.back().x) {
+  }
+
+  if (x > m_samples.back().x) {
     // Beyond the last sample.
     hint.update(static_cast<int>(m_samples.size() - 2));
     return interpolateXInSegment(x, hint.m_lastSegment);
@@ -119,13 +124,18 @@ double ArcLengthMapper::xToArcLen(double x, Hint& hint) const {
   // or in an adjacent one.
   if (checkSegmentForX(x, hint.m_lastSegment)) {
     return interpolateXInSegment(x, hint.m_lastSegment);
-  } else if (checkSegmentForX(x, hint.m_lastSegment + hint.m_direction)) {
+  }
+
+  if (checkSegmentForX(x, hint.m_lastSegment + hint.m_direction)) {
     hint.update(hint.m_lastSegment + hint.m_direction);
     return interpolateXInSegment(x, hint.m_lastSegment);
-  } else if (checkSegmentForX(x, hint.m_lastSegment - hint.m_direction)) {
+  }
+
+  if (checkSegmentForX(x, hint.m_lastSegment - hint.m_direction)) {
     hint.update(hint.m_lastSegment - hint.m_direction);
     return interpolateXInSegment(x, hint.m_lastSegment);
   }
+
   // Do a binary search.
   int leftIdx = 0;
   auto rightIdx = static_cast<int>(m_samples.size() - 1);
@@ -149,7 +159,7 @@ double ArcLengthMapper::xToArcLen(double x, Hint& hint) const {
 
 bool ArcLengthMapper::checkSegmentForArcLen(double arcLen, int segment) const {
   assert(m_samples.size() > 1);  // Enforced by the caller.
-  if ((segment < 0) || (segment >= int(m_samples.size()) - 1)) {
+  if ((segment < 0) || (segment >= static_cast<int>(m_samples.size()) - 1)) {
     return false;
   }
 
@@ -160,7 +170,7 @@ bool ArcLengthMapper::checkSegmentForArcLen(double arcLen, int segment) const {
 
 bool ArcLengthMapper::checkSegmentForX(double x, int segment) const {
   assert(m_samples.size() > 1);  // Enforced by the caller.
-  if ((segment < 0) || (segment >= int(m_samples.size()) - 1)) {
+  if ((segment < 0) || (segment >= static_cast<int>(m_samples.size()) - 1)) {
     return false;
   }
 

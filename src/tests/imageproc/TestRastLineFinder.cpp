@@ -1,20 +1,23 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <RastLineFinder.h>
-
+// NOLINTBEGIN(misc-include-cleaner)
 #include <QLineF>
 #include <QPointF>
+
 #include <gtest/gtest.h>
 #include <set>
 #include <vector>
 
-namespace imageproc {
-namespace tests {
+#include "RastLineFinder.h"
+
+namespace {
 static bool matchSupportPoints(const std::vector<unsigned>& idxs1, const std::set<unsigned>& idxs2) {
   return std::set<unsigned>(idxs1.begin(), idxs1.end()) == idxs2;
 }
+}
 
+namespace imageproc::tests {
 TEST(RastLineFinderTestSuite, test1) {
   // 4- and 3-point lines with min_support_points == 3
   // --------------------------------------------------
@@ -60,5 +63,5 @@ TEST(RastLineFinderTestSuite, test1) {
   // no more lines
   ASSERT_TRUE(finder.findNext().isNull());
 }
-}  // namespace tests
-}  // namespace imageproc
+}
+// NOLINTEND(misc-include-cleaner)

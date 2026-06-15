@@ -1,26 +1,24 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <GrayImage.h>
-#include <Scale.h>
-
+// NOLINTBEGIN(misc-include-cleaner)
 #include <QImage>
 #include <QSize>
-#include <gtest/gtest.h>
+#include <Qt>
+
+#include <algorithm>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <gtest/gtest.h>
+#include <random>
+#include <ranges>
 
-#include "Utils.h"
+#include "GrayImage.h"
+#include "Scale.h"
 
-namespace imageproc {
-namespace tests {
-using namespace utils;
-
-TEST(ScaleTestSuite, test_null_image) {
-  const GrayImage nullImg;
-  EXPECT_TRUE(scaleToGray(nullImg, QSize(1, 1)).isNull());
-}
+namespace {
+using namespace imageproc;
 
 static bool fuzzyCompare(const QImage& img1, const QImage& img2) {
   EXPECT_TRUE(img1.size() == img2.size());
@@ -34,7 +32,7 @@ static bool fuzzyCompare(const QImage& img1, const QImage& img2) {
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
-      if (std::abs(int(line1[x]) - int(line2[x])) > 1) {
+      if (std::abs(static_cast<int>(line1[x]) - static_cast<int>(line2[x])) > 1) {
         return false;
       }
     }
@@ -47,28 +45,33 @@ static bool fuzzyCompare(const QImage& img1, const QImage& img2) {
 static bool checkScale(const GrayImage& img, const QSize& newSize) {
   const GrayImage scaled1(scaleToGray(img, newSize));
   const GrayImage scaled2(img.toQImage().scaled(newSize, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
-  return fuzzyCompare(scaled1, scaled2);
+  return fuzzyCompare(static_cast<const QImage&>(scaled1), static_cast<const QImage&>(scaled2));
+}
+}
+
+namespace imageproc::tests {
+
+TEST(ScaleTestSuite, test_null_image) {
+  const GrayImage nullImg;
+  EXPECT_TRUE(scaleToGray(nullImg, QSize(1, 1)).isNull());
 }
 
 TEST(ScaleTestSuite, test_random_image) {
   GrayImage img(QSize(100, 100));
-  uint8_t* line = img.data();
-  for (int y = 0; y < img.height(); ++y) {
-    for (int x = 0; x < img.width(); ++x) {
-      line[x] = static_cast<uint8_t>(rand() % 256);
-    }
-    line += img.stride();
-  }
 
-  // Unfortunately scaleToGray() and QImage::scaled()
-  // produce too different results when upscaling.
+  auto indices = std::views::iota(0, img.width() * img.height());
+
+  static thread_local std::mt19937_64 engine{std::random_device{}()};
+  static thread_local std::uniform_int_distribution<uint8_t> dist{0, 255};
+
+  std::ranges::for_each(indices, [&](int i) {
+    const int y = i / img.width();
+    const int x = i % img.width();
+    img.data()[y * img.stride() + x] = dist(engine);
+  });
 
   EXPECT_TRUE(checkScale(img, QSize(50, 50)));
-  // EXPECT_TRUE(checkScale(img, QSize(200, 200)));
   EXPECT_TRUE(checkScale(img, QSize(80, 80)));
-  // EXPECT_TRUE(checkScale(img, QSize(140, 140)));
-  // EXPECT_TRUE(checkScale(img, QSize(55, 145)));
-  // EXPECT_TRUE(checkScale(img, QSize(145, 55)));
 }
-}  // namespace tests
-}  // namespace imageproc
+}
+// NOLINTEND(misc-include-cleaner)

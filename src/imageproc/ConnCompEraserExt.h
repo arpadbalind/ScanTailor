@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_CONNCOMPERASEREXT_H_
-#define SCANTAILOR_IMAGEPROC_CONNCOMPERASEREXT_H_
+#pragma once
 
 #include "BinaryImage.h"
 #include "ConnComp.h"
@@ -16,8 +15,7 @@ namespace imageproc {
 /**
  * \brief Same as ConnCompEraser, except it provides images of connected components.
  */
-class ConnCompEraserExt {
-  DECLARE_NON_COPYABLE(ConnCompEraserExt)
+class ConnCompEraserExt : private NonCopyable {
 
  public:
   /**
@@ -44,7 +42,7 @@ class ConnCompEraserExt {
    * In case nextConnComp() returned a null component or was never called,
    * a null BinaryImage is returned.
    */
-  BinaryImage computeConnCompImage() const;
+  [[nodiscard]] BinaryImage computeConnCompImage() const;
 
   /**
    * \brief Computes the image of the last connected component
@@ -66,7 +64,7 @@ class ConnCompEraserExt {
  private:
   ConnCompEraser m_eraser;
 
-  BinaryImage computeDiffImage(const QRect& rect) const;
+  [[nodiscard]] BinaryImage computeDiffImage(const QRect& rect) const;
 
   /**
    * m_lastImage is always one step behind of m_eraser.image().
@@ -76,4 +74,3 @@ class ConnCompEraserExt {
   ConnComp m_lastCC;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_CONNCOMPERASEREXT_H_

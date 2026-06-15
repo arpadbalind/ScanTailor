@@ -135,7 +135,7 @@ GrayImage extractRgbChannel(const QImage& image, const RgbChannel channel) {
 }
 
 inline BinaryThreshold adjustThreshold(const BinaryThreshold threshold, const int adjustment) {
-  return qBound(1, int(threshold) + adjustment, 255);
+  return static_cast<BinaryThreshold>(qBound(1, int(threshold) + adjustment, 255));
 }
 
 void reduceNoise(ConnectivityMap& segmentsMap, const Dpi& dpi, const int noiseThreshold) {
@@ -178,8 +178,8 @@ QImage prepareToMap(const QImage& colorImage, const BinaryImage& image) {
 
 BinaryImage componentFromChannel(const QImage& colorImage, const RgbChannel channel, const int adjustment) {
   GrayImage channelImage = extractRgbChannel(colorImage, channel);
-  BinaryThreshold threshold = BinaryThreshold::otsuThreshold(channelImage);
-  BinaryImage component = BinaryImage(channelImage, adjustThreshold(threshold, adjustment));
+  BinaryThreshold threshold = BinaryThreshold::otsuThreshold(static_cast<const QImage&>(channelImage));
+  BinaryImage component = BinaryImage(static_cast<const QImage&>(channelImage), adjustThreshold(threshold, adjustment));
   return component;
 }
 
@@ -220,13 +220,13 @@ ConnectivityMap buildMapFromRgb(const BinaryImage& image,
   rasterOp<RopSubtract<RopDst, RopSrc>>(blueComponent, magentaComponent);
   rasterOp<RopSubtract<RopDst, RopSrc>>(blueComponent, cyanComponent);
 
-  ConnectivityMap segmentsMap = ConnectivityMap(blackComponent, CONN8);
-  segmentsMap.addComponents(yellowComponent, CONN8);
-  segmentsMap.addComponents(magentaComponent, CONN8);
-  segmentsMap.addComponents(cyanComponent, CONN8);
-  segmentsMap.addComponents(redComponent, CONN8);
-  segmentsMap.addComponents(greenComponent, CONN8);
-  segmentsMap.addComponents(blueComponent, CONN8);
+  ConnectivityMap segmentsMap = ConnectivityMap(blackComponent, Connectivity::CONN8);
+  segmentsMap.addComponents(yellowComponent, Connectivity::CONN8);
+  segmentsMap.addComponents(magentaComponent, Connectivity::CONN8);
+  segmentsMap.addComponents(cyanComponent, Connectivity::CONN8);
+  segmentsMap.addComponents(redComponent, Connectivity::CONN8);
+  segmentsMap.addComponents(greenComponent, Connectivity::CONN8);
+  segmentsMap.addComponents(blueComponent, Connectivity::CONN8);
 
   reduceNoise(segmentsMap, dpi, noiseThreshold);
 
@@ -235,12 +235,12 @@ ConnectivityMap buildMapFromRgb(const BinaryImage& image,
 
   BinaryImage remainingComponents(image);
   rasterOp<RopSubtract<RopDst, RopSrc>>(remainingComponents, segmentsMap.getBinaryMask());
-  segmentsMap.addComponents(remainingComponents, CONN8);
+  segmentsMap.addComponents(remainingComponents, Connectivity::CONN8);
   return segmentsMap;
 }
 
 ConnectivityMap buildMapFromGrayscale(const BinaryImage& image) {
-  return ConnectivityMap(image, CONN8);
+  return ConnectivityMap(image, Connectivity::CONN8);
 }
 
 class ComponentColor {
@@ -384,7 +384,7 @@ QImage ColorSegmenter::segment(const BinaryImage& image, const QImage& colorImag
     throw std::invalid_argument("ColorSegmenter: images size doesn't match.");
   }
   if ((colorImage.format() == QImage::Format_Indexed8) && colorImage.isGrayscale()) {
-    return segment(image, GrayImage(colorImage));
+    return static_cast<const QImage&>(segment(image, GrayImage(colorImage)));
   }
   if ((colorImage.format() != QImage::Format_RGB32) && (colorImage.format() != QImage::Format_ARGB32)) {
     throw std::invalid_argument("ColorSegmenter: wrong image format.");

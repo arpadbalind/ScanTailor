@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_ATOMICFILEOVERWRITER_H_
-#define SCANTAILOR_CORE_ATOMICFILEOVERWRITER_H_
+#pragma once
 
 #include <memory>
 
@@ -19,8 +18,7 @@ class QTemporaryFile;
  * Because renaming across volumes doesn't work, we create a temporary file
  * in the same directory as the target file.
  */
-class AtomicFileOverwriter {
-  DECLARE_NON_COPYABLE(AtomicFileOverwriter)
+class AtomicFileOverwriter : private NonCopyable {
 
  public:
   AtomicFileOverwriter();
@@ -58,6 +56,3 @@ class AtomicFileOverwriter {
  private:
   std::unique_ptr<QTemporaryFile> m_tempFile;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_ATOMICFILEOVERWRITER_H_

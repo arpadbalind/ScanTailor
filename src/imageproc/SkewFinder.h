@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_SKEWFINDER_H_
-#define SCANTAILOR_IMAGEPROC_SKEWFINDER_H_
+#pragma once
 
 #include "NonCopyable.h"
 
@@ -30,7 +29,7 @@ class Skew {
    *
    * Positive values indicate clockwise skews.
    */
-  double angle() const { return m_angle; }
+  [[nodiscard]] double angle() const { return m_angle; }
 
   /**
    * \brief Get the confidence value.
@@ -39,7 +38,7 @@ class Skew {
    * above or equal to GOOD_CONFIDENCE indicates high
    * confidence level.
    */
-  double confidence() const { return m_confidence; }
+  [[nodiscard]] double confidence() const { return m_confidence; }
 
  private:
   double m_angle;
@@ -47,8 +46,7 @@ class Skew {
 };
 
 
-class SkewFinder {
-  DECLARE_NON_COPYABLE(SkewFinder)
+class SkewFinder : private NonCopyable {
 
  public:
   static const double DEFAULT_MAX_ANGLE;
@@ -130,7 +128,7 @@ class SkewFinder {
    * \note If the image contains text columns at (slightly) different
    * angles, one of those angles will be found, with a lower confidence.
    */
-  Skew findSkew(const BinaryImage& image) const;
+  [[nodiscard]] Skew findSkew(const BinaryImage& image) const;
 
  private:
   static const double LOW_SCORE;
@@ -147,4 +145,3 @@ class SkewFinder {
   int m_fineReduction;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_SKEWFINDER_H_

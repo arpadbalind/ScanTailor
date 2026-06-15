@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_CONNCOMPERASER_H_
-#define SCANTAILOR_IMAGEPROC_CONNCOMPERASER_H_
+#pragma once
 
 #include <cstdint>
 #include <stack>
@@ -18,9 +17,7 @@ class ConnComp;
 /**
  * \brief Erases connected components one by one and returns their bounding boxes.
  */
-class ConnCompEraser {
-  DECLARE_NON_COPYABLE(ConnCompEraser)
-
+class ConnCompEraser : private NonCopyable {
  public:
   /**
    * \brief Constructor.
@@ -45,7 +42,7 @@ class ConnCompEraser {
    * Every time nextConnComp() is called, a connected component
    * is erased from the image, assuming there was one.
    */
-  const BinaryImage& image() const { return m_image; }
+  [[nodiscard]] const BinaryImage& image() const { return m_image; }
 
  private:
   struct Segment {
@@ -96,4 +93,3 @@ class ConnCompEraser {
   int m_y;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_CONNCOMPERASER_H_

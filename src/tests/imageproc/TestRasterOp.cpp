@@ -1,21 +1,28 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <BinaryImage.h>
-#include <RasterOp.h>
-
+// NOLINTBEGIN(misc-include-cleaner)
 #include <QImage>
-#include <gtest/gtest.h>
+#include <QPoint>
+#include <QRect>
+
+#include <algorithm>
+#include <array>
 #include <cassert>
 #include <cstddef>
 #include <cstdlib>
+#include <cstdint>
+#include <gtest/gtest.h>
+#include <random>
+#include <ranges>
 #include <vector>
 
+#include "BinaryImage.h"
+#include "RasterOp.h"
 #include "Utils.h"
 
-namespace imageproc {
-namespace tests {
-using namespace utils;
+namespace {
+using namespace imageproc;
 
 template <typename Rop>
 static bool checkSubimageRop(const QImage& dst, const QRect& dstRect, const QImage& src, const QPoint& srcPt) {
@@ -29,27 +36,31 @@ static bool checkSubimageRop(const QImage& dst, const QRect& dstRect, const QIma
   rasterOp<Rop>(dstSubimage, dstSubimage.rect(), srcSubimage, QPoint(0, 0));
   return dstSubimage.toQImage() == dstBi.toQImage().copy(dstRect);
 }
+}
+
+namespace imageproc::tests {
+using namespace utils;
 
 TEST(RasterOpTestSuite, test_small_image) {
-  static const int inp[]
+  static const std::array<int, 72> inp
       = {0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0,
          0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0};
 
-  static const int mask[]
+  static const std::array<int, 72> mask
       = {0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0,
          0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0};
 
-  static const int out[]
+  static const std::array<int, 72> out
       = {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
          0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0};
 
-  BinaryImage img(makeBinaryImage(inp, 9, 8));
-  const BinaryImage maskImg(makeBinaryImage(mask, 9, 8));
+  BinaryImage img(makeBinaryImage(inp.data(), 9, 8));
+  const BinaryImage maskImg(makeBinaryImage(mask.data(), 9, 8));
 
   using Rop = RopAnd<RopDst, RopSrc>;
 
   rasterOp<Rop>(img, img.rect(), maskImg, QPoint(0, 0));
-  EXPECT_TRUE(img == makeBinaryImage(out, 9, 8));
+  EXPECT_TRUE(img == makeBinaryImage(out.data(), 9, 8));
 }
 
 namespace {
@@ -57,9 +68,9 @@ class Tester1 {
  public:
   Tester1();
 
-  bool testFullImage() const;
+  [[nodiscard]] bool testFullImage() const;
 
-  bool testSubImage(const QRect& dstRect, const QPoint& srcPt) const;
+  [[nodiscard]] bool testSubImage(const QRect& dstRect, const QPoint& srcPt) const;
 
  private:
   using Rop = RopXor<RopDst, RopSrc>;
@@ -71,23 +82,27 @@ class Tester1 {
 
 
 Tester1::Tester1() {
-  const int w = 400;
-  const int h = 300;
+  const size_t w{ 400 };
+  const size_t h{ 300 };
 
-  std::vector<int> src(w * h);
-  for (int& i : src) {
-    i = rand() & 1;
-  }
+  std::vector<int32_t> src(w * h);
+  std::vector<int32_t> dst(w * h);
+  std::vector<int32_t> res(w * h);
 
-  std::vector<int> dst(w * h);
-  for (int& i : dst) {
-    i = rand() & 1;
-  }
+  static thread_local std::mt19937_64 engine{std::random_device{}()};
+  static thread_local std::uniform_int_distribution<int32_t> distribution{0, 1};
 
-  std::vector<int> res(w * h);
-  for (size_t i = 0; i < res.size(); ++i) {
-    res[i] = Rop::transform(src[i], dst[i]) & 1;
-  }
+  std::ranges::generate(src, [&]() { return distribution(engine); });
+  std::ranges::generate(dst, [&]() { return distribution(engine); });
+
+  std::ranges::copy(
+      std::views::zip_transform(
+          [](int32_t s, int32_t d) { return Rop::transform(s, d) & 1u; },
+          src,
+          dst
+          ),
+      res.begin()
+      );
 
   m_src = makeBinaryImage(&src[0], w, h);
   m_dstBefore = makeBinaryImage(&dst[0], w, h);
@@ -112,7 +127,7 @@ bool Tester1::testSubImage(const QRect& dstRect, const QPoint& srcPt) const {
 }
 }  // namespace
 TEST(RasterOpTestSuite, test_large_image) {
-  Tester1 tester;
+  const Tester1 tester;
   ASSERT_TRUE(tester.testFullImage());
   ASSERT_TRUE(tester.testSubImage(QRect(101, 32, 211, 151), QPoint(101, 41)));
   ASSERT_TRUE(tester.testSubImage(QRect(101, 32, 211, 151), QPoint(99, 99)));
@@ -139,8 +154,8 @@ bool Tester2::testBlockMove(const QRect& rect, const int dx, const int dy) {
   BinaryImage dst(m_image);
   const QRect dstRect(rect.translated(dx, dy));
   rasterOp<RopSrc>(dst, dstRect, dst, rect.topLeft());
-  QImage qSrc(m_image.toQImage());
-  QImage qDst(dst.toQImage());
+  const QImage qSrc(m_image.toQImage());
+  const QImage qDst(dst.toQImage());
   if (qSrc.copy(rect) != qDst.copy(dstRect)) {
     return false;
   }
@@ -155,5 +170,5 @@ TEST(RasterOpTestSuite, test_move_blocks) {
   ASSERT_TRUE(tester.testBlockMove(QRect(51, 35, 199, 200), 0, 1));
   ASSERT_TRUE(tester.testBlockMove(QRect(51, 35, 199, 200), 1, 1));
 }
-}  // namespace tests
-}  // namespace imageproc
+}
+// NOLINTEND(misc-include-cleaner)

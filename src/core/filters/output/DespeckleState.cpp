@@ -87,7 +87,7 @@ QImage DespeckleState::overlaySpeckles(const QImage& mixed, const imageproc::Bin
  * generating output files.
  */
 BinaryImage DespeckleState::extractBW(const QImage& mixed) {
-  BinaryImage result(mixed.size(), WHITE);
+  BinaryImage result(mixed.size(), BWColor::WHITE);
 
   const auto* mixedLine = (const uint32_t*) mixed.bits();
   const int mixedStride = mixed.bytesPerLine() / 4;

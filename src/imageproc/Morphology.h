@@ -21,7 +21,7 @@ class Brick {
   /**
    * \brief Constructs a brick with origin at the center.
    */
-  Brick(const QSize& size);
+  explicit Brick(const QSize& size);
 
   /**
    * \brief Constructs a brick with origin specified relative to its size.
@@ -46,28 +46,28 @@ class Brick {
   /**
    * \brief Get the minimum (inclusive) X offset from the origin.
    */
-  int minX() const { return m_minX; }
+  [[nodiscard]] int minX() const { return m_minX; }
 
   /**
    * \brief Get the maximum (inclusive) X offset from the origin.
    */
-  int maxX() const { return m_maxX; }
+  [[nodiscard]] int maxX() const { return m_maxX; }
 
   /**
    * \brief Get the minimum (inclusive) Y offset from the origin.
    */
-  int minY() const { return m_minY; }
+  [[nodiscard]] int minY() const { return m_minY; }
 
   /**
    * \brief Get the maximum (inclusive) Y offset from the origin.
    */
-  int maxY() const { return m_maxY; }
+  [[nodiscard]] int maxY() const { return m_maxY; }
 
-  int width() const { return m_maxX - m_minX + 1; }
+  [[nodiscard]] int width() const { return m_maxX - m_minX + 1; }
 
-  int height() const { return m_maxY - m_minY + 1; }
+  [[nodiscard]] int height() const { return m_maxY - m_minY + 1; }
 
-  bool isEmpty() const { return m_minX > m_maxX || m_minY > m_maxY; }
+  [[nodiscard]] bool isEmpty() const { return m_minX > m_maxX || m_minY > m_maxY; }
 
   /**
    * \brief Flips the brick both horizontally and vertically around the origin.
@@ -77,7 +77,7 @@ class Brick {
   /**
    * \brief Returns a brick flipped both horizontally and vertically around the origin.
    */
-  Brick flipped() const;
+  [[nodiscard]] Brick flipped() const;
 
  private:
   int m_minX;
@@ -101,12 +101,12 @@ class Brick {
 BinaryImage dilateBrick(const BinaryImage& src,
                         const Brick& brick,
                         const QRect& dstArea,
-                        BWColor srcSurroundings = WHITE);
+                        BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-BinaryImage dilateBrick(const BinaryImage& src, const Brick& brick, BWColor srcSurroundings = WHITE);
+BinaryImage dilateBrick(const BinaryImage& src, const Brick& brick, BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Spreads darker pixels over the brick's area.
@@ -143,12 +143,12 @@ GrayImage dilateGray(const GrayImage& src, const Brick& brick, unsigned char src
 BinaryImage erodeBrick(const BinaryImage& src,
                        const Brick& brick,
                        const QRect& dstArea,
-                       BWColor srcSurroundings = BLACK);
+                       BWColor srcSurroundings = BWColor::BLACK);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-BinaryImage erodeBrick(const BinaryImage& src, const Brick& brick, BWColor srcSurroundings = BLACK);
+BinaryImage erodeBrick(const BinaryImage& src, const Brick& brick, BWColor srcSurroundings = BWColor::BLACK);
 
 /**
  * \brief Spreads lighter pixels over the brick's area.
@@ -180,19 +180,19 @@ GrayImage erodeGray(const GrayImage& src, const Brick& brick, unsigned char srcS
  *        will be returned as a destination image. It doesn't have
  *        to fit into the source image area.
  * \param srcSurroundings The color of pixels that are assumed to
- *        surround the source image.  If set to BLACK, a brick will be able
+ *        surround the source image.  If set to BWColor::BLACK, a brick will be able
  *        to fit by going partially off-screen (off the source
  *        image area actually).
  */
 BinaryImage openBrick(const BinaryImage& src,
                       const QSize& brick,
                       const QRect& dstArea,
-                      BWColor srcSurroundings = WHITE);
+                      BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-BinaryImage openBrick(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = WHITE);
+BinaryImage openBrick(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Remove dark areas smaller than the structuring element.
@@ -221,19 +221,19 @@ GrayImage openGray(const GrayImage& src, const QSize& brick, unsigned char srcSu
  *        will be returned as a destination image. It doesn't have
  *        to fit into the source image area.
  * \param srcSurroundings The color of pixels that are assumed to
- *        surround the source image.  If set to WHITE, a brick will be able
+ *        surround the source image.  If set to BWColor::WHITE, a brick will be able
  *        to fit by going partially off-screen (off the source
  *        image area actually).
  */
 BinaryImage closeBrick(const BinaryImage& src,
                        const QSize& brick,
                        const QRect& dstArea,
-                       BWColor srcSurroundings = WHITE);
+                       BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-BinaryImage closeBrick(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = WHITE);
+BinaryImage closeBrick(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Remove light areas smaller than the structuring element.
@@ -269,12 +269,12 @@ GrayImage closeGray(const GrayImage& src, const QSize& brick, unsigned char srcS
 BinaryImage whiteTopHatTransform(const BinaryImage& src,
                                  const QSize& brick,
                                  const QRect& dstArea,
-                                 BWColor srcSurroundings = WHITE);
+                                 BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-BinaryImage whiteTopHatTransform(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = WHITE);
+BinaryImage whiteTopHatTransform(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Extracts small elements and details from given image,
@@ -292,12 +292,12 @@ BinaryImage whiteTopHatTransform(const BinaryImage& src, const QSize& brick, BWC
 BinaryImage blackTopHatTransform(const BinaryImage& src,
                                  const QSize& brick,
                                  const QRect& dstArea,
-                                 BWColor srcSurroundings = WHITE);
+                                 BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-BinaryImage blackTopHatTransform(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = WHITE);
+BinaryImage blackTopHatTransform(const BinaryImage& src, const QSize& brick, BWColor srcSurroundings = BWColor::WHITE);
 
 /**
  * \brief Performs a hit-miss matching operation.

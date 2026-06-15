@@ -1,15 +1,13 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_MATH_POLYLINEINTERSECTOR_H_
-#define SCANTAILOR_MATH_POLYLINEINTERSECTOR_H_
-
-#include <QLineF>
-#include <QPointF>
+#pragma once
 #include <vector>
 
 #include "VecNT.h"
 
+class QPointF;
+class QLineF;
 class PolylineIntersector {
  public:
   class Hint {
@@ -21,8 +19,8 @@ class PolylineIntersector {
    private:
     void update(int newSegment);
 
-    int m_lastSegment;
-    int m_direction;
+    int m_lastSegment{ 0 };
+    int m_direction{ 1 };
   };
 
 
@@ -33,7 +31,7 @@ class PolylineIntersector {
  private:
   bool intersectsSegment(const QLineF& normal, int segment) const;
 
-  bool intersectsSpan(const QLineF& normal, const QLineF& span) const;
+  static bool intersectsSpan(const QLineF& normal, const QLineF& span);
 
   QPointF intersectWithSegment(const QLineF& line, int segment) const;
 
@@ -42,6 +40,3 @@ class PolylineIntersector {
   std::vector<QPointF> m_polyline;
   int m_numSegments;
 };
-
-
-#endif  // ifndef SCANTAILOR_MATH_POLYLINEINTERSECTOR_H_

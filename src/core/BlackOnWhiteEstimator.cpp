@@ -29,7 +29,7 @@ bool BlackOnWhiteEstimator::isBlackOnWhiteRefining(const imageproc::GrayImage& g
       return true;
     }
 
-    QImage gray150(transformToGray(grayImage, xform150dpi.transform(), xform150dpi.resultingRect().toRect(),
+    QImage gray150(transformToGray(static_cast<const QImage&>(grayImage), xform150dpi.transform(), xform150dpi.resultingRect().toRect(),
                                    OutsidePixels::assumeColor(Qt::white)));
     bw150 = binarizeOtsu(gray150);
 
@@ -53,7 +53,7 @@ bool BlackOnWhiteEstimator::isBlackOnWhiteRefining(const imageproc::GrayImage& g
     rasterOp<RopOr<RopSrc, RopDst>>(contentMask, blackTopHat);
 
     contentMask = closeBrick(contentMask, QSize(200, 200));
-    contentMask = dilateBrick(contentMask, QSize(30, 30));
+    contentMask = dilateBrick(contentMask, Brick(QSize(30, 30)));
     if (dbg) {
       dbg->add(contentMask, "content_mask");
     }
@@ -85,7 +85,7 @@ bool BlackOnWhiteEstimator::isBlackOnWhite(const GrayImage& img, const BinaryIma
     throw std::invalid_argument("BlackOnWhiteEstimator: img and mask have different sizes");
   }
 
-  BinaryImage bwImage(img, BinaryThreshold::otsuThreshold(GrayscaleHistogram(img, mask)));
+  BinaryImage bwImage(static_cast<const QImage&>(img), BinaryThreshold::otsuThreshold(GrayscaleHistogram(static_cast<const QImage&>(img), mask)));
   rasterOp<RopAnd<RopSrc, RopDst>>(bwImage, mask);
   return (2 * bwImage.countBlackPixels() <= mask.countBlackPixels());
 }
@@ -98,7 +98,7 @@ bool BlackOnWhiteEstimator::isBlackOnWhite(const GrayImage& img, const QPolygonF
     throw std::invalid_argument("BlackOnWhiteEstimator: the cropping area is wrong.");
   }
 
-  BinaryImage mask(img.size(), BLACK);
-  PolygonRasterizer::fillExcept(mask, WHITE, cropArea, Qt::WindingFill);
+  BinaryImage mask(img.size(), BWColor::BLACK);
+  PolygonRasterizer::fillExcept(mask, BWColor::WHITE, cropArea, Qt::WindingFill);
   return isBlackOnWhite(img, mask);
 }

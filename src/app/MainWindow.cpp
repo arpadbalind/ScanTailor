@@ -641,7 +641,7 @@ void MainWindow::resetThumbSequence(const std::shared_ptr<const PageOrderProvide
     m_thumbSequence->setThumbnailFactory(nullptr);
   }
 
-  if (selectionAction != ThumbnailSequence::KEEP_SELECTION) {
+  if (selectionAction != ThumbnailSequence::SelectionAction::KEEP_SELECTION) {
     const PageId page(m_selectedPage.get(getCurrentView()));
     if (m_thumbSequence->setSelection(page)) {
       // OK
@@ -881,7 +881,7 @@ void MainWindow::goNextSelectedPage() {
 
   const PageInfo nextSelectedPage(m_thumbSequence->nextSelectedPage(m_thumbSequence->selectionLeader().id()));
   if (!nextSelectedPage.isNull()) {
-    goToPage(nextSelectedPage.id(), ThumbnailSequence::KEEP_SELECTION);
+    goToPage(nextSelectedPage.id(), ThumbnailSequence::SelectionAction::KEEP_SELECTION);
   }
 }
 
@@ -892,7 +892,7 @@ void MainWindow::goPrevSelectedPage() {
 
   const PageInfo prevSelectedPage(m_thumbSequence->prevSelectedPage(m_thumbSequence->selectionLeader().id()));
   if (!prevSelectedPage.isNull()) {
-    goToPage(prevSelectedPage.id(), ThumbnailSequence::KEEP_SELECTION);
+    goToPage(prevSelectedPage.id(), ThumbnailSequence::SelectionAction::KEEP_SELECTION);
   }
 }
 
@@ -911,22 +911,22 @@ void MainWindow::currentPageChanged(const PageInfo& pageInfo,
                                     const ThumbnailSequence::SelectionFlags flags) {
   m_selectedPage.set(pageInfo.id(), getCurrentView());
 
-  if ((flags & ThumbnailSequence::SELECTED_BY_USER) || focusButton->isChecked()) {
-    if (!(flags & ThumbnailSequence::AVOID_SCROLLING_TO)) {
+  if (enumflags::any_of(flags, ThumbnailSequence::SelectionFlags::SELECTED_BY_USER) || focusButton->isChecked()) {
+    if (!(enumflags::any_of(flags, ThumbnailSequence::SelectionFlags::AVOID_SCROLLING_TO))) {
       thumbView->ensureVisible(thumbRect, 0, 0);
     }
   }
 
-  if (flags & ThumbnailSequence::SELECTED_BY_USER) {
+  if (enumflags::any_of(flags, ThumbnailSequence::SelectionFlags::SELECTED_BY_USER)) {
     if (isBatchProcessingInProgress()) {
       stopBatchProcessing();
-    } else if (!(flags & ThumbnailSequence::REDUNDANT_SELECTION)) {
+    } else if (!(enumflags::any_of(flags, ThumbnailSequence::SelectionFlags::REDUNDANT_SELECTION))) {
       // Start loading / processing the newly selected page.
       updateMainArea();
     }
   }
 
-  if ((flags & ThumbnailSequence::SELECTION_CLEARED) && selectionModeBtn->isChecked()) {
+  if ((enumflags::any_of(flags, ThumbnailSequence::SelectionFlags::SELECTION_CLEARED)) && selectionModeBtn->isChecked()) {
     selectionModeBtn->setChecked(false);
   }
 
@@ -1067,7 +1067,7 @@ void MainWindow::filterSelectionChanged(const QItemSelection& selected) {
   const int horScrollBarPos = thumbView->horizontalScrollBar()->value();
   const int verScrollBarPos = thumbView->verticalScrollBar()->value();
 
-  resetThumbSequence(currentPageOrderProvider(), ThumbnailSequence::KEEP_SELECTION);
+  resetThumbSequence(currentPageOrderProvider(), ThumbnailSequence::SelectionAction::KEEP_SELECTION);
 
   if (!focusButton->isChecked()) {
     thumbView->horizontalScrollBar()->setValue(horScrollBarPos);
@@ -1111,7 +1111,7 @@ void MainWindow::pageOrderingChanged(int idx) {
 
   m_stages->filterAt(m_curFilter)->selectPageOrder(idx);
 
-  m_thumbSequence->reset(currentPageSequence(), ThumbnailSequence::KEEP_SELECTION, currentPageOrderProvider());
+  m_thumbSequence->reset(currentPageSequence(), ThumbnailSequence::SelectionAction::KEEP_SELECTION, currentPageOrderProvider());
 
   if (!focusButton->isChecked()) {
     thumbView->horizontalScrollBar()->setValue(horScrollBarPos);
@@ -1238,8 +1238,6 @@ void MainWindow::filterResult(const BackgroundTaskPtr& task, const FilterResultP
         QString cmd = settings.value("main_window/external_alarm_cmd", extPlayCmd).toString();
         if (cmd.isEmpty()) {
           QApplication::beep();
-        } else {
-          Q_UNUSED(std::system(cmd.toStdString().c_str()));
         }
       }
 
@@ -1294,7 +1292,7 @@ void MainWindow::fixedDpiSubmitted() {
   m_pages->updateMetadataFrom(m_fixDpiDialog->files());
 
   // The thumbnail list also stores page metadata, including the DPI.
-  m_thumbSequence->reset(currentPageSequence(), ThumbnailSequence::KEEP_SELECTION,
+  m_thumbSequence->reset(currentPageSequence(), ThumbnailSequence::SelectionAction::KEEP_SELECTION,
                          m_thumbSequence->pageOrderProvider());
 
   const PageInfo selectedPageAfter(m_thumbSequence->selectionLeader());
@@ -1448,7 +1446,9 @@ void MainWindow::onSettingsChanged() {
   ApplicationSettings& settings = ApplicationSettings::getInstance();
   bool needInvalidate = true;
 
-  static_cast<Application*>(qApp)->installLanguage(settings.getLanguage());
+  if (auto* app = qobject_cast<Application*>(qApp)) {
+    app->installLanguage(settings.getLanguage());
+  }
 
   if (m_thumbnailCache) {
     const QSize maxThumbSize = settings.getThumbnailQuality();
@@ -2076,7 +2076,7 @@ void MainWindow::scaleThumbnails(int scaleFactor) {
 void MainWindow::updateMaxLogicalThumbSize() {
   m_thumbSequence->setMaxLogicalThumbSize(m_maxLogicalThumbSize);
   updateThumbViewMinWidth();
-  resetThumbSequence(currentPageOrderProvider(), ThumbnailSequence::KEEP_SELECTION);
+  resetThumbSequence(currentPageOrderProvider(), ThumbnailSequence::SelectionAction::KEEP_SELECTION);
 }
 
 void MainWindow::setupIcons() {

@@ -12,44 +12,78 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <random>
 
 namespace imageproc::tests::utils {
-inline BinaryImage randomBinaryImage(const int width, const int height) {
+inline BinaryImage randomBinaryImage(int width, int height)
+{
   BinaryImage image(width, height);
+
   uint32_t* pword = image.data();
-  uint32_t* const end = pword + image.height() * image.wordsPerLine();
+
+  const auto offset =
+      static_cast<std::ptrdiff_t>(image.height()) *
+      static_cast<std::ptrdiff_t>(image.wordsPerLine());
+
+  const uint32_t* const end = pword + offset;
+
+  static std::mt19937 rng{std::random_device{}()};
+  static std::uniform_int_distribution<uint32_t> dist(
+      0U, std::numeric_limits<uint32_t>::max());
+
   for (; pword != end; ++pword) {
-    const uint32_t w1 = rand() % (1 << 16);
-    const uint32_t w2 = rand() % (1 << 16);
-    *pword = (w1 << 16) | w2;
+    *pword = dist(rng);
   }
+
   return image;
 }
 
-inline QImage randomMonoQImage(const int width, const int height) {
+inline QImage randomMonoQImage(int width, int height)
+{
   QImage image(width, height, QImage::Format_Mono);
+
   image.setColorCount(2);
   image.setColor(0, 0xffffffff);
   image.setColor(1, 0xff000000);
-  auto* pword = (uint32_t*) image.bits();
+
+  // NOLINTBEGIN(cppcoreguidelines-pro-type-reinterpret-cast)
+  auto* pword = reinterpret_cast<uint32_t*>(image.bits());
+  // NOLINTEND(cppcoreguidelines-pro-type-reinterpret-cast)
+
   assert(image.bytesPerLine() % 4 == 0);
-  uint32_t* const end = pword + image.height() * (image.bytesPerLine() / 4);
+
+  const auto offset =
+      static_cast<std::ptrdiff_t>(image.height()) *
+      static_cast<std::ptrdiff_t>(image.bytesPerLine() / 4);
+
+  const uint32_t* const end = pword + offset;
+
+  static std::mt19937 rng{std::random_device{}()};
+  static std::uniform_int_distribution<uint32_t> dist(
+      0U, std::numeric_limits<uint32_t>::max());
+
   for (; pword != end; ++pword) {
-    const uint32_t w1 = rand() % (1 << 16);
-    const uint32_t w2 = rand() % (1 << 16);
-    *pword = (w1 << 16) | w2;
+    *pword = dist(rng);
   }
+
   return image;
 }
 
-inline QImage randomGrayImage(int width, int height) {
+inline QImage randomGrayImage(int width, int height)
+{
   QImage img(width, height, QImage::Format_Indexed8);
   img.setColorTable(createGrayscalePalette());
+
+  static std::mt19937 rng{std::random_device{}()};
+  static std::uniform_int_distribution<int> dist(0, 9);
+
   for (int y = 0; y < height; ++y) {
+    auto* line = img.scanLine(y);
     for (int x = 0; x < width; ++x) {
-      img.setPixel(x, y, rand() % 10);
+      line[x] = static_cast<uchar>(dist(rng));
     }
   }
+
   return img;
 }
 
@@ -81,31 +115,47 @@ inline QImage makeGrayImage(const int* data, const int width, const int height) 
   return img;
 }
 
-inline void dumpBinaryImage(const BinaryImage& img, const char* name) {
+inline void dumpBinaryImage(const BinaryImage& img, const char* name)
+{
+  static constexpr std::uint32_t ONE = 1U;
+  static constexpr std::size_t WORD_BITS = 32;
+
   if (name) {
     std::cout << name << " = ";
   }
 
   if (img.isNull()) {
-    std::cout << "NULL image" << std::endl;
+    std::cout << "NULL image\n";
     return;
   }
 
-  const int width = img.width();
-  const int height = img.height();
+  const auto width = static_cast<std::size_t>(img.width());
+  const auto height = static_cast<std::size_t>(img.height());
+
   const uint32_t* line = img.data();
-  const int wpl = img.wordsPerLine();
+  const auto wpl = static_cast<std::size_t>(img.wordsPerLine());
 
   std::cout << "{\n";
-  for (int y = 0; y < height; ++y, line += wpl) {
+
+  for (std::size_t y = 0; y < height; ++y, line += wpl) {
     std::cout << "\t";
-    for (int x = 0; x < width; ++x) {
-      std::cout << ((line[x >> 5] >> (31 - (x & 31))) & 1) << ", ";
+
+    for (std::size_t x = 0; x < width; ++x) {
+      const std::size_t wordIndex = x / WORD_BITS;
+      const std::size_t bitIndex  = WORD_BITS - 1 - (x % WORD_BITS);
+
+      const uint32_t word = line[wordIndex];
+      const uint32_t bit  = (word >> bitIndex) & ONE;
+
+      std::cout << bit << ", ";
     }
+
     std::cout << "\n";
   }
-  std::cout << "}" << std::endl;
+
+  std::cout << "}\n";
 }
+
 
 inline void dumpGrayImage(const QImage& img, const char* name) {
   if (name) {
@@ -113,11 +163,11 @@ inline void dumpGrayImage(const QImage& img, const char* name) {
   }
 
   if (img.isNull()) {
-    std::cout << "NULL image" << std::endl;
+    std::cout << "NULL image\n";
     return;
   }
   if (img.format() != QImage::Format_Indexed8) {
-    std::cout << "Not grayscale image" << std::endl;
+    std::cout << "Not grayscale image\n";
   }
 
   const int width = img.width();
@@ -131,7 +181,7 @@ inline void dumpGrayImage(const QImage& img, const char* name) {
     }
     std::cout << "\n";
   }
-  std::cout << "}" << std::endl;
+  std::cout << "}\n";
 }
 
 inline bool surroundingsIntact(const QImage& img1, const QImage& img2, const QRect& rect) {

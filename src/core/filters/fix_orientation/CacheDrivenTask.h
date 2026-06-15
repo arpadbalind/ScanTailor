@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FIX_ORIENTATION_CACHEDRIVENTASK_H_
-#define SCANTAILOR_FIX_ORIENTATION_CACHEDRIVENTASK_H_
+#pragma once
 
 #include <memory>
 
@@ -19,8 +18,7 @@ class CacheDrivenTask;
 namespace fix_orientation {
 class Settings;
 
-class CacheDrivenTask : public CompositeCacheDrivenTask {
-  DECLARE_NON_COPYABLE(CacheDrivenTask)
+class CacheDrivenTask : public CompositeCacheDrivenTask, private NonCopyable {
 
  public:
   CacheDrivenTask(std::shared_ptr<Settings> settings, std::shared_ptr<page_split::CacheDrivenTask> nextTask);
@@ -34,4 +32,3 @@ class CacheDrivenTask : public CompositeCacheDrivenTask {
   std::shared_ptr<Settings> m_settings;
 };
 }  // namespace fix_orientation
-#endif  // ifndef SCANTAILOR_FIX_ORIENTATION_CACHEDRIVENTASK_H_

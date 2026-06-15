@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_BINARYTHRESHOLD_H_
-#define SCANTAILOR_IMAGEPROC_BINARYTHRESHOLD_H_
+#pragma once
 
 #include "BWColor.h"
 
@@ -50,14 +49,14 @@ class BinaryThreshold {
    */
   static BinaryThreshold mokjiThreshold(const QImage& image, unsigned maxEdgeWidth = 3, unsigned minEdgeMagnitude = 20);
 
-  BinaryThreshold(int threshold) : m_threshold(threshold) {}
+  explicit BinaryThreshold(int threshold) : m_threshold(threshold) {}
 
-  operator int() const { return m_threshold; }
+  explicit operator int() const { return m_threshold; }
 
-  BWColor grayToBW(int gray) const { return gray < m_threshold ? BLACK : WHITE; }
+  [[nodiscard]] BWColor grayToBW(int gray) const { return gray < m_threshold ? BWColor::BLACK : BWColor::WHITE; }
 
  private:
   int m_threshold;
 };
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_BINARYTHRESHOLD_H_
+

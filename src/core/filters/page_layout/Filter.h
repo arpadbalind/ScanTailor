@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_PAGE_LAYOUT_FILTER_H_
-#define SCANTAILOR_PAGE_LAYOUT_FILTER_H_
+#pragma once
 
 #include <QCoreApplication>
 #include <memory>
@@ -32,9 +31,7 @@ class Task;
 class CacheDrivenTask;
 class Settings;
 
-class Filter : public AbstractFilter {
-  DECLARE_NON_COPYABLE(Filter)
-
+class Filter : public AbstractFilter, private NonCopyable {
   Q_DECLARE_TR_FUNCTIONS(page_layout::Filter)
  public:
   Filter(std::shared_ptr<ProjectPages> pageSequence, const PageSelectionAccessor& pageSelectionAccessor);
@@ -88,4 +85,3 @@ class Filter : public AbstractFilter {
   int m_selectedPageOrder;
 };
 }  // namespace page_layout
-#endif  // ifndef SCANTAILOR_PAGE_LAYOUT_FILTER_H_

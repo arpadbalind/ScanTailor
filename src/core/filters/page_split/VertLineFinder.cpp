@@ -42,7 +42,7 @@ std::vector<QLineF> VertLineFinder::findLines(const QImage& image,
   const GrayImage gray100(transformToGray(image, xform100dpi.transform(), targetRect,
                                           OutsidePixels::assumeWeakColor(Qt::black), QSizeF(5.0, 5.0)));
   if (dbg) {
-    dbg->add(gray100, "gray100");
+    dbg->add(static_cast<const QImage&>(gray100), "gray100");
   }
 
   if (grayDownscaled) {
@@ -77,8 +77,8 @@ std::vector<QLineF> VertLineFinder::findLines(const QImage& image,
 #else
   // These are not gradients, but their difference is the same as for
   // the two gradients above.  This branch is an optimization.
-  GrayImage hGradient(erodeGray(preprocessed, QSize(11, 1), 0x00));
-  GrayImage vGradient(erodeGray(preprocessed, QSize(1, 11), 0x00));
+  GrayImage hGradient(erodeGray(preprocessed, Brick(QSize(11, 1)), 0x00));
+  GrayImage vGradient(erodeGray(preprocessed, Brick(QSize(1, 11)), 0x00));
 #endif
 
   if (!dbg) {
@@ -89,13 +89,13 @@ std::vector<QLineF> VertLineFinder::findLines(const QImage& image,
   grayRasterOp<GRopClippedSubtract<GRopDst, GRopSrc>>(hGradient, vGradient);
   vGradient = GrayImage();
   if (dbg) {
-    dbg->add(hGradient, "vert_raster_lines");
+    dbg->add(static_cast<const QImage&>(hGradient), "vert_raster_lines");
   }
 
   const GrayImage rasterLines(closeGray(hGradient, QSize(1, 19), 0x00));
   hGradient = GrayImage();
   if (dbg) {
-    dbg->add(rasterLines, "short_segments_removed");
+    dbg->add(static_cast<const QImage&>(rasterLines), "short_segments_removed");
   }
 
   const double lineThickness = 5.0;

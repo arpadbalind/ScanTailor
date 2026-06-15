@@ -126,7 +126,7 @@ BinaryThreshold BinaryThreshold::mokjiThreshold(const QImage& image,
   const GrayImage gray(image);
 
   const int dilateSize = (maxEdgeWidth + 1) * 2 - 1;
-  GrayImage dilated(dilateGray(gray, QSize(dilateSize, dilateSize)));
+  GrayImage dilated(dilateGray(gray, Brick(QSize(dilateSize, dilateSize))));
 
   unsigned matrix[256][256];
   memset(matrix, 0, sizeof(matrix));
