@@ -78,13 +78,13 @@ class Mat {
   friend Mat<OT> operator/(const Mat<OT>& m, OT scalar);
 
  public:
-  Mat inv() const;
+  [[nodiscard]] Mat inv() const;
 
-  Mat solve(const Mat& b) const;
+  [[nodiscard]] Mat solve(const Mat& b) const;
 
   Mat solve(const T* data, int rows, int cols) const;
 
-  Mat trans() const;
+  [[nodiscard]] Mat trans() const;
 
   Mat write(T* buf) const;
 
@@ -111,7 +111,7 @@ class Mat {
 };
 }  // namespace mcalc
 
-// NOLINTNEXTLINE(readability-magic-numbers)
+// NOLINTBEGIN(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
 template <typename T, typename Alloc = mcalc::StaticPoolAllocator<T, 128, 9>>
 class MatrixCalc : private NonCopyable {
 
@@ -147,10 +147,9 @@ class MatrixCalc : private NonCopyable {
   Alloc m_alloc;
 };
 
-// NOLINTNEXTLINE(readability-magic-numbers)
 template <typename T, std::size_t TSize = 128, std::size_t PSize = 9>
 class StaticMatrixCalc : public MatrixCalc<T, mcalc::StaticPoolAllocator<T, TSize, PSize>> {};
-
+// NOLINTEND(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
 
 template <typename T>
 class DynamicMatrixCalc : public MatrixCalc<T, mcalc::DynamicPoolAllocator<T>> {};

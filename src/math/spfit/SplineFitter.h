@@ -47,10 +47,10 @@ class SplineFitter : private NonCopyable {
   void addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap);
 
   /** \see Optimizer::externalForce() */
-  double externalForce() const { return m_optimizer.externalForce(); }
+  [[nodiscard]] double externalForce() const { return m_optimizer.externalForce(); }
 
   /** \see Optimizer::internalForce() */
-  double internalForce() const { return m_optimizer.internalForce(); }
+  [[nodiscard]] double internalForce() const { return m_optimizer.internalForce(); }
 
   OptimizationResult optimize(double internalForceWeight);
 

@@ -19,14 +19,10 @@ class FittableSpline {
  public:
   inline static constexpr double MAXDISTANCE{ 0.2 };
   enum class SampleFlags : std::uint8_t {
-    DEFAULT_SAMPLE = 0,
-    HEAD_SAMPLE = 1 << 0,    /**< Start point of an open spline. */
-    TAIL_SAMPLE = 1 << 1,    /**< End point of an open spline. */
-    JUNCTION_SAMPLE = 1 << 2, /**< Point on the boundary of two segments. */
-    HEAD_TAIL = HEAD_SAMPLE | TAIL_SAMPLE,
-    HEAD_JUNCTION = HEAD_SAMPLE | JUNCTION_SAMPLE,
-    TAIL_JUNCTION = TAIL_SAMPLE | JUNCTION_SAMPLE,
-    MASK_ALL = HEAD_SAMPLE | TAIL_SAMPLE | JUNCTION_SAMPLE
+    DEFAULT_SAMPLE = 0U,
+    HEAD_SAMPLE = 0x01,    /**< Start point of an open spline. */
+    TAIL_SAMPLE = 0x02,    /**< End point of an open spline. */
+    JUNCTION_SAMPLE = 0x04 /**< Point on the boundary of two segments. */
   };
   /**
    * For a spline to be fittable, any point on a spline must be representable
@@ -38,14 +34,16 @@ class FittableSpline {
    * a particular control point.
    */
   struct LinearCoefficient {
+    // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
     double coeff;
     int controlPointIdx;
-
+    // NOLINTEND(misc-non-private-member-variables-in-classes)
     LinearCoefficient() : coeff(0), controlPointIdx(-1) {}
 
     LinearCoefficient(int cpIdx, double cf) : coeff(cf), controlPointIdx(cpIdx) {}
   };
 
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   struct SamplingParams {
     /**
      * The maximum distance from any point on the polyline that's the
@@ -61,12 +59,13 @@ class FittableSpline {
     explicit SamplingParams(double maxDistFromSpline = MAXDISTANCE, double maxDistBetweenSamples = NumericTraits<double>::max())
         : maxDistFromSpline(maxDistFromSpline), maxDistBetweenSamples(maxDistBetweenSamples) {}
   };
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   virtual ~FittableSpline() = default;
 
-  virtual int numControlPoints() const = 0;
+  [[nodiscard]] virtual int numControlPoints() const = 0;
 
-  virtual QPointF controlPointPosition(int idx) const = 0;
+  [[nodiscard]] virtual QPointF controlPointPosition(int idx) const = 0;
 
   virtual void moveControlPoint(int idx, const QPointF& pos) = 0;
 

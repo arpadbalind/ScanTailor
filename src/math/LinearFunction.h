@@ -17,8 +17,10 @@
 class LinearFunction {
   // Member-wise copying is OK.
  public:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   VecT<double> a;
   double b{ 0.0 };
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   /**
    * Constructs a linear function of the given number of variables,
@@ -31,7 +33,7 @@ class LinearFunction {
    */
   void reset();
 
-  std::size_t numVars() const { return a.size(); }
+  [[nodiscard]] std::size_t numVars() const { return a.size(); }
 
   /**
    * Evaluates a^T * x + b

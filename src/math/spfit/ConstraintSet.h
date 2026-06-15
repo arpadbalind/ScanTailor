@@ -18,7 +18,7 @@ class ConstraintSet {
  public:
   explicit ConstraintSet(const FittableSpline* spline);
 
-  const std::list<LinearFunction>& constraints() const { return m_constraints; }
+  [[nodiscard]] const std::list<LinearFunction>& constraints() const { return m_constraints; }
 
   void constrainControlPoint(int cpIdx, const QPointF& pos);
 

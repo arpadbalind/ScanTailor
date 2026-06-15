@@ -22,6 +22,6 @@ class ModelShape {
    * Returns a function that approximates the squared distance to the model.
    * The function is only accurate in the neighbourhood of \p pt.
    */
-  virtual SqDistApproximant localSqDistApproximant(const QPointF& pt, FittableSpline::SampleFlags flags) const = 0;
+  [[nodiscard]] virtual SqDistApproximant localSqDistApproximant(const QPointF& pt, FittableSpline::SampleFlags flags) const = 0;
 };
 }  // namespace spfit

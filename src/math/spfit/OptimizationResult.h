@@ -8,9 +8,9 @@ class OptimizationResult {
  public:
   OptimizationResult(double forceBefore, double forceAfter);
 
-  double forceBefore() const { return m_forceBefore; }
+  [[nodiscard]] double forceBefore() const { return m_forceBefore; }
 
-  double forceAfter() const { return m_forceAfter; }
+  [[nodiscard]] double forceAfter() const { return m_forceAfter; }
 
   /**
    * \brief Returns force decrease in percents.
@@ -21,7 +21,7 @@ class OptimizationResult {
    *       as the absolute force values depend on the number of samples,
    *       which varies from one optimization iteration to another.
    */
-  double improvementPercentage() const;
+  [[nodiscard]] double improvementPercentage() const;
 
  private:
   double m_forceBefore;

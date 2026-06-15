@@ -52,7 +52,7 @@ SqDistApproximant SqDistApproximant::pointDistance(const Vec2d& pt) {
 }
 
 SqDistApproximant SqDistApproximant::weightedPointDistance(const Vec2d& pt, double weight) {
-  return SqDistApproximant(pt, Vec2d(1, 0), Vec2d(0, 1), weight, weight);
+  return {pt, Vec2d(1, 0), Vec2d(0, 1), weight, weight};
 }
 
 SqDistApproximant SqDistApproximant::lineDistance(const QLineF& line) {
@@ -70,7 +70,7 @@ SqDistApproximant SqDistApproximant::weightedLineDistance(const QLineF& line, do
 
   // Unit normal to line.
   const Vec2d v(-u[1], u[0]);
-  return SqDistApproximant(Vec2d(line.p1()), Vec2d(u), Vec2d(v), 0, weight);
+  return {Vec2d(line.p1()), Vec2d(u), Vec2d(v), 0, weight};
 }
 
 SqDistApproximant SqDistApproximant::curveDistance(const Vec2d& referencePoint,
@@ -92,12 +92,11 @@ SqDistApproximant SqDistApproximant::weightedCurveDistance(const Vec2d& referenc
     const double d = std::fabs(frenetFrame.unitNormal().dot(toReferencePoint));
     m = d / (d + p);  // Formula 7 in [2].
   }
-  return SqDistApproximant(frenetFrame.origin(), frenetFrame.unitTangent(), frenetFrame.unitNormal(), m * weight,
-                           weight);
+  return {frenetFrame.origin(), frenetFrame.unitTangent(), frenetFrame.unitNormal(), m * weight, weight};
 }
 
 double SqDistApproximant::evaluate(const Vec2d& pt) const {
-  // NOLINTNEXTLINE(readability-magic-numbers)
+  // NOLINTNEXTLINE(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   StaticMatrixCalc<double, 8, 1> mc;
   return (mc(pt, 1, 2) * mc(A) * mc(pt, 2, 1) + mc(b, 1, 2) * mc(pt, 2, 1)).rawData()[0] + c;
 }

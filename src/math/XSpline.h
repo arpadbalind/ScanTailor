@@ -19,6 +19,7 @@ class QPointF;
  * [1] Blanc, C., Schlick, C.: X-splines: a spline model designed for the end-user.
  * http://scholar.google.com/scholar?cluster=2002168279173394147&hl=en&as_sdt=0,5
  */
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 class XSpline : public spfit::FittableSpline {
  public:
   static constexpr double DEFAULT_ACCURACY{ 0.2 };
@@ -42,19 +43,19 @@ class XSpline : public spfit::FittableSpline {
      * the X axis aligns with the tangent vector, curvature will be
      * positive if the spline curves towards the positive Y direction.
      */
-    double signedCurvature() const;
+    [[nodiscard]] double signedCurvature() const;
   };
 
-  int numControlPoints() const override;
+  [[nodiscard]] int numControlPoints() const override;
 
   /**
    * Returns the number of segments, that is spans between adjacent control points.
    * Because this class only deals with open splines, the number of segments
    * will always be max(0, numControlPoints() - 1).
    */
-  int numSegments() const;
+  [[nodiscard]] int numSegments() const;
 
-  double controlPointIndexToT(int idx) const;
+  [[nodiscard]] double controlPointIndexToT(int idx) const;
 
   /**
    * \brief Appends a control point to the end of the spline.
@@ -76,11 +77,11 @@ class XSpline : public spfit::FittableSpline {
 
   void eraseControlPoint(int idx);
 
-  QPointF controlPointPosition(int idx) const override;
+  [[nodiscard]] QPointF controlPointPosition(int idx) const override;
 
   void moveControlPoint(int idx, const QPointF& pos) override;
 
-  double controlPointTension(int idx) const;
+  [[nodiscard]] double controlPointTension(int idx) const;
 
   void setControlPointTension(int idx, double tension);
 
@@ -93,12 +94,12 @@ class XSpline : public spfit::FittableSpline {
    * \note Calling this function with less then 2 control points
    *       leads to undefined behaviour.
    */
-  QPointF pointAt(double t) const;
+  [[nodiscard]] QPointF pointAt(double t) const;
 
   /**
    * \brief Calculates a point on the spline plus the first and the second derivatives at position t.
    */
-  PointAndDerivs pointAndDtsAt(double t) const;
+  [[nodiscard]] PointAndDerivs pointAndDtsAt(double t) const;
 
   /** \see spfit::FittableSpline::linearCombinationAt() */
   void linearCombinationAt(double t, std::vector<LinearCoefficient>& coeffs) const override;
@@ -112,13 +113,13 @@ class XSpline : public spfit::FittableSpline {
    * not positions.
    * The sum is calculated across all segments.
    */
-  QuadraticFunction controlPointsAttractionForce() const;
+  [[nodiscard]] QuadraticFunction controlPointsAttractionForce() const;
 
   /**
    * Same as the above one, but you provide a range of segments to consider.
    * The range is half-closed: [segBegin, segEnd)
    */
-  QuadraticFunction controlPointsAttractionForce(int segBegin, int segEnd) const;
+  [[nodiscard]] QuadraticFunction controlPointsAttractionForce(int segBegin, int segEnd) const;
 
   /**
    * Returns a function equivalent to:
@@ -129,13 +130,13 @@ class XSpline : public spfit::FittableSpline {
    * not positions.
    * The sum is calculated across all segments.
    */
-  QuadraticFunction junctionPointsAttractionForce() const;
+  [[nodiscard]] QuadraticFunction junctionPointsAttractionForce() const;
 
   /**
    * Same as the above one, but you provide a range of segments to consider.
    * The range is half-closed: [segBegin, segEnd)
    */
-  QuadraticFunction junctionPointsAttractionForce(int segBegin, int segEnd) const;
+  [[nodiscard]] QuadraticFunction junctionPointsAttractionForce(int segBegin, int segEnd) const;
 
   /**
    * \brief Finds a point on the spline that's closest to a given point.
@@ -145,9 +146,9 @@ class XSpline : public spfit::FittableSpline {
    * \param accuracy The maximum distance from the found point to the spline.
    * \return The closest point found.
    */
-  QPointF pointClosestTo(QPointF to, double* t, double accuracy = DEFAULT_ACCURACY) const;
+  [[nodiscard]] QPointF pointClosestTo(QPointF to, double* t, double accuracy = DEFAULT_ACCURACY) const;
 
-  QPointF pointClosestTo(QPointF to, double accuracy = DEFAULT_ACCURACY) const;
+  [[nodiscard]] QPointF pointClosestTo(QPointF to, double accuracy = DEFAULT_ACCURACY) const;
 
   /** \see spfit::FittableSpline::sample() */
   void sample(const VirtualFunction<void, const QPointF&, double, SampleFlags>& sink,
@@ -155,7 +156,7 @@ class XSpline : public spfit::FittableSpline {
               double fromT = 0.0,
               double toT = 1.0) const override;
 
-  std::vector<QPointF> toPolyline(const SamplingParams& params = SamplingParams(),
+  [[nodiscard]] std::vector<QPointF> toPolyline(const SamplingParams& params = SamplingParams(),
                                   double fromT = 0.0,
                                   double toT = 1.0) const;
 
@@ -183,13 +184,13 @@ class XSpline : public spfit::FittableSpline {
 
   struct DecomposedDerivs;
 
-  QPointF pointAtImpl(int segment, double t) const;
+  [[nodiscard]] QPointF pointAtImpl(int segment, double t) const;
 
   int linearCombinationFor(std::array<LinearCoefficient, 4>& coeffs, int segment, double t) const;
 
-  DecomposedDerivs decomposedDerivs(double t) const;
+  [[nodiscard]] DecomposedDerivs decomposedDerivs(double t) const;
 
-  DecomposedDerivs decomposedDerivsImpl(int segment, double t) const;
+  [[nodiscard]] DecomposedDerivs decomposedDerivsImpl(int segment, double t) const;
 
   void maybeAddMoreSamples(const VirtualFunction<void, const QPointF&, double, SampleFlags>& sink,
                            double maxSqdistToSpline,
@@ -210,3 +211,4 @@ class XSpline : public spfit::FittableSpline {
 inline void swap(XSpline& o1, XSpline& o2) noexcept {
   o1.swap(o2);
 }
+// NOLINTEND(misc-non-private-member-variables-in-classes)
