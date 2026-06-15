@@ -42,7 +42,7 @@ class ConnCompEraser : private NonCopyable {
    * Every time nextConnComp() is called, a connected component
    * is erased from the image, assuming there was one.
    */
-  const BinaryImage& image() const { return m_image; }
+  [[nodiscard]] const BinaryImage& image() const { return m_image; }
 
  private:
   struct Segment {

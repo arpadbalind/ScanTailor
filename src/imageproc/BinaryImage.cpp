@@ -126,17 +126,17 @@ BinaryImage::BinaryImage(const QImage& image, const BinaryThreshold threshold)
       *this = fromMonoLSB(image);
       break;
     case QImage::Format_Indexed8:
-      *this = fromIndexed8(image, imageRect, threshold);
+      *this = fromIndexed8(image, imageRect, static_cast<int>(threshold));
       break;
     case QImage::Format_RGB32:
     case QImage::Format_ARGB32:
-      *this = fromRgb32(image, imageRect, threshold);
+      *this = fromRgb32(image, imageRect, static_cast<int>(threshold));
       break;
     case QImage::Format_ARGB32_Premultiplied:
-      *this = fromArgb32Premultiplied(image, imageRect, threshold);
+      *this = fromArgb32Premultiplied(image, imageRect, static_cast<int>(threshold));
       break;
     case QImage::Format_RGB16:
-      *this = fromRgb16(image, imageRect, threshold);
+      *this = fromRgb16(image, imageRect, static_cast<int>(threshold));
       break;
     default:
       throw std::runtime_error("Unsupported QImage format");
@@ -161,17 +161,17 @@ BinaryImage::BinaryImage(const QImage& image, const QRect& rect, const BinaryThr
       *this = fromMonoLSB(image, rect);
       break;
     case QImage::Format_Indexed8:
-      *this = fromIndexed8(image, rect, threshold);
+      *this = fromIndexed8(image, rect, static_cast<int>(threshold));
       break;
     case QImage::Format_RGB32:
     case QImage::Format_ARGB32:
-      *this = fromRgb32(image, rect, threshold);
+      *this = fromRgb32(image, rect, static_cast<int>(threshold));
       break;
     case QImage::Format_ARGB32_Premultiplied:
-      *this = fromArgb32Premultiplied(image, rect, threshold);
+      *this = fromArgb32Premultiplied(image, rect, static_cast<int>(threshold));
       break;
     case QImage::Format_RGB16:
-      *this = fromRgb16(image, rect, threshold);
+      *this = fromRgb16(image, rect, static_cast<int>(threshold));
       break;
     default:
       throw std::runtime_error("BinaryImage: Unsupported QImage format");
@@ -189,11 +189,27 @@ BinaryImage& BinaryImage::operator=(const BinaryImage& other) {
   return *this;
 }
 
-void BinaryImage::swap(BinaryImage& other) {
+void BinaryImage::swap(BinaryImage& other) noexcept {
   std::swap(m_data, other.m_data);
   std::swap(m_width, other.m_width);
   std::swap(m_height, other.m_height);
   std::swap(m_wpl, other.m_wpl);
+}
+
+BinaryImage::BinaryImage(BinaryImage&& other) noexcept
+    : m_data(other.m_data),
+      m_width(other.m_width),
+      m_height(other.m_height),
+      m_wpl(other.m_wpl) {
+  other.m_data = nullptr;
+  other.m_width = 0;
+  other.m_height = 0;
+  other.m_wpl = 0;
+}
+
+BinaryImage& BinaryImage::operator=(BinaryImage&& other) noexcept {
+  swap(other);
+  return *this;
 }
 
 void BinaryImage::invert() {
@@ -245,7 +261,7 @@ void BinaryImage::fill(const BWColor color) {
     throw std::logic_error("Attempt to fill a null BinaryImage!");
   }
 
-  const int pattern = (color == BLACK) ? ~0 : 0;
+  const int pattern = (color == BWColor::BLACK) ? ~0 : 0;
   memset(data(), pattern, m_height * m_wpl * 4);
 }
 
@@ -272,7 +288,7 @@ void BinaryImage::fillExcept(const QRect& rect, const BWColor color) {
     return;
   }
 
-  const int pattern = (color == BLACK) ? ~0 : 0;
+  const int pattern = (color == BWColor::BLACK) ? ~0 : 0;
   uint32_t* const data = this->data();  // this will call copyIfShared()
   if (boundedRect.top() > 0) {
     memset(data, pattern, boundedRect.top() * m_wpl * 4);
@@ -408,7 +424,7 @@ QRect BinaryImage::contentBoundingBox(const BWColor contentColor) const {
   const int lastWordBits = w - (lastWordIdx << 5);
   const int lastWordUnusedBits = 32 - lastWordBits;
   const uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
-  const uint32_t modifier = (contentColor == WHITE) ? ~uint32_t(0) : 0;
+  const uint32_t modifier = (contentColor == BWColor::WHITE) ? ~uint32_t(0) : 0;
   const uint32_t* const data = this->data();
 
   int bottom = -1;  // inclusive
@@ -465,7 +481,7 @@ QRect BinaryImage::contentBoundingBox(const BWColor contentColor) const {
 
 void BinaryImage::setPixel(int x, int y, BWColor color) {
   uint32_t* line = this->data() + m_wpl * y;
-  (color == WHITE) ? line[x >> 5] &= ~(0x80000000 >> (x & 31)) : line[x >> 5] |= (0x80000000 >> (x & 31));
+  (color == BWColor::WHITE) ? line[x >> 5] &= ~(0x80000000 >> (x & 31)) : line[x >> 5] |= (0x80000000 >> (x & 31));
 }
 
 BWColor BinaryImage::getPixel(int x, int y) const {
@@ -564,7 +580,7 @@ void BinaryImage::copyIfShared() {
 }
 
 void BinaryImage::fillRectImpl(uint32_t* const data, const QRect& rect, const BWColor color) {
-  const uint32_t pattern = (color == BLACK) ? ~uint32_t(0) : 0;
+  const uint32_t pattern = (color == BWColor::BLACK) ? ~uint32_t(0) : 0;
 
   if ((rect.x() == 0) && (rect.width() == m_width)) {
     memset(data + rect.y() * m_wpl, pattern, rect.height() * m_wpl * 4);

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_GRAYIMAGE_H_
-#define SCANTAILOR_IMAGEPROC_GRAYIMAGE_H_
+#pragma once
 
 #include <QImage>
 #include <QRect>
@@ -40,17 +39,17 @@ class GrayImage {
    * The underlying QImage is either a null image or a 8-bit indexed
    * image with a grayscale palette.
    */
-  const QImage& toQImage() const { return m_image; }
+  [[nodiscard]] const QImage& toQImage() const { return m_image; }
 
-  operator const QImage&() const { return m_image; }
+  explicit operator const QImage&() const { return m_image; }
 
-  bool isNull() const { return m_image.isNull(); }
+  [[nodiscard]] bool isNull() const { return m_image.isNull(); }
 
   void fill(uint8_t color) { m_image.fill(color); }
 
   uint8_t* data() { return m_image.bits(); }
 
-  const uint8_t* data() const { return m_image.bits(); }
+  [[nodiscard]] const uint8_t* data() const { return m_image.bits(); }
 
   /**
    * \brief Number of bytes per line.
@@ -59,23 +58,23 @@ class GrayImage {
    * An additional guaranee provided by the underlying QImage
    * is that this value is a multiple of 4.
    */
-  int stride() const { return m_image.bytesPerLine(); }
+  [[nodiscard]] int stride() const { return m_image.bytesPerLine(); }
 
-  QSize size() const { return m_image.size(); }
+  [[nodiscard]] QSize size() const { return m_image.size(); }
 
-  QRect rect() const { return m_image.rect(); }
+  [[nodiscard]] QRect rect() const { return m_image.rect(); }
 
-  int width() const { return m_image.width(); }
+  [[nodiscard]] int width() const { return m_image.width(); }
 
-  int height() const { return m_image.height(); }
+  [[nodiscard]] int height() const { return m_image.height(); }
 
   void invert();
 
-  GrayImage inverted() const;
+  [[nodiscard]] GrayImage inverted() const;
 
-  int dotsPerMeterX() const;
+  [[nodiscard]] int dotsPerMeterX() const;
 
-  int dotsPerMeterY() const;
+  [[nodiscard]] int dotsPerMeterY() const;
 
   void setDotsPerMeterX(int value);
 
@@ -94,4 +93,3 @@ inline bool operator!=(const GrayImage& lhs, const GrayImage& rhs) {
   return lhs.toQImage() != rhs.toQImage();
 }
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_GRAYIMAGE_H_

@@ -68,18 +68,18 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
   // two methods.
 
   GrayImage method1(createFramedImage(image.size()));
-  seedFillGrayInPlace(method1, image, CONN8);
+  seedFillGrayInPlace(method1, image, Connectivity::CONN8);
 
   // This will get rid of the remnants of letters.  Note that since we know we
   // are working with at most 300x300 px images, we can just hardcode the size.
   method1 = openGray(method1, QSize(1, 20), 0x00);
   if (dbg) {
-    dbg->add(method1, "preproc_method1");
+    dbg->add(static_cast<const QImage&>(method1), "preproc_method1");
   }
 
   seedFillTopBottomInPlace(image);
   if (dbg) {
-    dbg->add(image, "preproc_method2");
+    dbg->add(static_cast<const QImage&>(image), "preproc_method2");
   }
 
   // Now let's estimate, which of the methods is better for this case.
@@ -92,7 +92,7 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
                     a -= b;
                   });
   if (dbg) {
-    dbg->add(diff, "raw_diff");
+    dbg->add(static_cast<const QImage&>(diff), "raw_diff");
   }
 
   // Approximate the difference using a polynomial function.
@@ -100,7 +100,7 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
   // to be caused by a shadow rather than a picture, and use method1.
   GrayImage approximated(PolynomialSurface(3, 3, diff).render(diff.size()));
   if (dbg) {
-    dbg->add(approximated, "approx_diff");
+    dbg->add(static_cast<const QImage&>(approximated), "approx_diff");
   }
   // Now let's take the difference between the original difference
   // and approximated difference.
@@ -114,7 +114,7 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
                   });
   approximated = GrayImage();  // save memory.
   if (dbg) {
-    dbg->add(diff, "raw_vs_approx_diff");
+    dbg->add(static_cast<const QImage&>(diff), "raw_vs_approx_diff");
   }
 
   // Our final decision is like this:
@@ -123,7 +123,7 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
   // and use method2.
 
   int sum = 0;
-  GrayscaleHistogram hist(diff);
+  GrayscaleHistogram hist(static_cast<const QImage&>(diff));
   for (int i = 255; i > 10; --i) {
     sum += hist[i];
   }
@@ -133,12 +133,12 @@ static void morphologicalPreprocessingInPlace(GrayImage& image, DebugImages* dbg
   if (sum < 0.01 * (diff.width() * diff.height())) {
     image = method1;
     if (dbg) {
-      dbg->add(image, "use_method1");
+      dbg->add(static_cast<const QImage&>(image), "use_method1");
     }
   } else {
     // image is already set to method2
     if (dbg) {
-      dbg->add(image, "use_method2");
+      dbg->add(static_cast<const QImage&>(image), "use_method2");
     }
   }
 }  // morphologicalPreprocessingInPlace
@@ -151,7 +151,7 @@ imageproc::PolynomialSurface estimateBackground(const GrayImage& input,
   reducedSize.scale(300, 300, Qt::KeepAspectRatio);
   GrayImage background(scaleToGray(GrayImage(input), reducedSize));
   if (dbg) {
-    dbg->add(background, "downscaled");
+    dbg->add(static_cast<const QImage&>(background), "downscaled");
   }
 
   status.throwIfCancelled();
@@ -166,12 +166,12 @@ imageproc::PolynomialSurface estimateBackground(const GrayImage& input,
   const uint8_t* const bgData = background.data();
   const int bgStride = background.stride();
 
-  BinaryImage mask(background.size(), BLACK);
+  BinaryImage mask(background.size(), BWColor::BLACK);
 
   if (!areaToConsider.isEmpty()) {
     QTransform xform;
     xform.scale((double) reducedSize.width() / input.width(), (double) reducedSize.height() / input.height());
-    PolygonRasterizer::fillExcept(mask, WHITE, xform.map(areaToConsider), Qt::WindingFill);
+    PolygonRasterizer::fillExcept(mask, BWColor::WHITE, xform.map(areaToConsider), Qt::WindingFill);
   }
 
   if (dbg) {
@@ -232,7 +232,7 @@ imageproc::PolynomialSurface estimateBackground(const GrayImage& input,
 
   status.throwIfCancelled();
 
-  mask = erodeBrick(mask, QSize(3, 3));
+  mask = erodeBrick(mask, Brick(QSize(3, 3)));
   if (dbg) {
     dbg->add(mask, "eroded");
   }

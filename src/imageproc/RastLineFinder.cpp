@@ -57,6 +57,7 @@ RastLineFinder::RastLineFinder(const std::vector<QPointF>& points, const RastLin
       m_angleToleranceRad(params.angleToleranceDeg() * constants::DEG2RAD),
       m_maxDistFromLine(params.maxDistFromLine()),
       m_minSupportPoints(params.minSupportPoints()),
+      m_orderedSearchSpaces(),
       m_firstLine(true) {
   std::string error;
   if (!params.validate(&error)) {
@@ -295,7 +296,7 @@ void RastLineFinder::SearchSpace::pruneUnavailablePoints(PointUnavailablePred pr
   m_pointIdxs.resize(std::remove_if(m_pointIdxs.begin(), m_pointIdxs.end(), pred) - m_pointIdxs.begin());
 }
 
-void RastLineFinder::SearchSpace::swap(SearchSpace& other) {
+void RastLineFinder::SearchSpace::swap(SearchSpace& other) noexcept {
   std::swap(m_minDist, other.m_minDist);
   std::swap(m_maxDist, other.m_maxDist);
   std::swap(m_minAngleRad, other.m_minAngleRad);

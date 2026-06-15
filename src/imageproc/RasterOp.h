@@ -177,6 +177,7 @@ class TemplateRasterOp : public AbstractRasterOp {
 
 
 namespace detail {
+// NOLINTBEGIN(bugprone-signed-bitwise)
 template <typename Rop>
 void rasterOpInDirection(BinaryImage& dst,
                          const QRect& dr,
@@ -184,17 +185,28 @@ void rasterOpInDirection(BinaryImage& dst,
                          const QPoint& sp,
                          const int dy,
                          const int dx) {
-  const int srcStartBit = sp.x() % 32;
-  const int dstStartBit = dr.x() % 32;
-  const int rightmostDstBit = dr.right();  // == dr.x() + dr.width() - 1;
-  const int rightmostDstWord = rightmostDstBit / 32 - dr.x() / 32;
-  const uint32_t leftmostDstMask = ~uint32_t(0) >> dstStartBit;
-  const uint32_t rightmostDstMask = ~uint32_t(0) << (31 - rightmostDstBit % 32);
+  constexpr std::size_t WORD_BITS = 32;
 
-  int firstDstWord;
-  int lastDstWord;
-  uint32_t firstDstMask;
-  uint32_t lastDstMask;
+  const auto srcStartBit = static_cast<std::size_t>(sp.x()) % WORD_BITS;
+
+  const auto dstStartBit = static_cast<std::size_t>(dr.x()) % WORD_BITS;
+
+  const auto rightmostDstBit = static_cast<std::size_t>(dr.right());
+
+  const auto rightmostDstWord = rightmostDstBit / WORD_BITS - static_cast<std::size_t>(dr.x()) / WORD_BITS;
+
+  const uint32_t fullMask = ~uint32_t{0};
+
+  const uint32_t leftmostDstMask = fullMask >> dstStartBit;
+
+  const std::size_t bit = rightmostDstBit % WORD_BITS;
+
+  const uint32_t rightmostDstMask = fullMask << (WORD_BITS - 1U - bit);
+
+int firstDstWord{ 0 };
+  int lastDstWord { 0 };
+  uint32_t firstDstMask{ 0 };
+  uint32_t lastDstMask{ 0 };
   if (dx == 1) {
     firstDstWord = 0;
     lastDstWord = rightmostDstWord;
@@ -208,26 +220,32 @@ void rasterOpInDirection(BinaryImage& dst,
     lastDstMask = leftmostDstMask;
   }
 
-  int srcSpanDelta;
-  int dstSpanDelta;
-  uint32_t* dstSpan;
-  const uint32_t* srcSpan;
+  int srcSpanDelta{ 0 };
+  int dstSpanDelta{ 0 };
+  uint32_t* dstSpan = nullptr;
+  const uint32_t* srcSpan = nullptr;
   if (dy == 1) {
     srcSpanDelta = src.wordsPerLine();
     dstSpanDelta = dst.wordsPerLine();
-    dstSpan = dst.data() + dr.y() * dstSpanDelta + dr.x() / 32;
-    srcSpan = src.data() + sp.y() * srcSpanDelta + sp.x() / 32;
+    dstSpan = dst.data()
+        + static_cast<std::ptrdiff_t>(dr.y()) * dstSpanDelta
+        + static_cast<std::ptrdiff_t>(dr.x()) / 32;
+
+    srcSpan =
+        src.data()
+        + static_cast<std::ptrdiff_t>(sp.y()) * srcSpanDelta
+        + static_cast<std::ptrdiff_t>(sp.x()) / 32;
   } else {
     assert(dy == -1);
     srcSpanDelta = -src.wordsPerLine();
     dstSpanDelta = -dst.wordsPerLine();
     assert(dr.bottom() == dr.y() + dr.height() - 1);
-    dstSpan = dst.data() - dr.bottom() * dstSpanDelta + dr.x() / 32;
-    srcSpan = src.data() - (sp.y() + dr.height() - 1) * srcSpanDelta + sp.x() / 32;
+    dstSpan = dst.data() - static_cast<std::ptrdiff_t>(dr.bottom()) * dstSpanDelta + static_cast<std::ptrdiff_t>(dr.x()) / 32;
+    srcSpan = src.data() - static_cast<std::ptrdiff_t>(sp.y() + dr.height() - 1) * srcSpanDelta + static_cast<std::ptrdiff_t>(sp.x()) / 32;
   }
 
-  int srcWord1Shift;
-  int srcWord2Shift;
+  int srcWord1Shift{ 0 };
+  int srcWord2Shift{ 0 };
   if (srcStartBit > dstStartBit) {
     srcWord1Shift = srcStartBit - dstStartBit;
     srcWord2Shift = 32 - srcWord1Shift;
@@ -277,8 +295,8 @@ void rasterOpInDirection(BinaryImage& dst,
   if (firstDstWord == lastDstWord) {
     assert(firstDstWord == 0);
     const uint32_t mask = firstDstMask & lastDstMask;
-    const uint32_t canWord1 = (~uint32_t(0) << srcWord1Shift) & mask;
-    const uint32_t canWord2 = (~uint32_t(0) >> srcWord2Shift) & mask;
+    const uint32_t canWord1 = (~uint32_t{0} << srcWord1Shift) & mask;
+    const uint32_t canWord2 = (~uint32_t{0} >> srcWord2Shift) & mask;
 
     for (int i = dr.height(); i > 0; --i, srcSpan += srcSpanDelta, dstSpan += dstSpanDelta) {
       uint32_t srcWord = 0;
@@ -295,10 +313,10 @@ void rasterOpInDirection(BinaryImage& dst,
       dstSpan[0] = (dstWord & ~mask) | (newDstWord & mask);
     }
   } else {
-    const uint32_t canFirstWord1 = (~uint32_t(0) << srcWord1Shift) & firstDstMask;
-    const uint32_t canFirstWord2 = (~uint32_t(0) >> srcWord2Shift) & firstDstMask;
-    const uint32_t canLastWord1 = (~uint32_t(0) << srcWord1Shift) & lastDstMask;
-    const uint32_t canLastWord2 = (~uint32_t(0) >> srcWord2Shift) & lastDstMask;
+    const uint32_t canFirstWord1 = (~uint32_t{0} << srcWord1Shift) & firstDstMask;
+    const uint32_t canFirstWord2 = (~uint32_t{0} >> srcWord2Shift) & firstDstMask;
+    const uint32_t canLastWord1 = (~uint32_t{0} << srcWord1Shift) & lastDstMask;
+    const uint32_t canLastWord2 = (~uint32_t{0} >> srcWord2Shift) & lastDstMask;
 
     for (int i = dr.height(); i > 0; --i, srcSpan += srcSpanDelta, dstSpan += dstSpanDelta) {
       int widx = firstDstWord;
@@ -347,6 +365,7 @@ void rasterOpInDirection(BinaryImage& dst,
   }
 }  // rasterOpInDirection
 }  // namespace detail
+// NOLINTEND(bugprone-signed-bitwise)
 
 template <typename Rop>
 void rasterOp(BinaryImage& dst, const QRect& dr, const BinaryImage& src, const QPoint& sp) {

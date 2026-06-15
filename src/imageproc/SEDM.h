@@ -103,23 +103,29 @@ class SEDM {
    */
   explicit SEDM(ConnectivityMap& cmap);
 
+  virtual ~SEDM() = default;
+
   SEDM(const SEDM& other);
+
+  SEDM(SEDM&& other) noexcept;
 
   SEDM& operator=(const SEDM& other);
 
-  void swap(SEDM& other);
+  SEDM& operator=(SEDM&& other) noexcept;
+
+  void swap(SEDM& other) noexcept;
 
   /**
    * \brief Return the dimensions of the distance map.
    */
-  QSize size() const { return m_size; }
+  [[nodiscard]] QSize size() const { return m_size; }
 
   /**
    * \brief Return the number of 32bit words in a line.
    *
    * This value is going to be size().width() + 2.
    */
-  int stride() const { return m_stride; }
+  [[nodiscard]] int stride() const { return m_stride; }
 
   /**
    * \brief Return a matrix of squared distances in row-major order.
@@ -129,7 +135,7 @@ class SEDM {
   /**
    * \brief Return a matrix of squared distances in row-major order.
    */
-  const uint32_t* data() const { return m_plainData; }
+  [[nodiscard]] const uint32_t* data() const { return m_plainData; }
 
   /**
    * \brief Finds peaks on the distance map, altering it in the process.
@@ -162,7 +168,7 @@ class SEDM {
 
   void processRows(ConnectivityMap& cmap);
 
-  BinaryImage findPeakCandidatesNonPadded() const;
+  [[nodiscard]] BinaryImage findPeakCandidatesNonPadded() const;
 
   BinaryImage buildEqualMapNonPadded(const uint32_t* src1, const uint32_t* src2) const;
 
@@ -181,7 +187,7 @@ class SEDM {
 };
 
 
-inline void swap(SEDM& o1, SEDM& o2) {
+inline void swap(SEDM& o1, SEDM& o2) noexcept {
   o1.swap(o2);
 }
 }  // namespace imageproc

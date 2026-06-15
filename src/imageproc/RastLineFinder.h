@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_RASTLINEFINDER_H_
-#define SCANTAILOR_IMAGEPROC_RASTLINEFINDER_H_
+#pragma once
 
 #include <QLineF>
 #include <QPointF>
@@ -25,7 +24,7 @@ class RastLineFinderParams {
   void setOrigin(const QPointF& origin) { m_origin = origin; }
 
   /** \see setOrigin() */
-  const QPointF& origin() const { return m_origin; }
+  [[nodiscard]] const QPointF& origin() const { return m_origin; }
 
   /**
    * By default, all angles are considered. Keeping in mind that line direction
@@ -47,10 +46,10 @@ class RastLineFinderParams {
   }
 
   /** \see setAngleRangeDeg() */
-  double minAngleDeg() const { return m_minAngleDeg; }
+  [[nodiscard]] double minAngleDeg() const { return m_minAngleDeg; }
 
   /** \see setAngleRangeDeg() */
-  double maxAngleDeg() const { return m_maxAngleDeg; }
+  [[nodiscard]] double maxAngleDeg() const { return m_maxAngleDeg; }
 
   /**
    * Being a recursive subdivision algorithm, it has to stop refining the angle
@@ -61,7 +60,7 @@ class RastLineFinderParams {
   void setAngleToleranceDeg(double toleranceDeg) { m_angleToleranceDeg = toleranceDeg; }
 
   /** \see setAngleToleranceDeg() */
-  double angleToleranceDeg() const { return m_angleToleranceDeg; }
+  [[nodiscard]] double angleToleranceDeg() const { return m_angleToleranceDeg; }
 
   /**
    * Sets the maximum distance the point is allowed to be from a line
@@ -74,7 +73,7 @@ class RastLineFinderParams {
   void setMaxDistFromLine(double dist) { m_maxDistFromLine = dist; }
 
   /** \see setMaxDistFromLine() */
-  double maxDistFromLine() const { return m_maxDistFromLine; }
+  [[nodiscard]] double maxDistFromLine() const { return m_maxDistFromLine; }
 
   /**
    * A support point is a point considered to be a part of a line.
@@ -88,7 +87,7 @@ class RastLineFinderParams {
   /**
    * \see setMinSupportPoints()
    */
-  unsigned minSupportPoints() const { return m_minSupportPoints; }
+  [[nodiscard]] unsigned minSupportPoints() const { return m_minSupportPoints; }
 
   /**
    * \brief Checks if parameters are valid, optionally providing an error string.
@@ -114,11 +113,6 @@ class RastLineFinderParams {
  * http://infoscience.epfl.ch/record/82286/files/93-11.pdf?version=1
  */
 class RastLineFinder {
- private:
-  class SearchSpace;
-
-  friend void swap(SearchSpace& o1, SearchSpace& o2) { o1.swap(o2); }
-
  public:
   /**
    * Construct a line finder from a point cloud and a set of parameters.
@@ -147,13 +141,16 @@ class RastLineFinder {
   QLineF findNext(std::vector<unsigned>* pointIdxs = nullptr);
 
  private:
+  class SearchSpace;
+  friend void swap(SearchSpace& o1, SearchSpace& o2) noexcept { o1.swap(o2); }
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   class Point {
    public:
+    explicit Point(const QPointF& p) : pt(p) {}
     QPointF pt;
-    bool available;
-
-    explicit Point(const QPointF& p) : pt(p), available(true) {}
+    bool available{ true };
   };
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
 
   class PointUnavailablePred {
@@ -184,9 +181,9 @@ class RastLineFinder {
      * line segment, meaning that exact positions of endpoints can't be
      * counted on.
      */
-    QLineF representativeLine(const RastLineFinder& owner) const;
+    [[nodiscard]] QLineF representativeLine(const RastLineFinder& owner) const;
 
-    bool subdivideDist(const RastLineFinder& owner, SearchSpace& subspace1, SearchSpace& subspace2) const;
+    [[nodiscard]] bool subdivideDist(const RastLineFinder& owner, SearchSpace& subspace1, SearchSpace& subspace2) const;
 
     bool subdivideAngle(const RastLineFinder& owner, SearchSpace& subspace1, SearchSpace& subspace2) const;
 
@@ -194,9 +191,9 @@ class RastLineFinder {
 
     std::vector<unsigned>& pointIdxs() { return m_pointIdxs; }
 
-    const std::vector<unsigned>& pointIdxs() const { return m_pointIdxs; }
+    [[nodiscard]] const std::vector<unsigned>& pointIdxs() const { return m_pointIdxs; }
 
-    void swap(SearchSpace& other);
+    void swap(SearchSpace& other) noexcept;
 
    private:
     float m_minDist;  //
@@ -213,7 +210,7 @@ class RastLineFinder {
    private:
     void setIndex([[maybe_unused]] SearchSpace& obj, [[maybe_unused]] size_t heapIdx) {}
 
-    bool higherThan(const SearchSpace& lhs, const SearchSpace& rhs) const {
+    [[nodiscard]] bool higherThan(const SearchSpace& lhs, const SearchSpace& rhs) const {
       return lhs.pointIdxs().size() > rhs.pointIdxs().size();
     }
   };
@@ -234,5 +231,3 @@ class RastLineFinder {
   bool m_firstLine;
 };
 }  // namespace imageproc
-
-#endif  // ifndef SCANTAILOR_IMAGEPROC_RASTLINEFINDER_H_

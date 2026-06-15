@@ -54,7 +54,7 @@ ConnComp ConnCompEraser::nextConnComp() {
     return ConnComp();
   }
 
-  if (m_connectivity == CONN4) {
+  if (m_connectivity == Connectivity::CONN4) {
     return eraseConnComp4();
   } else {
     return eraseConnComp8();

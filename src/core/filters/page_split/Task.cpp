@@ -100,7 +100,7 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data) 
 
     if (!params || !deps.compatibleWith(*params)) {
       if (!params || (record.combinedLayoutType() == AUTO_LAYOUT_TYPE)) {
-        newLayout = PageLayoutEstimator::estimatePageLayout(record.combinedLayoutType(), data.grayImage(), data.xform(),
+        newLayout = PageLayoutEstimator::estimatePageLayout(record.combinedLayoutType(), static_cast<const QImage&>(data.grayImage()), data.xform(),
                                                             data.bwThreshold(), m_dbg.get());
 
         status.throwIfCancelled();

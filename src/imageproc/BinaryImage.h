@@ -98,19 +98,23 @@ class BinaryImage {
    */
   BinaryImage& operator=(const BinaryImage& other);
 
+  BinaryImage(BinaryImage&& other) noexcept;
+
+  BinaryImage& operator=(BinaryImage&& other) noexcept;
+
   /**
    * \brief Returns true if the image is null.
    *
    * Null images have zero width, height and wordsPerLine.
    */
-  bool isNull() const { return !m_data; }
+  [[nodiscard]] bool isNull() const { return !m_data; }
 
   /**
    * \brief Swaps two images.
    *
    * This operations doesn't copy data, it just swaps pointers to it.
    */
-  void swap(BinaryImage& other);
+  void swap(BinaryImage& other) noexcept;
 
   /**
    * \brief Release the image data and return it as a new image.
@@ -127,7 +131,7 @@ class BinaryImage {
   /**
    * \brief Creates an inverted version of this image.
    */
-  BinaryImage inverted() const;
+  [[nodiscard]] BinaryImage inverted() const;
 
   /**
    * \brief Fills the whole image with either white or black color.
@@ -156,9 +160,9 @@ class BinaryImage {
    */
   void fillFrame(const QRect& outerRect, const QRect& innerRect, BWColor color);
 
-  int countBlackPixels() const;
+  [[nodiscard]] int countBlackPixels() const;
 
-  int countWhitePixels() const;
+  [[nodiscard]] int countWhitePixels() const;
 
   /**
    * \brief Return the number of black pixels in a specified area.
@@ -166,7 +170,7 @@ class BinaryImage {
    * The specified rectangle is allowed to extend beyond the image area.
    * In this case, pixels that are outside of the image won't be counted.
    */
-  int countBlackPixels(const QRect& rect) const;
+  [[nodiscard]] int countBlackPixels(const QRect& rect) const;
 
   /**
    * \brief Return the number of white pixels in a specified area.
@@ -174,20 +178,20 @@ class BinaryImage {
    * The specified rectangle is allowed to extend beyond the image area.
    * In this case, pixels that are outside of the image won't be counted.
    */
-  int countWhitePixels(const QRect& rect) const;
+  [[nodiscard]] int countWhitePixels(const QRect& rect) const;
 
   /**
    * \brief Calculates the bounding box of either black or white content.
    */
-  QRect contentBoundingBox(BWColor contentColor = BLACK) const;
+  [[nodiscard]] QRect contentBoundingBox(BWColor contentColor = BWColor::BLACK) const;
 
-  int width() const { return m_width; }
+  [[nodiscard]] int width() const { return m_width; }
 
-  int height() const { return m_height; }
+  [[nodiscard]] int height() const { return m_height; }
 
-  QRect rect() const { return QRect(0, 0, m_width, m_height); }
+  [[nodiscard]] QRect rect() const { return {0, 0, m_width, m_height}; }
 
-  QSize size() const { return QSize(m_width, m_height); }
+  [[nodiscard]] QSize size() const { return {m_width, m_height}; }
 
   /**
    * \brief Returns the number of 32bit words per line.
@@ -195,7 +199,7 @@ class BinaryImage {
    * This value is usually (width + 31) / 32, but it can also
    * be bigger than that.
    */
-  int wordsPerLine() const { return m_wpl; }
+  [[nodiscard]] int wordsPerLine() const { return m_wpl; }
 
   /**
    * \brief Returns a pointer to non-const image data.
@@ -206,7 +210,7 @@ class BinaryImage {
    * images will share the same data, and you will need to call
    * data() again if you want to continue writing to this image.
    */
-  uint32_t* data();
+  [[nodiscard]] uint32_t* data();
 
   /**
    * \brief Returns a pointer to const image data.
@@ -215,23 +219,23 @@ class BinaryImage {
    * The pointer returned is only valid until call a non-const
    * version of data(), because that may trigger copy-on-write.
    */
-  const uint32_t* data() const;
+  [[nodiscard]] const uint32_t* data() const;
 
   /**
    * \brief Convert to a QImage with Format_Mono.
    */
-  QImage toQImage() const;
+  [[nodiscard]] QImage toQImage() const;
 
   /**
    * \brief Convert to an ARGB32_Premultiplied image, where white pixels become transparent.
    *
    * Opaque (black) pixels take the specified color.  Colors with alpha channel are supported.
    */
-  QImage toAlphaMask(const QColor& color) const;
+  [[nodiscard]] QImage toAlphaMask(const QColor& color) const;
 
   void setPixel(int x, int y, BWColor color);
 
-  BWColor getPixel(int x, int y) const;
+  [[nodiscard]] BWColor getPixel(int x, int y) const;
 
  private:
   class SharedData;
@@ -271,7 +275,7 @@ class BinaryImage {
 };
 
 
-inline void swap(BinaryImage& o1, BinaryImage& o2) {
+inline void swap(BinaryImage& o1, BinaryImage& o2) noexcept {
   o1.swap(o2);
 }
 

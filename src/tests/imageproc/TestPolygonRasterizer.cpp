@@ -1,16 +1,12 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <BWColor.h>
-#include <BinaryImage.h>
-#include <BinaryThreshold.h>
-#include <PolygonRasterizer.h>
-#include <RasterOp.h>
-
+// NOLINTBEGIN(misc-include-cleaner)
+// TODO: remove no linting in qt6
 #include <QBrush>
 #include <QColor>
-#include <QImage>
 #include <QPainter>
+#include <QPainterPath>
 #include <QPointF>
 #include <QPolygonF>
 #include <QRectF>
@@ -18,16 +14,19 @@
 #include <Qt>
 #include <gtest/gtest.h>
 #include <cmath>
+#include <numbers>
 
-#include "Utils.h"
+#include "BWColor.h"
+#include "BinaryImage.h"
+#include "BinaryThreshold.h"
+#include "PolygonRasterizer.h"
+#include "RasterOp.h"
 
-namespace imageproc {
-namespace tests {
-using namespace utils;
-
+namespace {
+using namespace imageproc;
 static QPolygonF createShape(const QSize& imageSize, double radius) {
   const QPointF center(0.5 * imageSize.width(), 0.5 * imageSize.height());
-  const double PI = 3.14159265;
+  const double PI {std::numbers::pi};
   double angle = PI / 2.0;
   const int numSteps = 5;
   const double step = PI * 2.0 / numSteps;
@@ -47,18 +46,18 @@ static bool fuzzyCompare(const BinaryImage& img, const QImage& control) {
   BinaryImage control1(control, BinaryThreshold(128 - 30));
   BinaryImage control2(control, BinaryThreshold(128 + 30));
 
-  // Take the difference with each control image.
+          // Take the difference with each control image.
   rasterOp<RopXor<RopSrc, RopDst>>(control1, img);
   rasterOp<RopXor<RopSrc, RopDst>>(control2, img);
 
-  // Are there pixels different in both cases?
+          // Are there pixels different in both cases?
   rasterOp<RopAnd<RopSrc, RopDst>>(control1, control2);
   return control1.countBlackPixels() == 0;
 }
 
 static bool testFillShape(const QSize& imageSize, const QPolygonF& shape, Qt::FillRule fillRule) {
-  BinaryImage bImage(imageSize, WHITE);
-  PolygonRasterizer::fill(bImage, BLACK, shape, fillRule);
+  BinaryImage bImage(imageSize, BWColor::WHITE);
+  PolygonRasterizer::fill(bImage, BWColor::BLACK, shape, fillRule);
 
   QImage qImage(imageSize, QImage::Format_RGB32);
   qImage.fill(0xffffffff);
@@ -74,8 +73,8 @@ static bool testFillShape(const QSize& imageSize, const QPolygonF& shape, Qt::Fi
 }
 
 static bool testFillExceptShape(const QSize& imageSize, const QPolygonF& shape, Qt::FillRule fillRule) {
-  BinaryImage bImage(imageSize, WHITE);
-  PolygonRasterizer::fillExcept(bImage, BLACK, shape, fillRule);
+  BinaryImage bImage(imageSize, BWColor::WHITE);
+  PolygonRasterizer::fillExcept(bImage, BWColor::BLACK, shape, fillRule);
 
   QImage qImage(imageSize, QImage::Format_RGB32);
   qImage.fill(0x00000000);
@@ -89,6 +88,9 @@ static bool testFillExceptShape(const QSize& imageSize, const QPolygonF& shape, 
   }
   return fuzzyCompare(bImage, qImage);
 }
+}
+
+namespace imageproc::tests {
 
 TEST(PolygonRasterizerTestSuite, test_complex_shape) {
   const QSize imageSize(500, 500);
@@ -144,5 +146,5 @@ TEST(PolygonRasterizerTestSuite, regression_test_1) {
   shape.push_back(QPointF(937.872, 24.559));
   EXPECT_TRUE(testFillExceptShape(QSize(938, 1299), shape, Qt::WindingFill));
 }
-}  // namespace tests
-}  // namespace imageproc
+}
+// NOLINTEND(misc-include-cleaner)

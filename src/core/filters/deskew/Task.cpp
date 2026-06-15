@@ -111,7 +111,7 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
 
     if (boundedImageArea.isValid()) {
       BinaryImage rotatedImage(orthogonalRotation(
-          BinaryImage(data.grayImageBlackOnWhite(), boundedImageArea, data.bwThresholdBlackOnWhite()),
+          BinaryImage(static_cast<const QImage&>(data.grayImageBlackOnWhite()), boundedImageArea, data.bwThresholdBlackOnWhite()),
           data.xform().preRotation().toDegrees()));
       if (m_dbg) {
         m_dbg->add(rotatedImage, "bw_rotated");
@@ -174,17 +174,17 @@ void Task::cleanup(const TaskStatus& status, BinaryImage& image, const Dpi& dpi)
   status.throwIfCancelled();
 
   const QSize brick(from150dpi(QSize(200, 14), reducedDpi));
-  BinaryImage opened(openBrick(reducedImage, brick, BLACK));
+  BinaryImage opened(openBrick(reducedImage, brick, BWColor::BLACK));
   reducedImage.release();
 
   status.throwIfCancelled();
 
-  BinaryImage seed(upscaleIntegerTimes(opened, image.size(), WHITE));
+  BinaryImage seed(upscaleIntegerTimes(opened, image.size(), BWColor::WHITE));
   opened.release();
 
   status.throwIfCancelled();
 
-  BinaryImage garbage(seedFill(seed, image, CONN8));
+  BinaryImage garbage(seedFill(seed, image, Connectivity::CONN8));
   seed.release();
 
   status.throwIfCancelled();
@@ -212,13 +212,13 @@ void Task::updateFilterData(const TaskStatus& status, FilterData& data, bool nee
     data.updateImageParams(*params);
   } else {
     const GrayImage& img = data.grayImage();
-    BinaryImage mask(img.size(), BLACK);
-    PolygonRasterizer::fillExcept(mask, WHITE, data.xform().resultingPreCropArea(), Qt::WindingFill);
+    BinaryImage mask(img.size(), BWColor::BLACK);
+    PolygonRasterizer::fillExcept(mask, BWColor::WHITE, data.xform().resultingPreCropArea(), Qt::WindingFill);
     bool isBlackOnWhite = true;
     if (ApplicationSettings::getInstance().isBlackOnWhiteDetectionEnabled()) {
       isBlackOnWhite = BlackOnWhiteEstimator::isBlackOnWhite(data.grayImage(), data.xform(), status, m_dbg.get());
     }
-    ImageSettings::PageParams newParams(BinaryThreshold::otsuThreshold(GrayscaleHistogram(img, mask)), isBlackOnWhite);
+    ImageSettings::PageParams newParams(BinaryThreshold::otsuThreshold(GrayscaleHistogram(static_cast<const QImage&>(img), mask)), isBlackOnWhite);
 
     m_imageSettings->setPageParams(m_pageId, newParams);
     data.updateImageParams(newParams);

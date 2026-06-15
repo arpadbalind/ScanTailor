@@ -38,7 +38,7 @@ class GrayscaleHistogram {
 
   void fromAnyImage(const QImage& img, const BinaryImage& mask);
 
-  int m_pixels[256] = {0};
+  std::array<int, 256> m_pixels{};
 };
 
 

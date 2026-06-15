@@ -29,7 +29,7 @@ class Skew {
    *
    * Positive values indicate clockwise skews.
    */
-  double angle() const { return m_angle; }
+  [[nodiscard]] double angle() const { return m_angle; }
 
   /**
    * \brief Get the confidence value.
@@ -38,7 +38,7 @@ class Skew {
    * above or equal to GOOD_CONFIDENCE indicates high
    * confidence level.
    */
-  double confidence() const { return m_confidence; }
+  [[nodiscard]] double confidence() const { return m_confidence; }
 
  private:
   double m_angle;
@@ -128,7 +128,7 @@ class SkewFinder : private NonCopyable {
    * \note If the image contains text columns at (slightly) different
    * angles, one of those angles will be found, with a lower confidence.
    */
-  Skew findSkew(const BinaryImage& image) const;
+  [[nodiscard]] Skew findSkew(const BinaryImage& image) const;
 
  private:
   static const double LOW_SCORE;

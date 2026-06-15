@@ -7,8 +7,14 @@
 #include <cassert>
 
 #include "BadAllocIfNull.h"
+#include "FlagOps.h"
 #include "ColorMixer.h"
 #include "Grayscale.h"
+
+namespace {
+using namespace enumflags;
+}
+
 
 namespace imageproc {
 namespace {
@@ -48,7 +54,7 @@ static void transformGeneric(const StorageUnit* const srcData,
                              const QTransform& xform,
                              const QRect& dstRect,
                              const StorageUnit outsideColor,
-                             const int outsideFlags,
+                             OutsidePixels::Flags outsideFlags,
                              const QSizeF& minMappingArea) {
   const int sw = srcSize.width();
   const int sh = srcSize.height();
@@ -91,7 +97,7 @@ static void transformGeneric(const StorageUnit* const srcData,
 
       if ((srcBottom < 0) || (srcRight < 0) || (srcLeft >= sw) || (srcTop >= sh)) {
         // Completely outside of src image.
-        if (outsideFlags & OutsidePixels::COLOR) {
+        if (enumflags::has_flag(outsideFlags, OutsidePixels::Flags::COLOR)) {
           dstLine[dx] = outsideColor;
         } else {
           const int srcX = qBound<int>(0, (srcLeft + srcRight) >> 1, sw - 1);
@@ -153,10 +159,10 @@ static void transformGeneric(const StorageUnit* const srcData,
       assert(srcRight >= srcLeft);
 
       Mixer mixer;
-      if (outsideFlags & OutsidePixels::WEAK) {
+      if (enumflags::has_flag(outsideFlags, OutsidePixels::Flags::WEAK)) {
         backgroundArea = 0;
       } else {
-        assert(outsideFlags & OutsidePixels::COLOR);
+        assert(outsideFlags & OutsidePixels::Flags::COLOR);
         mixer.add(outsideColor, backgroundArea);
       }
 
@@ -172,7 +178,7 @@ static void transformGeneric(const StorageUnit* const srcData,
 
       const unsigned srcArea = (src32Bottom - src32Top) * (src32Right - src32Left);
       if (srcArea == 0) {
-        if ((outsideFlags & OutsidePixels::COLOR)) {
+        if (enumflags::has_flag(outsideFlags, OutsidePixels::Flags::COLOR)) {
           dstLine[dx] = outsideColor;
         } else {
           const int srcX = qBound<int>(0, (srcLeft + srcRight) >> 1, sw - 1);
@@ -323,7 +329,7 @@ QImage transform(const QImage& src,
             outsidePixels.grayLevel(), outsidePixels.flags(), minMappingArea);
 
         fixDpiInPlace(grayDst, src, xform);
-        return grayDst;
+        return static_cast<const QImage&>(grayDst);
       }
       // fall through
     default:

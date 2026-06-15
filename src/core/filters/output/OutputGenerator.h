@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_OUTPUTGENERATOR_H_
-#define SCANTAILOR_OUTPUT_OUTPUTGENERATOR_H_
+#pragma once
 
 #include <QRect>
 #include <memory>
@@ -100,4 +99,3 @@ class OutputGenerator {
   QRect m_contentRect;
 };
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_OUTPUTGENERATOR_H_

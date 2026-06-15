@@ -55,7 +55,7 @@ ImageSettings::PageParams::PageParams(const QDomElement& el)
 
 QDomElement ImageSettings::PageParams::toXml(QDomDocument& doc, const QString& name) const {
   QDomElement el(doc.createElement(name));
-  el.setAttribute("bwThreshold", m_bwThreshold);
+  el.setAttribute("bwThreshold", static_cast<int>(m_bwThreshold));
   el.setAttribute("blackOnWhite", m_blackOnWhite ? "1" : "0");
   return el;
 }

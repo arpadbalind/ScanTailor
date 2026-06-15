@@ -338,7 +338,7 @@ PageLayout PageLayoutEstimator::cutAtWhitespace(const LayoutType layoutType,
     const auto margin = (int) std::ceil(std::fabs(0.5 * h * tg));
     const int newWidth = w - margin * 2;
     if (newWidth > 0) {
-      hShearInPlace(img, tg, 0.5 * h, WHITE);
+      hShearInPlace(img, tg, 0.5 * h, BWColor::WHITE);
       BinaryImage newImg(newWidth, h);
       rasterOp<RopSrc>(newImg, newImg.rect(), img, QPoint(margin, 0));
       img.swap(newImg);
@@ -387,10 +387,10 @@ PageLayout PageLayoutEstimator::cutAtWhitespaceDeskewed150(const LayoutType layo
   const int width = input.width();
   const int height = input.height();
 
-  BinaryImage ccImg(input.size(), WHITE);
+  BinaryImage ccImg(input.size(), BWColor::WHITE);
 
   {
-    ConnCompEraser ccEraser(input, CONN8);
+    ConnCompEraser ccEraser(input, Connectivity::CONN8);
     ConnComp cc;
     while (!(cc = ccEraser.nextConnComp()).isNull()) {
       if ((cc.width() < 5) || (cc.height() < 5)) {
@@ -399,7 +399,7 @@ PageLayout PageLayoutEstimator::cutAtWhitespaceDeskewed150(const LayoutType layo
       if ((double) cc.height() / cc.width() > 6) {
         continue;
       }
-      ccImg.fill(cc.rect(), BLACK);
+      ccImg.fill(cc.rect(), BWColor::BLACK);
     }
   }
 
@@ -448,7 +448,7 @@ imageproc::BinaryImage PageLayoutEstimator::to300DpiBinary(const QImage& img,
                       std::max(1, (int) std::ceil(yfactor * img.height())));
 
   const GrayImage newImage(scaleToGray(GrayImage(img), newSize));
-  return BinaryImage(newImage, binaryThreshold);
+  return BinaryImage(static_cast<const QImage&>(newImage), binaryThreshold);
 }
 
 BinaryImage PageLayoutEstimator::removeGarbageAnd2xDownscale(const BinaryImage& image, DebugImages* dbg) {
@@ -461,15 +461,15 @@ BinaryImage PageLayoutEstimator::removeGarbageAnd2xDownscale(const BinaryImage& 
   BinaryImage nonGarbageSeed2(openBrick(reduced, QSize(1, 4)));
   rasterOp<RopOr<RopSrc, RopDst>>(nonGarbageSeed, nonGarbageSeed2);
   nonGarbageSeed2.release();
-  reduced = seedFill(nonGarbageSeed, reduced, CONN8);
+  reduced = seedFill(nonGarbageSeed, reduced, Connectivity::CONN8);
   nonGarbageSeed.release();
 
   if (dbg) {
     dbg->add(reduced, "garbage_removed");
   }
 
-  BinaryImage horSeed(openBrick(reduced, QSize(200, 14), BLACK));
-  BinaryImage verSeed(openBrick(reduced, QSize(14, 300), BLACK));
+  BinaryImage horSeed(openBrick(reduced, QSize(200, 14), BWColor::BLACK));
+  BinaryImage verSeed(openBrick(reduced, QSize(14, 300), BWColor::BLACK));
 
   rasterOp<RopOr<RopSrc, RopDst>>(horSeed, verSeed);
   BinaryImage seed(horSeed.release());
@@ -478,9 +478,9 @@ BinaryImage PageLayoutEstimator::removeGarbageAnd2xDownscale(const BinaryImage& 
     dbg->add(seed, "shadows_seed");
   }
 
-  BinaryImage dilated(dilateBrick(reduced, QSize(3, 3)));
+  BinaryImage dilated(dilateBrick(reduced, Brick(QSize(3, 3))));
 
-  BinaryImage shadowsDilated(seedFill(seed, dilated, CONN8));
+  BinaryImage shadowsDilated(seedFill(seed, dilated, Connectivity::CONN8));
   dilated.release();
   if (dbg) {
     dbg->add(shadowsDilated, "shadowsDilated");

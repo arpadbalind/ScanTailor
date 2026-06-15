@@ -42,7 +42,7 @@ class ConnCompEraserExt : private NonCopyable {
    * In case nextConnComp() returned a null component or was never called,
    * a null BinaryImage is returned.
    */
-  BinaryImage computeConnCompImage() const;
+  [[nodiscard]] BinaryImage computeConnCompImage() const;
 
   /**
    * \brief Computes the image of the last connected component
@@ -64,7 +64,7 @@ class ConnCompEraserExt : private NonCopyable {
  private:
   ConnCompEraser m_eraser;
 
-  BinaryImage computeDiffImage(const QRect& rect) const;
+  [[nodiscard]] BinaryImage computeDiffImage(const QRect& rect) const;
 
   /**
    * m_lastImage is always one step behind of m_eraser.image().

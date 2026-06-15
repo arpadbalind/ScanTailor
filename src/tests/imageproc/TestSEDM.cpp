@@ -1,22 +1,21 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <BWColor.h>
-#include <BinaryImage.h>
-#include <SEDM.h>
 
 #include <QImage>
+
+#include <array>
+#include <cstdint>
 #include <gtest/gtest.h>
-#include <cmath>
 #include <iostream>
 
+#include "BinaryImage.h"
+#include "SEDM.h"
 #include "Utils.h"
 
-namespace imageproc {
-namespace tests {
-using namespace utils;
-
-bool verifySEDM(const SEDM& sedm, const uint32_t* control) {
+namespace {
+using namespace imageproc;
+static bool verifySEDM(const SEDM& sedm, const uint32_t* control) {
   const uint32_t* line = sedm.data();
   for (int y = 0; y < sedm.size().height(); ++y) {
     for (int x = 0; x < sedm.size().width(); ++x) {
@@ -29,30 +28,32 @@ bool verifySEDM(const SEDM& sedm, const uint32_t* control) {
   }
   return true;
 }
-
-void dumpMatrix(const uint32_t* data, QSize size) {
+static void dumpMatrix(const uint32_t* data, QSize size) {
   const int width = size.width();
   const int height = size.height();
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x, ++data) {
       std::cout << *data << ' ';
     }
-    std::cout << std::endl;
+    std::cout << "\n";
   }
 }
+}
+
+namespace imageproc::tests {
+using namespace utils;
 
 TEST(SEDMTestSuite, test1) {
-  static const int inp[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0,
+  static const std::array<int, 81> inp = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0,
                             0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0,
                             0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  static const uint32_t out[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0,
+  static const std::array<uint32_t, 81> out = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0,
                                  0, 0, 1, 4, 4, 4, 1, 0, 0, 0, 0, 1, 4, 9, 4, 1, 0, 0, 0, 0, 1, 4, 4, 4, 1, 0, 0,
                                  0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-  const BinaryImage img(makeBinaryImage(inp, 9, 9));
+  const BinaryImage img(makeBinaryImage(inp.data(), 9, 9));
   const SEDM sedm(img, SEDM::DistType::DIST_TO_WHITE, SEDM::Borders::DIST_TO_NO_BORDERS);
-  EXPECT_TRUE(verifySEDM(sedm, out));
+  EXPECT_TRUE(verifySEDM(sedm, out.data()));
 }
-}  // namespace tests
-}  // namespace imageproc
+}

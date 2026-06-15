@@ -175,7 +175,7 @@ void TopBottomEdgeTracer::trace(const imageproc::GrayImage& image,
                            double(downscaledSize.height()) / image.height());
     downscaled = scaleToGray(image, downscaledSize);
     if (dbg) {
-      dbg->add(downscaled, "downscaled");
+      dbg->add(static_cast<const QImage&>(downscaled), "downscaled");
     }
 
     status.throwIfCancelled();
@@ -209,7 +209,7 @@ void TopBottomEdgeTracer::trace(const imageproc::GrayImage& image,
   propagateShortestPaths(dir1stTo2nd, queue, grid);
   const std::vector<QPoint> endpoints1(locateBestPathEndpoints(grid, bounds.second));
   if (dbg) {
-    dbg->add(visualizePaths(downscaled, grid, bounds, endpoints1), "best_paths_ltr");
+    dbg->add(visualizePaths(static_cast<const QImage&>(downscaled), grid, bounds, endpoints1), "best_paths_ltr");
   }
 
   gaussBlurGradient(grid);

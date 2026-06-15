@@ -25,7 +25,7 @@ static BinaryImage rotate90(const BinaryImage& src, const QRect& srcRect) {
   const int dstW = srcRect.height();
   const int dstH = srcRect.width();
   BinaryImage dst(dstW, dstH);
-  dst.fill(WHITE);
+  dst.fill(BWColor::WHITE);
   const int srcWpl = src.wordsPerLine();
   const int dstWpl = dst.wordsPerLine();
   const uint32_t* const srcData = src.data() + srcRect.bottom() * srcWpl;
@@ -60,7 +60,7 @@ static BinaryImage rotate180(const BinaryImage& src, const QRect& srcRect) {
   const int dstW = srcRect.width();
   const int dstH = srcRect.height();
   BinaryImage dst(dstW, dstH);
-  dst.fill(WHITE);
+  dst.fill(BWColor::WHITE);
   const int srcWpl = src.wordsPerLine();
   const int dstWpl = dst.wordsPerLine();
   const uint32_t* srcLine = src.data() + srcRect.bottom() * srcWpl;
@@ -91,7 +91,7 @@ static BinaryImage rotate270(const BinaryImage& src, const QRect& srcRect) {
   const int dstW = srcRect.height();
   const int dstH = srcRect.width();
   BinaryImage dst(dstW, dstH);
-  dst.fill(WHITE);
+  dst.fill(BWColor::WHITE);
   const int srcWpl = src.wordsPerLine();
   const int dstWpl = dst.wordsPerLine();
   const uint32_t* const srcData = src.data() + srcRect.top() * srcWpl;

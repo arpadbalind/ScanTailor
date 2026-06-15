@@ -141,7 +141,7 @@ std::vector<HoughLine> HoughLineDetector::findLines(const unsigned qualityLowerB
 
   std::vector<HoughLine> lines;
 
-  ConnCompEraser eraser(peaks.release(), CONN8);
+  ConnCompEraser eraser(peaks.release(), Connectivity::CONN8);
   ConnComp cc;
   while (!(cc = eraser.nextConnComp()).isNull()) {
     const unsigned level = m_histogram[cc.seed().y() * m_histWidth + cc.seed().x()];
@@ -167,7 +167,7 @@ BinaryImage HoughLineDetector::findHistogramPeaks(const std::vector<unsigned>& h
   // To check if a peak candidate is really a peak, we have to check
   // that every bin in its neighborhood has a lower value than that
   // candidate.  The are working with 5x5 neighborhoods.
-  BinaryImage neighborhoodMask(dilateBrick(peakCandidates, QSize(5, 5)));
+  BinaryImage neighborhoodMask(dilateBrick(peakCandidates, Brick(QSize(5, 5))));
   rasterOp<RopXor<RopSrc, RopDst>>(neighborhoodMask, peakCandidates);
 
   // Bins in the neighborhood of a peak candidate fall into two categories:
@@ -188,7 +188,7 @@ BinaryImage HoughLineDetector::findHistogramPeaks(const std::vector<unsigned>& h
   // If a bin that has changed its state was a part of a peak candidate,
   // it means a neighboring bin went from equal to a greater value,
   // which indicates that such candidate is not a peak.
-  const BinaryImage notPeaks(seedFill(diff, peakCandidates, CONN8));
+  const BinaryImage notPeaks(seedFill(diff, peakCandidates, Connectivity::CONN8));
 
   rasterOp<RopXor<RopSrc, RopDst>>(peakCandidates, notPeaks);
   return peakCandidates;
@@ -336,7 +336,7 @@ BinaryImage HoughLineDetector::buildEqualMap(const std::vector<unsigned>& src1,
                                              const int width,
                                              const int height,
                                              const unsigned lowerBound) {
-  BinaryImage dst(width, height, WHITE);
+  BinaryImage dst(width, height, BWColor::WHITE);
   uint32_t* dstLine = dst.data();
   const int dstWpl = dst.wordsPerLine();
   const unsigned* src1Line = &src1[0];

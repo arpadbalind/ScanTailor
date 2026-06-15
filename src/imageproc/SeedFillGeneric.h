@@ -246,7 +246,7 @@ void seedFill4(SpreadOp spreadOp,
   maskLine -= maskStride;
 
   FastQueue<Position<T>> queue;
-  BinaryImage inQueue(size, WHITE);
+  BinaryImage inQueue(size, BWColor::WHITE);
   uint32_t* const inQueueData = inQueue.data();
   const int inQueueStride = inQueue.wordsPerLine();
   std::vector<HTransition> hTransitions;
@@ -359,7 +359,7 @@ void seedFill8(SpreadOp spreadOp,
   }
 
   FastQueue<Position<T>> queue;
-  BinaryImage inQueue(size, WHITE);
+  BinaryImage inQueue(size, BWColor::WHITE);
   uint32_t* const inQueueData = inQueue.data();
   const int inQueueStride = inQueue.wordsPerLine();
   std::vector<HTransition> hTransitions;
@@ -466,10 +466,10 @@ void seedFillGenericInPlace(SpreadOp spreadOp,
     return;
   }
 
-  if (conn == CONN4) {
+  if (conn == Connectivity::CONN4) {
     detail::seed_fill_generic::seedFill4(spreadOp, maskOp, seed, seedStride, size, mask, maskStride);
   } else {
-    assert(conn == CONN8);
+    assert(conn == Connectivity::CONN8);
     detail::seed_fill_generic::seedFill8(spreadOp, maskOp, seed, seedStride, size, mask, maskStride);
   }
 }
