@@ -72,8 +72,9 @@ MatT<double> Function<2>::hessian(const SparseMap<2>& sparseMap) const {
           const std::size_t ii = sparseMap.nonZeroElementIdx(i, i);
           const std::size_t jj = sparseMap.nonZeroElementIdx(j, j);
           assert(ii != sparseMap.ZERO_ELEMENT && jj != sparseMap.ZERO_ELEMENT);
-          // NOLINTNEXTLINE(readability-magic-numbers)
+          // NOLINTBEGIN(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
           Fij = 0.5 * (secondDerivs[ij] - (secondDerivs[ii] + secondDerivs[jj]));
+          // NOLINTEND(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
         }
       }
       hess(i, j) = Fij;
@@ -171,8 +172,9 @@ Function<2> operator*(const Function<2>& f1, const Function<2>& f2) {
 
   for (std::size_t u = 0; u < p; ++u) {
     res.firstDerivs[u] = f1.firstDerivs[u] * f2.value + f1.value * f2.firstDerivs[u];
-    // NOLINTNEXTLINE(readability-magic-numbers)
+    // NOLINTBEGIN(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
     res.secondDerivs[u] = f1.secondDerivs[u] * f2.value + 2.0 * f1.firstDerivs[u] * f2.firstDerivs[u] + f1.value * f2.secondDerivs[u];
+    // NOLINTEND(readability-magic-numbers, cppcoreguidelines-avoid-magic-numbers)
   }
   return res;
 }
