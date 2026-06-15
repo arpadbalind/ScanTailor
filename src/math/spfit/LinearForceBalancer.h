@@ -19,11 +19,11 @@ class LinearForceBalancer {
   explicit LinearForceBalancer(double internalExternalRatio);
   inline static constexpr double epsilon{ 1e-6 };
 
-  double currentRatio() const { return m_currentRatio; }
+  [[nodiscard]] double currentRatio() const { return m_currentRatio; }
 
   void setCurrentRatio(double internalExternalRatio);
 
-  double targetRatio() const { return m_targetRatio; }
+  [[nodiscard]] double targetRatio() const { return m_targetRatio; }
 
   void setTargetRatio(double internalExternalRatio);
 
@@ -34,7 +34,7 @@ class LinearForceBalancer {
    */
   void setIterationsToTarget(int iterations);
 
-  double calcInternalForceWeight(double internalForce, double externalForce) const;
+  [[nodiscard]] double calcInternalForceWeight(double internalForce, double externalForce) const;
 
   /**
    * Returns the current internal / external force ratio, then moves

@@ -45,7 +45,7 @@ PolylineModelShape::PolylineModelShape(const std::vector<QPointF>& polyline) {
 SqDistApproximant PolylineModelShape::localSqDistApproximant(const QPointF& pt,
                                                              FittableSpline::SampleFlags sampleFlags) const {
   if (m_vertices.empty()) {
-    return SqDistApproximant();
+    return {};
   }
 
   // First, find the point on the polyline closest to pt.

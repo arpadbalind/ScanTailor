@@ -41,23 +41,23 @@ class Optimizer {
 
   void addInternalForce(const QuadraticFunction& force, const std::vector<int>& sparseMap);
 
-  std::size_t numVars() const { return m_numVars; }
+  [[nodiscard]] std::size_t numVars() const { return m_numVars; }
 
   /**
    * Get the external force accumulated from calls to addAttractionForce().
    * Note that optimize() will reset all forces.
    */
-  double externalForce() const { return m_externalForce.c; }
+  [[nodiscard]] double externalForce() const { return m_externalForce.c; }
 
   /**
    * Get the internal force accumulated from calls to addInternalForce().
    * Note that optimize() will reset all forces.
    */
-  double internalForce() const { return m_internalForce.c; }
+  [[nodiscard]] double internalForce() const { return m_internalForce.c; }
 
   OptimizationResult optimize(double internalForceWeight);
 
-  const double* displacementVector() const { return m_x.data(); }
+  [[nodiscard]] const double* displacementVector() const { return m_x.data(); }
 
   /**
    * Rolls back the very last adjustment to constraints done by optimize()

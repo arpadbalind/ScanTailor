@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <cmath>
+#include <numeric>
 
 void ArcLengthMapper::Hint::update(int newSegment) {
   m_direction = newSegment < m_lastSegment ? -1 : 1;
@@ -84,7 +85,7 @@ double ArcLengthMapper::arcLenToX(double arcLen, Hint& hint) const {
   auto rightIdx = static_cast<int>(m_samples.size() - 1);
   double leftArcLen = m_samples[leftIdx].arcLen;
   while (leftIdx + 1 < rightIdx) {
-    const int midIdx = (leftIdx + rightIdx) >> 1;
+    const int midIdx = std::midpoint(leftIdx, rightIdx);
     const double midArcLen = m_samples[midIdx].arcLen;
     if ((arcLen - midArcLen) * (arcLen - leftArcLen) <= 0) {
       // Note: <= 0 vs < 0 is actually important for this branch.
@@ -141,7 +142,7 @@ double ArcLengthMapper::xToArcLen(double x, Hint& hint) const {
   auto rightIdx = static_cast<int>(m_samples.size() - 1);
   double leftX = m_samples[leftIdx].x;
   while (leftIdx + 1 < rightIdx) {
-    const int midIdx = (leftIdx + rightIdx) >> 1;
+    const int midIdx = std::midpoint(leftIdx, rightIdx);
     const double midX = m_samples[midIdx].x;
     if ((x - midX) * (x - leftX) <= 0) {
       // Note: <= 0 vs < 0 is actually important for this branch.

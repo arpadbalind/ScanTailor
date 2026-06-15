@@ -31,11 +31,11 @@ class FrenetFrame {
    */
   FrenetFrame(const Vec2d& origin, const Vec2d& tangentVector, FrenetFrame::YAxisDirection ydir = FrenetFrame::YAxisDirection::Y_POINTS_DOWN);
 
-  const Vec2d& origin() const { return m_origin; }
+  [[nodiscard]] const Vec2d& origin() const { return m_origin; }
 
-  const Vec2d& unitTangent() const { return m_unitTangent; }
+  [[nodiscard]] const Vec2d& unitTangent() const { return m_unitTangent; }
 
-  const Vec2d& unitNormal() const { return m_unitNormal; }
+  [[nodiscard]] const Vec2d& unitNormal() const { return m_unitNormal; }
 
  private:
   Vec2d m_origin;

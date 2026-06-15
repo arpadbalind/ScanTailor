@@ -113,7 +113,7 @@ OptimizationResult Optimizer::optimize(double internalForceWeight) {
     m_externalForce.reset();
     m_internalForce.reset();
     m_x.fill(0);  // To make undoLastStep() work as expected.
-    return OptimizationResult(totalForceBefore, totalForceBefore);
+    return {totalForceBefore, totalForceBefore};
   }
 
   const double totalForceAfter = m_internalForce.evaluate(m_x.data());
@@ -122,7 +122,7 @@ OptimizationResult Optimizer::optimize(double internalForceWeight) {
   // The last thing remaining is to adjust constraints,
   // as they depend on the current variables.
   adjustConstraints(1.0);
-  return OptimizationResult(totalForceBefore, totalForceAfter);
+  return {totalForceBefore, totalForceAfter};
 }  // Optimizer::optimize
 
 void Optimizer::undoLastStep() {

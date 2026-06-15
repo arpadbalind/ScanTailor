@@ -20,6 +20,8 @@
  * b: vector of N coefficients.\n
  * c: constant component.\n
  */
+
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 class QuadraticFunction {
   // Member-wise copying is OK.
  public:
@@ -54,14 +56,14 @@ class QuadraticFunction {
    */
   void reset();
 
-  std::size_t numVars() const { return b.size(); }
+  [[nodiscard]] std::size_t numVars() const { return b.size(); }
 
   /**
    * Evaluates x^T * A * x + b^T * x + c
    */
   double evaluate(const double* x) const;
 
-  Gradient gradient() const;
+  [[nodiscard]] Gradient gradient() const;
 
   /**
    * f(x) is our function.  This method will replace f(x) with g(x) so that
@@ -75,7 +77,7 @@ class QuadraticFunction {
 
   QuadraticFunction& operator*=(double scalar);
 };
-
+// NOLINTEND(misc-non-private-member-variables-in-classes)
 
 inline void swap(QuadraticFunction& f1, QuadraticFunction& f2) noexcept {
   f1.swap(f2);

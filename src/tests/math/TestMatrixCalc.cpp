@@ -41,7 +41,7 @@ TEST(MatrixCalcSuite, test2) {
 
   // Now make the system inconsistent.
   B[4] += 1.0;
-  EXPECT_THROW(mc(A.data(), 3, 5).trans().solve(mc(B.data(), 5, 1)), std::runtime_error);
+  EXPECT_THROW(std::ignore = mc(A.data(), 3, 5).trans().solve(mc(B.data(), 5, 1)), std::runtime_error);
 }
 
 TEST(MatrixCalcSuite, test3) {

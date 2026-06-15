@@ -21,17 +21,17 @@ class PolylineModelShape : public ModelShape, private NonCopyable {
  public:
   enum class Flags : std::uint8_t {
     DEFAULT_FLAGS  = 0,
-    POLYLINE_FRONT = 1 << 0,
-    POLYLINE_BACK  = 1 << 1,
-    MASK_ALL = POLYLINE_FRONT | POLYLINE_BACK
+    POLYLINE_FRONT = 0x01,
+    POLYLINE_BACK  = 0x02,
+    POLYLINE_FRONT_BACK = 0x03
   };
 
   explicit PolylineModelShape(const std::vector<QPointF>& polyline);
 
-  SqDistApproximant localSqDistApproximant(const QPointF& pt, FittableSpline::SampleFlags sampleFlags) const override;
+  [[nodiscard]] SqDistApproximant localSqDistApproximant(const QPointF& pt, FittableSpline::SampleFlags sampleFlags) const override;
 
  protected:
-  virtual SqDistApproximant calcApproximant(const QPointF& pt,
+  [[nodiscard]] virtual SqDistApproximant calcApproximant(const QPointF& pt,
                                             FittableSpline::SampleFlags sampleFlags,
                                             Flags polylineFlags,
                                             const FrenetFrame& frenetFrame,
