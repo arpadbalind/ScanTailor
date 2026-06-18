@@ -2,7 +2,7 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #pragma once
-
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 #include <QPoint>
 #include <QRect>
 #include <QSize>
@@ -121,8 +121,8 @@ template <typename Arg1, typename Arg2>
 class RopSubtract {
  public:
   static uint32_t transform(uint32_t src, uint32_t dst) {
-    uint32_t lhs = Arg1::transform(src, dst);
-    uint32_t rhs = Arg2::transform(src, dst);
+    const uint32_t lhs = Arg1::transform(src, dst);
+    const uint32_t rhs = Arg2::transform(src, dst);
     return lhs & (lhs ^ rhs);
   }
 };
@@ -425,3 +425,4 @@ void rasterOp(BinaryImage& dst, const BinaryImage& src) {
   rasterOpInDirection<Rop>(dst, dst.rect(), src, QPoint(0, 0), 1, 1);
 }
 }  // namespace imageproc
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

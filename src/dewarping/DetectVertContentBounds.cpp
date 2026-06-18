@@ -3,33 +3,45 @@
 
 #include "DetectVertContentBounds.h"
 
-#include <BinaryImage.h>
-#include <Constants.h>
-
 #include <QImage>
+#include <QLine>
+#include <QLineF>
 #include <QPainter>
+#include <QPen>
 #include <QRandomGenerator>
+#include <QRect>
+#include <QRectF>
+#include <QSize>
+#include <Qt>
 
 
 #include <algorithm>
-#include <ranges>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <deque>
+#include <utility>
+#include <vector>
 
+#include "BinaryImage.h"
+#include "Constants.h"
 #include "DebugImages.h"
 #include "VecNT.h"
 
 using namespace imageproc;
-
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
 namespace dewarping {
 namespace {
 struct VertRange {
-  int top;
-  int bottom;
+  int top{-1};
+  int bottom{-1};
 
-  VertRange() : top(-1), bottom(-1) {}
+  VertRange() = default;
 
   VertRange(int t, int b) : top(t), bottom(b) {}
 
-  bool isValid() const { return top != -1; }
+  [[nodiscard]] bool isValid() const { return top != -1; }
 };
 
 
@@ -38,8 +50,9 @@ struct Segment {
   Vec2d unitVec;
   int vertDist;
 
-  bool distToVertLine(int vertLineX) const {
-    return (bool) std::min<int>(std::abs(line.p1().x() - vertLineX), std::abs(line.p2().x() - vertLineX));
+  [[nodiscard]] bool distToVertLine(int vertLineX) const {
+    return line.p1().x() == vertLineX ||
+           line.p2().x() == vertLineX;
   }
 
   Segment(const QLine& line, const Vec2d& vec, int dist) : line(line), unitVec(vec), vertDist(dist) {}
@@ -48,18 +61,18 @@ struct Segment {
 
 struct RansacModel {
   std::vector<Segment> segments;
-  int totalVertDist;  // Sum of individual Segment::vertDist
+  int totalVertDist{ 0 };  // Sum of individual Segment::vertDist
 
-  RansacModel() : totalVertDist(0) {}
+  RansacModel() = default;
 
   void add(const Segment& seg) {
     segments.push_back(seg);
     totalVertDist += seg.vertDist;
   }
 
-  bool betterThan(const RansacModel& other) const { return totalVertDist > other.totalVertDist; }
+  [[nodiscard]] bool betterThan(const RansacModel& other) const { return totalVertDist > other.totalVertDist; }
 
-  void swap(RansacModel& other) {
+  void swap(RansacModel& other) noexcept {
     segments.swap(other.segments);
     std::swap(totalVertDist, other.totalVertDist);
   }
@@ -68,16 +81,17 @@ struct RansacModel {
 
 class RansacAlgo {
  public:
+  static constexpr double RADIAL_TOLERANCE{ 4.0 };
   explicit RansacAlgo(const std::vector<Segment>& segments);
 
   void buildAndAssessModel(const Segment& seedSegment);
 
   RansacModel& bestModel() { return m_bestModel; }
 
-  const RansacModel& bestModel() const { return m_bestModel; }
+  [[nodiscard]] const RansacModel& bestModel() const { return m_bestModel; }
 
  private:
-  const std::vector<Segment>& m_segments;
+  std::vector<Segment> m_segments;
   RansacModel m_bestModel;
   double m_cosThreshold;
 };
@@ -85,9 +99,12 @@ class RansacAlgo {
 
 class SequentialColumnProcessor {
  public:
-  enum LeftOrRight { LEFT, RIGHT };
+  enum class Orientation : std::uint8_t {
+    LEFT,
+    RIGHT
+  };
 
-  SequentialColumnProcessor(const QSize& pageSize, LeftOrRight leftOrRight);
+  SequentialColumnProcessor(const QSize& pageSize, Orientation orientation);
 
   void process(int x, const VertRange& range);
 
@@ -96,13 +113,13 @@ class SequentialColumnProcessor {
   QImage visualizeEnvelope(const QImage& background);
 
  private:
-  bool topMidBottomConcave(QPoint top, QPoint mid, QPoint bottom) const;
+  [[nodiscard]] bool topMidBottomConcave(QPoint top, QPoint mid, QPoint bottom) const;
 
   static int crossZ(QPoint v1, QPoint v2);
 
-  bool segmentIsTooLong(QPoint p1, QPoint p2) const;
+  [[nodiscard]] bool segmentIsTooLong(QPoint p1, QPoint p2) const;
 
-  QLineF interpolateSegments(const std::vector<Segment>& segments) const;
+  [[nodiscard]] QLineF interpolateSegments(const std::vector<Segment>& segments) const;
 
   // Top and bottom points on the leftmost or the rightmost line.
   QPoint m_leadingTop;
@@ -110,12 +127,12 @@ class SequentialColumnProcessor {
   std::deque<QPoint> m_path;  // Top to bottom.
   int m_maxSegmentSqLen;
   int m_leftMinusOneRightOne;
-  LeftOrRight m_leftOrRight;
+  Orientation m_Orientation;
 };
 
 
 RansacAlgo::RansacAlgo(const std::vector<Segment>& segments)
-    : m_segments(segments), m_cosThreshold(std::cos(4.0 * constants::DEG2RAD)) {}
+    : m_segments(segments), m_cosThreshold(std::cos(RADIAL_TOLERANCE * constants::DEG2RAD)) {}
 
 void RansacAlgo::buildAndAssessModel(const Segment& seedSegment) {
   RansacModel curModel;
@@ -133,8 +150,8 @@ void RansacAlgo::buildAndAssessModel(const Segment& seedSegment) {
   }
 }
 
-SequentialColumnProcessor::SequentialColumnProcessor(const QSize& pageSize, LeftOrRight leftOrRight)
-    : m_leftMinusOneRightOne(leftOrRight == LEFT ? -1 : 1), m_leftOrRight(leftOrRight) {
+SequentialColumnProcessor::SequentialColumnProcessor(const QSize& pageSize, Orientation orientation)
+    : m_leftMinusOneRightOne(orientation == Orientation::LEFT ? -1 : 1), m_Orientation(orientation) {
   const int w = pageSize.width();
   const int h = pageSize.height();
   m_maxSegmentSqLen = (w * w + h * h) / 3;
@@ -269,7 +286,7 @@ QLineF SequentialColumnProcessor::approximateWithLine(std::vector<Segment>* dbgS
   }
 
   if (ransac.bestModel().segments.empty()) {
-    return QLineF(m_leadingTop, m_leadingTop + QPointF(0, 1));
+    return {m_leadingTop, m_leadingTop + QPointF(0, 1)};
   }
 
   const QLineF line(interpolateSegments(ransac.bestModel().segments));
@@ -289,7 +306,7 @@ QLineF SequentialColumnProcessor::interpolateSegments(const std::vector<Segment>
   double accumWeight = 0;
 
   for (const Segment& seg : segments) {
-    const double weight = std::sqrt(double(seg.vertDist));
+    const double weight = std::sqrt(static_cast<double>(seg.vertDist));
     accumVec += weight * seg.unitVec;
     accumWeight += weight;
   }
@@ -299,7 +316,7 @@ QLineF SequentialColumnProcessor::interpolateSegments(const std::vector<Segment>
 
   QLineF line(m_path.front(), QPointF(Vec2d(m_path.front()) + accumVec));
   Vec2d normal(-accumVec[1], accumVec[0]);
-  if ((m_leftOrRight == RIGHT) != (normal[0] < 0)) {
+  if ((m_Orientation == Orientation::RIGHT) != (normal[0] < 0)) {
     normal = -normal;
   }
   // normal now points *inside* the image, towards the other bound.
@@ -332,7 +349,7 @@ QImage SequentialColumnProcessor::visualizeEnvelope(const QImage& background) {
   painter.setOpacity(0.7);
   QRectF rect(0, 0, 9, 9);
 
-  for (QPoint pt : m_path) {
+  for (const auto& pt : m_path) {
     rect.moveCenter(pt + QPointF(0.5, 0.5));
     painter.drawEllipse(rect);
   }
@@ -359,18 +376,26 @@ QImage visualizeSegments(const QImage& background, const std::vector<Segment>& s
 void calculateVertRanges(const imageproc::BinaryImage& image, std::vector<VertRange>& ranges) {
   const int width = image.width();
   const int height = image.height();
+
+  if (width <= 0 || height <= 0) {
+    return;
+  }
+
   const uint32_t* imageData = image.data();
   const int imageStride = image.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  constexpr std::uint32_t msb = 0x80000000u;
 
   ranges.reserve(width);
 
-  for (int x = 0; x < width; ++x) {
+  for (auto x = 0; x < width; ++x) {
     ranges.emplace_back();
     VertRange& range = ranges.back();
 
-    const uint32_t mask = msb >> (x & 31);
-    const uint32_t* pWord = imageData + (x >> 5);
+    const auto wordIndex = static_cast<std::ptrdiff_t>(static_cast<std::uint32_t>(x) >> 5u);
+
+    const std::uint32_t mask = msb >> (static_cast<std::uint32_t>(x) & 31u);
+
+    const std::uint32_t* pWord = imageData + wordIndex;
 
     int topY = 0;
     for (; topY < height; ++topY, pWord += imageStride) {
@@ -381,7 +406,7 @@ void calculateVertRanges(const imageproc::BinaryImage& image, std::vector<VertRa
     }
 
     int bottomY = height - 1;
-    pWord = imageData + bottomY * imageStride + (x >> 5);
+    pWord = imageData + static_cast<std::ptrdiff_t>(bottomY) * imageStride + wordIndex;
     for (; bottomY >= topY; --bottomY, pWord -= imageStride) {
       if (*pWord & mask) {
         range.bottom = bottomY;
@@ -400,7 +425,7 @@ QLineF extendLine(const QLineF& line, int height) {
 
   line.intersects(topLine, &topIntersection);
   line.intersects(bottomLine, &bottomIntersection);
-  return QLineF(topIntersection, bottomIntersection);
+  return {topIntersection, bottomIntersection};
 }
 }  // namespace
 
@@ -411,12 +436,12 @@ std::pair<QLineF, QLineF> detectVertContentBounds(const imageproc::BinaryImage& 
   std::vector<VertRange> cols;
   calculateVertRanges(image, cols);
 
-  SequentialColumnProcessor leftProcessor(image.size(), SequentialColumnProcessor::LEFT);
+  SequentialColumnProcessor leftProcessor(image.size(), SequentialColumnProcessor::Orientation::LEFT);
   for (int x = 0; x < width; ++x) {
     leftProcessor.process(x, cols[x]);
   }
 
-  SequentialColumnProcessor rightProcessor(image.size(), SequentialColumnProcessor::RIGHT);
+  SequentialColumnProcessor rightProcessor(image.size(), SequentialColumnProcessor::Orientation::RIGHT);
   for (int x = width - 1; x >= 0; --x) {
     rightProcessor.process(x, cols[x]);
   }
@@ -448,3 +473,4 @@ std::pair<QLineF, QLineF> detectVertContentBounds(const imageproc::BinaryImage& 
   return bounds;
 }  // detectVertContentBounds
 }  // namespace dewarping
+// NOLINTEND(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)

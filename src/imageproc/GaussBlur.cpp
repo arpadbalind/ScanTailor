@@ -80,8 +80,10 @@ GrayImage gaussBlur(const GrayImage& src, float hSigma, float vSigma) {
   }
 
   GrayImage dst(src.size());
-  gaussBlurGeneric(src.size(), hSigma, vSigma, src.data(), src.stride(), StaticCastValueConv<float>(), dst.data(),
-                   dst.stride(), [](auto& dest, const auto& src) { dest = RoundAndClipValueConv<uint8_t>()(src); });
+  gaussBlurGeneric(src.size(), hSigma, vSigma, src.data(), src.stride(), [](auto v) { return static_cast<float>(v); }, dst.data(),
+                   dst.stride(), [](auto& dest, auto src) {
+                     src = std::clamp<float>(src, 0.0f, 255.0f);
+                     dest = static_cast<uint8_t>(std::lround(src)); });
   return dst;
 }
 }  // namespace imageproc

@@ -64,7 +64,7 @@ QImage DespeckleState::overlaySpeckles(const QImage& mixed, const imageproc::Bin
 
   const uint32_t* specklesLine = speckles.data();
   const int specklesStride = speckles.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   const int width = result.width();
   const int height = result.height();
@@ -94,7 +94,7 @@ BinaryImage DespeckleState::extractBW(const QImage& mixed) {
 
   uint32_t* resultLine = result.data();
   const int resultStride = result.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   const int width = result.width();
   const int height = result.height();

@@ -26,7 +26,6 @@ set(sources
     MatT.h
     PriorityQueue.h
     Grid.h
-    ValueConv.h
     Hashes.h
     Utils.cpp Utils.h)
 

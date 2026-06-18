@@ -434,7 +434,7 @@ void ContentBoxFinder::trimContentBlocksInPlace(const imageproc::BinaryImage& co
 
   int width = content.width();
   int height = content.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   const uint32_t* contentLine = content.data();
   const int contentStride = content.wordsPerLine();
@@ -493,7 +493,7 @@ void ContentBoxFinder::inPlaceRemoveAreasTouchingBorders(imageproc::BinaryImage&
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       uint32_t mask = cbLine[x >> 5] >> (31 - (x & 31));
-      mask &= uint32_t(1);
+      mask &= uint32_t{1};
       --mask;
 
       // BWColor::WHITE -> max, BWColor::BLACK -> 0
@@ -569,7 +569,7 @@ void ContentBoxFinder::inPlaceRemoveAreasTouchingBorders(imageproc::BinaryImage&
 
   cbLine = contentBlocks.data();
   mapLine = &map[0] + width + 3;
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (mapLine[x] + 1 > 1) {  // If not 0 or ~uint16_t(0)
@@ -622,7 +622,7 @@ void ContentBoxFinder::segmentGarbage(const imageproc::BinaryImage& garbage,
   uint32_t* hgLine = horGarbage.data();
   const int hgStride = horGarbage.wordsPerLine();
 
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -1145,7 +1145,7 @@ QRect ContentBoxFinder::trim(const imageproc::BinaryImage& content,
 
   const uint32_t* cbLine = contentBlocks.data();
   const int cbStride = contentBlocks.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   const uint32_t* dmGarbageLine = garbage.sedm().data();
   const uint32_t* dmOthersLine = dmToOthers.data();

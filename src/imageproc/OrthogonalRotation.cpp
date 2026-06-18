@@ -8,7 +8,7 @@
 
 namespace imageproc {
 static inline uint32_t mask(int x) {
-  return (uint32_t(1) << 31) >> (x % 32);
+  return (uint32_t{1} << 31) >> (x % 32);
 }
 
 static BinaryImage rotate0(const BinaryImage& src, const QRect& srcRect) {

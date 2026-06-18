@@ -445,7 +445,7 @@ void reserveBlackAndWhite(QImage& img, const BinaryImage& mask) {
   const int imageStride = img.bytesPerLine() / sizeof(PixelType);
   const uint32_t* maskLine = mask.data();
   const int maskStride = mask.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -480,7 +480,7 @@ void fillExcept(QImage& image, const BinaryImage& bwMask, const QColor& color) {
   const int bwMaskStride = bwMask.wordsPerLine();
   const int width = image.width();
   const int height = image.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   const auto fillingPixel = static_cast<MixedPixel>(color.rgba());
 
   for (int y = 0; y < height; ++y) {
@@ -501,7 +501,7 @@ void fillExcept(BinaryImage& image, const BinaryImage& bwMask, const BWColor col
   const int bwMaskStride = bwMask.wordsPerLine();
   const int width = image.width();
   const int height = image.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -773,8 +773,8 @@ std::vector<QRect> findRectAreas(const BinaryImage& mask, BWColor contentColor, 
   const int lastWordIdx = (w - 1) >> 5;
   const int lastWordBits = w - (lastWordIdx << 5);
   const int lastWordUnusedBits = 32 - lastWordBits;
-  const uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
-  const uint32_t modifier = (contentColor == BWColor::WHITE) ? ~uint32_t(0) : 0;
+  const uint32_t lastWordMask = ~uint32_t{0} << lastWordUnusedBits;
+  const uint32_t modifier = (contentColor == BWColor::WHITE) ? ~uint32_t{0} : 0;
   const uint32_t* const data = mask.data();
 
   const uint32_t* line = data;

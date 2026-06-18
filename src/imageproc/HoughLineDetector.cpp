@@ -223,7 +223,7 @@ void HoughLineDetector::incrementBinsMasked(std::vector<unsigned>& hist,
   const uint32_t* maskLine = mask.data();
   const int maskWpl = mask.wordsPerLine();
   unsigned* histLine = &hist[0];
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -341,7 +341,7 @@ BinaryImage HoughLineDetector::buildEqualMap(const std::vector<unsigned>& src1,
   const int dstWpl = dst.wordsPerLine();
   const unsigned* src1Line = &src1[0];
   const unsigned* src2Line = &src2[0];
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {

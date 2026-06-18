@@ -58,14 +58,14 @@ class ProjectWriter : private NonCopyable {
     QString path;
     int numericId;
 
-    Directory(const QString& path, int numericId) : path(path), numericId(numericId) {}
+    Directory(const QString& pPath, int pNumericId) : path(pPath), numericId(pNumericId) {}
   };
 
   struct File {
     QString path;
     int numericId;
 
-    File(const QString& path, int numericId) : path(path), numericId(numericId) {}
+    File(const QString& pPath, int pNumericId) : path(pPath), numericId(pNumericId) {}
   };
 
   struct Image {
@@ -82,7 +82,7 @@ class ProjectWriter : private NonCopyable {
     PageId id;
     int numericId;
 
-    Page(const PageId& id, int numericId) : id(id), numericId(numericId) {}
+    Page(const PageId& pID, int pNumericId) : id(pID), numericId(pNumericId) {}
   };
 
   class Sequenced;

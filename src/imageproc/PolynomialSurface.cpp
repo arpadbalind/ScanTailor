@@ -307,7 +307,7 @@ void PolynomialSurface::prepareDataForLeastSquares(const GrayImage& image,
 
   VecT<double> fullPowers(numTerms);
 
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   for (int y = 0; y < height; ++y) {
     const double yAdjusted = yscale * y;
 

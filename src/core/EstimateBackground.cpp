@@ -182,7 +182,7 @@ imageproc::PolynomialSurface estimateBackground(const GrayImage& input,
   int maskStride = mask.wordsPerLine();
 
   std::vector<uint8_t> line(std::max(width, height), 0);
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   status.throwIfCancelled();
 
@@ -245,7 +245,7 @@ imageproc::PolynomialSurface estimateBackground(const GrayImage& input,
   // Check each horizontal line.  If it's mostly
   // white (ignored), then make it completely white.
   const int lastWordIdx = (width - 1) >> 5;
-  const uint32_t lastWordMask = ~uint32_t(0) << (32 - width - (lastWordIdx << 5));
+  const uint32_t lastWordMask = ~uint32_t{0} << (32 - width - (lastWordIdx << 5));
   maskLine = maskData;
   for (int y = 0; y < height; ++y, maskLine += maskStride) {
     int blackCount = 0;

@@ -2,16 +2,17 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #pragma once
-
-#include <GrayImage.h>
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 
 #include <QLineF>
 #include <QPointF>
+
 #include <cstdint>
 #include <list>
 #include <vector>
 
 #include "Dpi.h"
+#include "GrayImage.h"
 #include "Grid.h"
 #include "VecNT.h"
 
@@ -22,12 +23,15 @@ class QImage;
 namespace dewarping {
 class TextLineRefiner {
  public:
-  TextLineRefiner(const imageproc::GrayImage& image, const Dpi& dpi, const Vec2f& unitDownVector);
+  TextLineRefiner(imageproc::GrayImage image, const Dpi& dpi, const Vec2f& unitDownVector);
 
   void refine(std::list<std::vector<QPointF>>& polylines, int iterations, DebugImages* dbg) const;
 
  private:
-  enum OnConvergence { ON_CONVERGENCE_STOP, ON_CONVERGENCE_GO_FINER };
+  enum class OnConvergence : std::uint8_t {
+    STOP,
+    GO_FINER
+  };
 
   class SnakeLength;
 
@@ -41,10 +45,8 @@ class TextLineRefiner {
   };
 
   struct Snake {
-    std::vector<SnakeNode> nodes;
-    int iterationsRemaining;
-
-    Snake() : iterationsRemaining(0) {}
+    std::vector<SnakeNode> nodes{};
+    int iterationsRemaining{ 0 };
   };
 
   struct Step {
@@ -66,12 +68,13 @@ class TextLineRefiner {
 
   void evolveSnake(Snake& snake, const Grid<float>& gradient, OnConvergence onConvergence) const;
 
-  QImage visualizeGradient(const Grid<float>& gradient) const;
+  [[nodiscard]] QImage visualizeGradient(const Grid<float>& gradient) const;
 
-  QImage visualizeSnakes(const std::vector<Snake>& snakes, const Grid<float>* gradient = nullptr) const;
+  [[nodiscard]] QImage visualizeSnakes(const std::vector<Snake>& snakes, const Grid<float>* gradient = nullptr) const;
 
   imageproc::GrayImage m_image;
   Dpi m_dpi;
   Vec2f m_unitDownVec;
 };
 }  // namespace dewarping
+// NOLINTEND(misc-non-private-member-variables-in-classes)

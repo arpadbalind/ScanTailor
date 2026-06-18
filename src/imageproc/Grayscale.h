@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_GRAYSCALE_H_
-#define SCANTAILOR_IMAGEPROC_GRAYSCALE_H_
+#pragma once
 
 #include <QColor>
 #include <QVector>
@@ -17,6 +16,8 @@ class BinaryImage;
 
 class GrayscaleHistogram {
  public:
+  static constexpr int MAXIMUM_VALUE{ 256 };
+
   explicit GrayscaleHistogram(const QImage& img);
 
   GrayscaleHistogram(const QImage& img, const BinaryImage& mask);
@@ -38,10 +39,11 @@ class GrayscaleHistogram {
 
   void fromAnyImage(const QImage& img, const BinaryImage& mask);
 
-  std::array<int, 256> m_pixels{};
+  std::array<int, MAXIMUM_VALUE> m_pixels{};
 };
 
-
+inline constexpr unsigned char kDefaultInnerColor = 0xFF;
+inline constexpr unsigned char kDefaultFrameColor = 0x00;
 /**
  * \brief Create a 256-element grayscale palette.
  */
@@ -77,7 +79,7 @@ GrayImage stretchGrayRange(const GrayImage& src, double blackClipFraction = 0.0,
  * \param frameColor The gray level of the frame area.  Defaults to black.
  * \return The resulting image.
  */
-GrayImage createFramedImage(const QSize& size, unsigned char innerColor = 0xff, unsigned char frameColor = 0x00);
+GrayImage createFramedImage(const QSize& size, unsigned char innerColor = kDefaultInnerColor, unsigned char frameColor = kDefaultFrameColor);
 
 /**
  * \brief Find the darkest gray level of an image.
@@ -88,4 +90,3 @@ GrayImage createFramedImage(const QSize& size, unsigned char innerColor = 0xff, 
  */
 unsigned char darkestGrayLevel(const QImage& image);
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_GRAYSCALE_H_

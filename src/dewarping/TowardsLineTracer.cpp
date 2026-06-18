@@ -3,14 +3,19 @@
 
 #include "TowardsLineTracer.h"
 
-#include <SEDM.h>
+#include <QPoint>
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <cstdint>
 
+#include "Grid.h"
 #include "NumericTraits.h"
+#include "SEDM.h"
 #include "SidesOfLine.h"
 
+// NOLINTBEGIN(misc-include-cleaner, cppcoreguidelines-avoid-magic-numbers)
 using namespace imageproc;
 
 namespace dewarping {
@@ -25,9 +30,7 @@ TowardsLineTracer::TowardsLineTracer(const imageproc::SEDM* dm,
       m_rect(QPoint(0, 0), dm->size()),
       m_line(line),
       m_normalTowardsLine(m_line.normalVector().p2() - m_line.p1()),
-      m_lastOutputPos(initialPos),
-      m_numSteps(0),
-      m_finished(false) {
+      m_lastOutputPos(initialPos) {
   if (sidesOfLine(m_line, initialPos, QPointF(Vec2d(line.p1()) + m_normalTowardsLine)) > 0) {
     // It points the wrong way -> fix that.
     m_normalTowardsLine = -m_normalTowardsLine;
@@ -41,13 +44,11 @@ const QPoint* TowardsLineTracer::trace(const float maxDist) {
     return nullptr;
   }
 
-  const int maxSqdist = qRound(maxDist * maxDist);
-
+  const auto maxSqdist = static_cast<int>(std::lround(maxDist * maxDist));
   QPoint curPos(m_lastOutputPos);
-  QPoint lastContentPos(-1, -1);
 
-  const uint32_t* pDm = m_dmData + curPos.y() * m_dmStride + curPos.x();
-  const float* pPm = m_pmData + curPos.y() * m_pmStride + curPos.x();
+  const uint32_t* pDm = m_dmData + static_cast<std::ptrdiff_t>(curPos.y()) * m_dmStride + curPos.x();
+  const float* pPm = m_pmData + static_cast<std::ptrdiff_t>(curPos.y()) * m_pmStride + curPos.x();
 
   while (true) {
     int bestDmIdx = -1;
@@ -85,7 +86,7 @@ const QPoint* TowardsLineTracer::trace(const float maxDist) {
       bestIdx = bestDmIdx;
     }
 
-    Step& step = m_steps[bestIdx];
+    const Step& step = m_steps[bestIdx];
 
     if (sidesOfLine(m_line, curPos + step.vec, m_lastOutputPos) < 0) {
       // Note that this has to be done before we update curPos,
@@ -114,11 +115,11 @@ const QPoint* TowardsLineTracer::trace(const float maxDist) {
 }  // TowardsLineTracer::trace
 
 void TowardsLineTracer::setupSteps() {
-  QPoint all_directions[8];
+  std::array<QPoint, 8> all_directions{};
   // all_directions[0] is north-west, and then clockwise from there.
-  static const int m0p[] = {-1, 0, 1};
-  static const int p0m[] = {1, 0, -1};
-
+  static const std::array<int, 3> m0p = {-1, 0, 1};
+  static const std::array<int, 3> p0m = {1, 0, -1};
+  constexpr int numDirections{ 8 };
   for (int i = 0; i < 3; ++i) {
     // north
     all_directions[i].setX(m0p[i]);
@@ -133,8 +134,8 @@ void TowardsLineTracer::setupSteps() {
     all_directions[4 + i].setY(1);
 
     // west
-    all_directions[(6 + i) & 7].setX(-1);
-    all_directions[(6 + i) & 7].setY(p0m[i]);
+    all_directions[(6 + i) % numDirections].setX(-1);
+    all_directions[(6 + i) % numDirections].setY(p0m[i]);
   }
 
   m_numSteps = 0;
@@ -147,14 +148,13 @@ void TowardsLineTracer::setupSteps() {
       step.dmOffset = step.vec.y() * m_dmStride + step.vec.x();
       step.pmOffset = step.vec.y() * m_pmStride + step.vec.x();
       ++m_numSteps;
-      assert(m_numSteps <= int(sizeof(m_steps) / sizeof(m_steps[0])));
     }
   }
 
   // Sort by decreasing alignment with m_normalTowardsLine.
-  std::sort(m_steps, m_steps + m_numSteps,
-            [this](const auto& a, const auto& b) {
+  std::ranges::sort(m_steps, [this](const auto& a, const auto& b) {
               return a.unitVec.dot(m_normalTowardsLine) > b.unitVec.dot(m_normalTowardsLine);
             });
 }  // TowardsLineTracer::setupSteps
 }  // namespace dewarping
+// NOLINTEND(misc-include-cleaner, cppcoreguidelines-avoid-magic-numbers)

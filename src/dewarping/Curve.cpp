@@ -4,18 +4,24 @@
 #include "Curve.h"
 
 #include <QDataStream>
+#include <algorithm>
+#include <cstddef>
+#include <vector>
 
 #include "VecNT.h"
 #include "XmlMarshaller.h"
 #include "XmlUnmarshaller.h"
+#include "XSpline.h"
 
 namespace dewarping {
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 struct Curve::CloseEnough {
   bool operator()(const QPointF& p1, const QPointF& p2) {
     const QPointF d(p1 - p2);
     return d.x() * d.x() + d.y() * d.y() <= 0.01 * 0.01;
   }
 };
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 
 Curve::Curve() = default;
 
@@ -29,7 +35,7 @@ Curve::Curve(const QDomElement& el)
 
 QDomElement Curve::toXml(QDomDocument& doc, const QString& name) const {
   if (!isValid()) {
-    return QDomElement();
+    return {};
   }
 
   QDomElement el(doc.createElement(name));
@@ -66,17 +72,17 @@ std::vector<QPointF> Curve::deserializePolyline(const QDomElement& el) {
 
 QDomElement Curve::serializePolyline(const std::vector<QPointF>& polyline, QDomDocument& doc, const QString& name) {
   if (polyline.empty()) {
-    return QDomElement();
+    return {};
   }
-
+  static constexpr std::size_t FLOAT_PAIR_SIZE{ 8 };
   QByteArray ba;
-  ba.reserve(static_cast<int>(8 * polyline.size()));
+  ba.reserve(static_cast<int>(FLOAT_PAIR_SIZE * polyline.size()));
   QDataStream strm(&ba, QIODevice::WriteOnly);
   strm.setVersion(QDataStream::Qt_4_4);
   strm.setByteOrder(QDataStream::LittleEndian);
 
   for (const QPointF& pt : polyline) {
-    strm << (float) pt.x() << (float) pt.y();
+    strm << static_cast<float>(pt.x()) << static_cast<float>(pt.y());
   }
 
   QDomElement el(doc.createElement(name));
@@ -93,7 +99,7 @@ bool Curve::approxPolylineMatch(const std::vector<QPointF>& polyline1, const std
 
 QDomElement Curve::serializeXSpline(const XSpline& xspline, QDomDocument& doc, const QString& name) {
   if (xspline.numControlPoints() == 0) {
-    return QDomElement();
+    return {};
   }
 
   QDomElement el(doc.createElement(name));
@@ -139,13 +145,6 @@ bool Curve::splineHasLoops(const XSpline& spline) {
     if (Vec2d(cp2 - cp1).dot(mainDirection) < 0) {
       return true;
     }
-#if 0
-            const double t1 = spline.controlPointIndexToT(i - 1);
-            const double t2 = spline.controlPointIndexToT(i);
-            if (Vec2d(spline.pointAt(t2) - spline.pointAt(t1)).dot(mainDirection)) < 0) {
-                    return true;
-                }
-#endif
   }
   return false;
 }

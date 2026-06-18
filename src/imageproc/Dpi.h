@@ -23,17 +23,17 @@ class Dpi {
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  Dpi(Dpm dpm);
+  explicit Dpi(Dpm dpm);
 
   explicit Dpi(QSize size);
 
-  int horizontal() const;
+  [[nodiscard]] int horizontal() const;
 
-  int vertical() const;
+  [[nodiscard]] int vertical() const;
 
-  QSize toSize() const;
+  [[nodiscard]] QSize toSize() const;
 
-  bool isNull() const;
+  [[nodiscard]] bool isNull() const;
 
   bool operator==(const Dpi& other) const;
 

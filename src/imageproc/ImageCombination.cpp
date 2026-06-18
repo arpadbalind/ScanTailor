@@ -19,14 +19,14 @@ void combineImagesMono(QImage& mixedImage, const BinaryImage& foreground) {
   const int foregroundStride = foreground.wordsPerLine();
   const int width = mixedImage.width();
   const int height = mixedImage.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (foregroundLine[x >> 5] & (msb >> (x & 31))) {
         uint32_t tmp = foregroundLine[x >> 5];
         tmp >>= (31 - (x & 31));
-        tmp &= uint32_t(1);
+        tmp &= uint32_t{1};
 
         --tmp;
         tmp |= 0xff000000;
@@ -48,14 +48,14 @@ void combineImagesMono(QImage& mixedImage, const BinaryImage& foreground, const 
   const int maskStride = mask.wordsPerLine();
   const int width = mixedImage.width();
   const int height = mixedImage.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (maskLine[x >> 5] & (msb >> (x & 31))) {
         uint32_t tmp = foregroundLine[x >> 5];
         tmp >>= (31 - (x & 31));
-        tmp &= uint32_t(1);
+        tmp &= uint32_t{1};
 
         --tmp;
         tmp |= 0xff000000;
@@ -173,7 +173,7 @@ void combineImagesColor(QImage& mixedImage, const QImage& foreground, const Bina
   const int maskStride = mask.wordsPerLine();
   const int width = mixedImage.width();
   const int height = mixedImage.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -200,7 +200,7 @@ void combineImagesColor<uint32_t, uint8_t>(QImage& mixedImage, const QImage& for
   const int maskStride = mask.wordsPerLine();
   const int width = mixedImage.width();
   const int height = mixedImage.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   const QVector<QRgb> foregroundPalette = foreground.colorTable();
 
@@ -227,7 +227,7 @@ void combineImagesColor<uint8_t, uint8_t>(QImage& mixedImage, const QImage& fore
   const int maskStride = mask.wordsPerLine();
   const int width = mixedImage.width();
   const int height = mixedImage.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   QVector<uint32_t> mixedPalette = mixedImage.colorTable();
   const QVector<uint32_t> foregroundPalette = foreground.colorTable();
@@ -265,7 +265,7 @@ void applyMask(QImage& image, const BinaryImage& bwMask, const BWColor fillingCo
   const int bwMaskStride = bwMask.wordsPerLine();
   const int width = image.width();
   const int height = image.height();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   const auto fillingPixel = static_cast<MixedPixel>((fillingColor == BWColor::WHITE) ? 0xffffffff : 0x00000000);
 
   for (int y = 0; y < height; ++y) {

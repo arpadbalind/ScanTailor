@@ -25,13 +25,14 @@ class CylindricalSurfaceDewarper {
     ArcLengthMapper::Hint m_arcLengthHint;
   };
 
-
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   struct Generatrix {
     QLineF imgLine;
     HomographicTransform<1, double> pln2img;
 
     Generatrix(const QLineF& imgLine, const HomographicTransform<1, double>& H) : imgLine(imgLine), pln2img(H) {}
   };
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   /**
    * \param depthPerception The distance from the camera to the plane formed
@@ -47,7 +48,7 @@ class CylindricalSurfaceDewarper {
    * \brief Returns the arc length of a directrix, assuming its
    *        chord length is one.
    */
-  double directrixArcLength() const { return m_directrixArcLength; }
+  [[nodiscard]] double directrixArcLength() const { return m_directrixArcLength; }
 
   Generatrix mapGeneratrix(double crvX, State& state) const;
 
@@ -57,7 +58,7 @@ class CylindricalSurfaceDewarper {
    * in the beginning of the *.cpp file for more information
    * about coordinate systems we work with.
    */
-  QPointF mapToDewarpedSpace(const QPointF& imgPt) const;
+  [[nodiscard]] QPointF mapToDewarpedSpace(const QPointF& imgPt) const;
 
   /**
    * Transforms a point from dewarped normalized coordinates
@@ -65,7 +66,7 @@ class CylindricalSurfaceDewarper {
    * of the *.cpp file for more information about coordinate
    * systems we owork with.
    */
-  QPointF mapToWarpedSpace(const QPointF& crvPt) const;
+  [[nodiscard]] QPointF mapToWarpedSpace(const QPointF& crvPt) const;
 
  private:
   class CoupledPolylinesIterator;
@@ -90,7 +91,7 @@ class CylindricalSurfaceDewarper {
   HomographicTransform<2, double> m_img2pln;
   double m_depthPerception;
   double m_plnStraightLineY;
-  double m_directrixArcLength;
+  double m_directrixArcLength{ 1.0 };
   ArcLengthMapper m_arcLengthMapper;
   PolylineIntersector m_imgDirectrix1Intersector;
   PolylineIntersector m_imgDirectrix2Intersector;

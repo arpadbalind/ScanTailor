@@ -8,7 +8,7 @@
 namespace imageproc {
 namespace {
 inline uint32_t multiplyBit(uint32_t bit, int times) {
-  return (uint32_t(0) - bit) >> (32 - times);
+  return (uint32_t{0} - bit) >> (32 - times);
 }
 
 void expandImpl(BinaryImage& dst, const BinaryImage& src, const int xscale, const int yscale) {
@@ -29,7 +29,7 @@ void expandImpl(BinaryImage& dst, const BinaryImage& src, const int xscale, cons
     for (int sx = 0; sx < sw; ++sx) {
       const uint32_t srcWord = srcLine[sx >> 5];
       const int srcBit = 31 - (sx & 31);
-      const uint32_t bit = (srcWord >> srcBit) & uint32_t(1);
+      const uint32_t bit = (srcWord >> srcBit) & uint32_t{1};
       int todo = xscale;
 
       while (dstBitsRemaining <= todo) {

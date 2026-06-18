@@ -19,11 +19,11 @@ class HomographicTransformBase {
 
   explicit HomographicTransformBase(const Mat& mat) : m_mat(mat) {}
 
-  HomographicTransform<N, T> inv() const;
+  [[nodiscard]] HomographicTransform<N, T> inv() const;
 
   Vec operator()(const Vec& from) const;
 
-  const Mat& mat() const { return m_mat; }
+  [[nodiscard]] const Mat& mat() const { return m_mat; }
 
  private:
   Mat m_mat;

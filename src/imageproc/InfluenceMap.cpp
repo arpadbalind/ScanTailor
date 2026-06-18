@@ -89,12 +89,12 @@ void InfluenceMap::init(const ConnectivityMap& cmap, const BinaryImage* mask) {
     const uint32_t* maskLine = mask->data();
     const int maskStride = mask->wordsPerLine();
     cell = m_plainData;
-    const uint32_t msb = uint32_t(1) << 31;
+    const uint32_t msb = uint32_t{1} << 31;
     for (int y = 0; y < height - 2; ++y) {
       for (int x = 0; x < width - 2; ++x, ++cell) {
         if (maskLine[x >> 5] & (msb >> (x & 31))) {
           if (cell->label == 0) {
-            cell->distSq = ~uint32_t(0);
+            cell->distSq = ~uint32_t{0};
           }
         }
       }
@@ -106,7 +106,7 @@ void InfluenceMap::init(const ConnectivityMap& cmap, const BinaryImage* mask) {
     for (int y = 0; y < height - 2; ++y) {
       for (int x = 0; x < width - 2; ++x, ++cell) {
         if (cell->label == 0) {
-          cell->distSq = ~uint32_t(0);
+          cell->distSq = ~uint32_t{0};
         }
       }
       cell += 2;
@@ -121,7 +121,7 @@ void InfluenceMap::init(const ConnectivityMap& cmap, const BinaryImage* mask) {
     assert((cell - &m_data[0]) / width < height - 1);
     assert((cell - &m_data[0]) % width > 0);
     assert((cell - &m_data[0]) % width < width - 1);
-    assert(cell->distSq != ~uint32_t(0));
+    assert(cell->distSq != ~uint32_t{0});
     assert(cell->label != 0);
     assert(cell->label <= m_maxLabel);
 
@@ -239,7 +239,7 @@ QImage InfluenceMap::visualized() const {
 
       const int bitsUnused = countMostSignificantZeroes(val);
       const uint32_t reversed = reverseBits(val) >> bitsUnused;
-      const uint32_t mask = ~uint32_t(0) >> bitsUnused;
+      const uint32_t mask = ~uint32_t{0} >> bitsUnused;
 
       const double H = 0.99 * (double(reversed) / mask);
       const double S = 1.0;

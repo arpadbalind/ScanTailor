@@ -5,11 +5,11 @@
 #pragma once
 
 #include <QSize>
+
+#include <array>
 #include <cstring>
 #include <iterator>
 #include <vector>
-
-#include "ValueConv.h"
 
 namespace imageproc {
 class GrayImage;
@@ -98,21 +98,26 @@ void gaussBlurGeneric(const QSize size,
   if (size.isEmpty()) {
     return;
   }
-
-  const int width = size.width();
-  const int height = size.height();
-  const int widthHeightMax = width > height ? width : height;
+  static constexpr int arraySize{ 5 };
+  const auto width = static_cast<size_t>(size.width());
+  const auto height = static_cast<size_t>(size.height());
+  const auto widthHeightMax = width > height ? width : height;
 
   std::vector<float> valP(widthHeightMax);
   std::vector<float> valM(widthHeightMax);
   std::vector<float> intermediateImage(width * height);
-  const int intermediateStride = width;
+  const size_t intermediateStride = width;
 
   // IIR parameters.
-  float nP[5], nM[5], dP[5], dM[5], bdP[5], bdM[5];
+  std::array<float, arraySize> nP{};
+  std::array<float, arraySize> nM{};
+  std::array<float, arraySize> dP{};
+  std::array<float, arraySize> dM{};
+  std::array<float, arraySize> bdP{};
+  std::array<float, arraySize> bdM{};
   // Vertical pass.
-  gauss_blur_impl::findIirConstants(nP, nM, dP, dM, bdP, bdM, vSigma);
-  for (int x = 0; x < width; ++x) {
+  gauss_blur_impl::findIirConstants(nP.data(), nM.data(), dP.data(), dM.data(), bdP.data(), bdM.data(), vSigma);
+  for (size_t x = 0; x < width; ++x) {
     memset(&valP[0], 0, height * sizeof(valP[0]));
     memset(&valM[0], 0, height * sizeof(valM[0]));
 
@@ -123,10 +128,10 @@ void gaussBlurGeneric(const QSize size,
     const float initialP = floatReader(spP[0]);
     const float initialM = floatReader(spM[0]);
 
-    for (int y = 0; y < height; ++y) {
-      const int terms = y < 4 ? y : 4;
-      int i = 0;
-      int spOff = 0;
+    for (size_t y = 0; y < height; ++y) {
+      const size_t terms = y < 4 ? y : 4;
+      size_t i = 0;
+      size_t spOff = 0;
       for (; i <= terms; ++i, spOff += inputStride) {
         *vp += nP[i] * floatReader(spP[-spOff]) - dP[i] * vp[-i];
         *vm += nM[i] * floatReader(spM[spOff]) - dM[i] * vm[i];
@@ -145,10 +150,10 @@ void gaussBlurGeneric(const QSize size,
                           gauss_blur_impl::FloatToFloatWriter());
   }
   // Horizontal pass.
-  gauss_blur_impl::findIirConstants(nP, nM, dP, dM, bdP, bdM, hSigma);
+  gauss_blur_impl::findIirConstants(nP.data(), nM.data(), dP.data(), dM.data(), bdP.data(), bdM.data(), hSigma);
   const float* intermediateLine = &intermediateImage[0];
   DstIt outputLine(output);
-  for (int y = 0; y < height; ++y) {
+  for (size_t y = 0; y < height; ++y) {
     memset(&valP[0], 0, width * sizeof(valP[0]));
     memset(&valM[0], 0, width * sizeof(valM[0]));
 
@@ -159,9 +164,9 @@ void gaussBlurGeneric(const QSize size,
     const float initialP = spP[0];
     const float initialM = spM[0];
 
-    for (int x = 0; x < width; ++x) {
-      const int terms = x < 4 ? x : 4;
-      int i = 0;
+    for (size_t x = 0; x < width; ++x) {
+      const size_t terms = x < 4 ? x : 4;
+      size_t i = 0;
       for (; i <= terms; ++i) {
         *vp += nP[i] * spP[-i] - dP[i] * vp[-i];
         *vm += nM[i] * spM[i] - dM[i] * vm[i];

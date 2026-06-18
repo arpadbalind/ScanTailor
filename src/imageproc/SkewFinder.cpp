@@ -191,7 +191,7 @@ double SkewFinder::calcScore(const BinaryImage& image) {
   const uint32_t* line = image.data();
   const int wpl = image.wordsPerLine();
   const int lastWordIdx = (width - 1) >> 5;
-  const uint32_t lastWordMask = ~uint32_t(0) << (31 - ((width - 1) & 31));
+  const uint32_t lastWordMask = ~uint32_t{0} << (31 - ((width - 1) & 31));
 
   double score = 0.0;
   int lastLineBlackPixels = 0;

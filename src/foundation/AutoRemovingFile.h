@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_FOUNDATION_AUTOREMOVINGFILE_H_
-#define SCANTAILOR_FOUNDATION_AUTOREMOVINGFILE_H_
+#pragma once
 
 #include <QString>
 
@@ -13,31 +12,21 @@
  * this class deletes a file.  unique_ptr's copying semantics is also preserved.
  */
 class AutoRemovingFile {
- private:
-  struct CopyHelper {
-    AutoRemovingFile* obj;
-
-    explicit CopyHelper(AutoRemovingFile* o) : obj(o) {}
-  };
-
  public:
-  AutoRemovingFile();
+  AutoRemovingFile() = default;
 
-  explicit AutoRemovingFile(const QString& filePath);
-
-  AutoRemovingFile(AutoRemovingFile& other);
-
-  AutoRemovingFile(CopyHelper other);
-
+  explicit AutoRemovingFile(QString filePath);
   ~AutoRemovingFile();
 
-  AutoRemovingFile& operator=(AutoRemovingFile& other);
+  AutoRemovingFile(const AutoRemovingFile&) = delete;
 
-  AutoRemovingFile& operator=(CopyHelper other);
+  AutoRemovingFile& operator=(const AutoRemovingFile&) = delete;
 
-  operator CopyHelper() { return CopyHelper(this); }
+  AutoRemovingFile(AutoRemovingFile&& other) noexcept;
 
-  const QString& get() const { return m_file; }
+  AutoRemovingFile& operator=(AutoRemovingFile&& other) noexcept;
+
+  [[nodiscard]] const QString& get() const { return m_file; }
 
   void reset(const QString& file);
 
@@ -46,6 +35,3 @@ class AutoRemovingFile {
  private:
   QString m_file;
 };
-
-
-#endif  // ifndef SCANTAILOR_FOUNDATION_AUTOREMOVINGFILE_H_

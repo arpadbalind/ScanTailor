@@ -354,7 +354,7 @@ void GrayscaleHistogram::fromMonoMSBImage(const QImage& img, const BinaryImage& 
   const int wpl = img.bytesPerLine() >> 2;
   const int lastWordIdx = (w - 1) >> 5;
   const int lastWordUnusedBits = (((lastWordIdx + 1) << 5) - w);
-  uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
+  uint32_t lastWordMask = ~uint32_t{0} << lastWordUnusedBits;
   const auto* line = (const uint32_t*) img.bits();
   const uint32_t* maskLine = mask.data();
   const int maskWpl = mask.wordsPerLine();
@@ -406,7 +406,7 @@ void GrayscaleHistogram::fromGrayscaleImage(const QImage& img, const BinaryImage
   const uint8_t* line = img.bits();
   const uint32_t* maskLine = mask.data();
   const int maskWpl = mask.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < h; ++y, line += bpl, maskLine += maskWpl) {
     for (int x = 0; x < w; ++x) {
@@ -433,7 +433,7 @@ void GrayscaleHistogram::fromAnyImage(const QImage& img, const BinaryImage& mask
   const int h = img.height();
   const uint32_t* maskLine = mask.data();
   const int maskWpl = mask.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < h; ++y, maskLine += maskWpl) {
     for (int x = 0; x < w; ++x) {

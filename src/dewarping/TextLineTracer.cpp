@@ -2,35 +2,48 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "TextLineTracer.h"
-
-#include <Binarize.h>
-#include <BinaryImage.h>
-#include <Constants.h>
-#include <GaussBlur.h>
-#include <Grayscale.h>
-#include <LocalMinMaxGeneric.h>
-#include <Morphology.h>
-#include <RasterOp.h>
-#include <RasterOpGeneric.h>
-#include <SEDM.h>
-#include <Scale.h>
-#include <SeedFill.h>
-#include <Sobel.h>
-
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
 #include <QPainter>
-#include <cmath>
+#include <QPen>
+#include <Qt>
 
+#include <algorithm>
+#include <cassert>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
+#include <limits>
+#include <utility>
+#include <list>
+#include <vector>
+
+#include "Binarize.h"
+#include "BinaryImage.h"
+#include "BWColor.h"
+#include "Connectivity.h"
+#include "Constants.h"
 #include "DebugImages.h"
 #include "DetectVertContentBounds.h"
 #include "DistortionModel.h"
 #include "DistortionModelBuilder.h"
+#include "GaussBlur.h"
+#include "Grayscale.h"
+#include "Grid.h"
 #include "GridLineTraverser.h"
 #include "LineBoundedByRect.h"
+#include "Morphology.h"
 #include "NumericTraits.h"
+#include "RasterOp.h"
+#include "RasterOpGeneric.h"
+#include "SEDM.h"
+#include "Scale.h"
+#include "SeedFill.h"
+#include "Sobel.h"
 #include "TaskStatus.h"
 #include "TextLineRefiner.h"
 #include "ToLineProjector.h"
 #include "TowardsLineTracer.h"
+#include "VecNT.h"
 
 using namespace imageproc;
 
@@ -41,7 +54,7 @@ void TextLineTracer::trace(const GrayImage& input,
                            DistortionModelBuilder& output,
                            [[maybe_unused]] const TaskStatus& status,
                            DebugImages* dbg) {
-  GrayImage downscaled(downscale(input, dpi));
+  const GrayImage downscaled(downscale(input, dpi));
   if (dbg) {
     dbg->add(static_cast<const QImage&>(downscaled), "downscaled");
   }
@@ -49,8 +62,8 @@ void TextLineTracer::trace(const GrayImage& input,
   const int downscaledWidth = downscaled.width();
   const int downscaledHeight = downscaled.height();
 
-  const double downscaleXFactor = double(downscaledWidth) / input.width();
-  const double downscaleYFactor = double(downscaledHeight) / input.height();
+  const double downscaleXFactor = static_cast<double>(downscaledWidth) / input.width();
+  const double downscaleYFactor = static_cast<double>(downscaledHeight) / input.height();
   QTransform toOrig;
   toOrig.scale(1.0 / downscaleXFactor, 1.0 / downscaleYFactor);
 
@@ -88,7 +101,7 @@ void TextLineTracer::trace(const GrayImage& input,
   if (unitDownVector[1] < 0) {
     unitDownVector = -unitDownVector;
   }
-  TextLineRefiner refiner(downscaled, Dpi(200, 200), unitDownVector);
+  const TextLineRefiner refiner(downscaled, Dpi(200, 200), unitDownVector);
   refiner.refine(polylines, /*iterations=*/100, dbg);
 
   filterEdgyCurves(polylines);
@@ -331,7 +344,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
 
   rasterOpGeneric(initialBinarization, mainGrid.data(), mainGrid.stride(),
       [threshold](auto& dest_val, const auto& src_val) {
-        dest_val = (src_val > threshold) ? uint32_t(1) : uint32_t(0); });
+        dest_val = (src_val > threshold) ? uint32_t{1} : uint32_t{0}; });
 
   if (dbg) {
     dbg->add(initialBinarization, "initialBinarization");
@@ -362,7 +375,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   BinaryImage postBinarization(image.size());
 
   rasterOpGeneric(postBinarization, auxGrid.data(), auxGrid.stride(),
-      [threshold](auto& dest_val, const auto& src_val) { dest_val = (src_val > threshold) ? uint32_t(1) : uint32_t(0); });
+      [threshold](auto& dest_val, const auto& src_val) { dest_val = (src_val > threshold) ? uint32_t{1} : uint32_t{0}; });
 
   if (dbg) {
     dbg->add(postBinarization, "postBinarization");
@@ -371,7 +384,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   BinaryImage obstacles(image.size());
 
   rasterOpGeneric(obstacles, auxGrid.data(), auxGrid.stride(),
-      [threshold](auto& dest_val, const auto& src_val) { dest_val = (src_val < -threshold) ? uint32_t(1) : uint32_t(0); });
+      [threshold](auto& dest_val, const auto& src_val) { dest_val = (src_val < -threshold) ? uint32_t{1} : uint32_t{0}; });
 
   if (dbg) {
     dbg->add(obstacles, "obstacles");
@@ -393,7 +406,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
   const SEDM sedm(postBinarization);
 
   std::vector<QPoint> seeds;
-  QLineF midLine(calcMidLine(bounds.first, bounds.second));
+  const QLineF midLine(calcMidLine(bounds.first, bounds.second));
   findMidLineSeeds(sedm, midLine, seeds);
 
   if (dbg) {
@@ -409,7 +422,7 @@ void TextLineTracer::extractTextLines(std::list<std::vector<QPointF>>& out,
       while (const QPoint* pt = tracer.trace(10.0f)) {
         polyline.emplace_back(*pt);
       }
-      std::reverse(polyline.begin(), polyline.end());
+      std::ranges::reverse(polyline);
     }
 
     polyline.emplace_back(seed);
@@ -480,14 +493,14 @@ QLineF TextLineTracer::calcMidLine(const QLineF& line1, const QLineF& line2) {
     const QPointF p2(ToLineProjector(line1).projectionPoint(p1));
     const QPointF origin(0.5 * (p1 + p2));
     const QPointF vector(line2.p2() - line2.p1());
-    return QLineF(origin, origin + vector);
+    return {origin, origin + vector};
   } else {
     // Lines do intersect.
     Vec2d v1(line1.p2() - line1.p1());
     Vec2d v2(line2.p2() - line2.p1());
     v1 /= std::sqrt(v1.squaredNorm());
     v2 /= std::sqrt(v2.squaredNorm());
-    return QLineF(intersection, QPointF(Vec2d(intersection) + 0.5 * (v1 + v2)));
+    return {intersection, QPointF(Vec2d(intersection) + 0.5 * (v1 + v2))};
   }
 }
 
@@ -533,14 +546,15 @@ QImage TextLineTracer::visualizeGradient(const QImage& background, const Grid<fl
   }
 
   QImage overlay(width, height, QImage::Format_ARGB32_Premultiplied);
-  auto* overlayLine = (uint32_t*) overlay.bits();
+  // NOLINTNEXTLINE(bugprone-casting-through-void,cppcoreguidelines-pro-type-reinterpret-cast)
+  auto* overlayLine = reinterpret_cast<uint32_t*>(overlay.bits());
   const int overlayStride = overlay.bytesPerLine() / 4;
 
   gradLine = grad.data();
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       const float value = gradLine[x] * scale;
-      const int magnitude = qBound(0, static_cast<const int&>(std::round(std::fabs(value))), 255);
+      const int magnitude = std::clamp(static_cast<int>(std::lround(std::abs(value))), 0, 255);
       if (value < 0) {
         overlayLine[x] = qRgba(0, 0, magnitude, magnitude);
       } else {
@@ -615,3 +629,5 @@ QImage TextLineTracer::visualizePolylines(const QImage& background,
   return canvas;
 }
 }  // namespace dewarping
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)

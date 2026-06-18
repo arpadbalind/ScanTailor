@@ -2,8 +2,7 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 
-#ifndef SCANTAILOR_OUTPUT_DESPECKLEVIEW_H_
-#define SCANTAILOR_OUTPUT_DESPECKLEVIEW_H_
+#pragma once
 
 #include <BinaryImage.h>
 
@@ -74,4 +73,3 @@ class DespeckleView : public QStackedWidget {
   bool m_debug;
 };
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_DESPECKLEVIEW_H_

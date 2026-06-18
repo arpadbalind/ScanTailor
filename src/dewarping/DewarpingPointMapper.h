@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_DEWARPING_DEWARPINGPOINTMAPPER_H_
-#define SCANTAILOR_DEWARPING_DEWARPINGPOINTMAPPER_H_
+#pragma once
 
 #include <QtGui/QTransform>
 
@@ -19,7 +18,7 @@ class DewarpingPointMapper {
                        double depthPerception,
                        const QTransform& distortionModelToOutput,
                        const QRect& outputContentRect,
-                       const QTransform& postTransform = QTransform());
+                       QTransform postTransform = QTransform());
 
   /**
    * Similar to CylindricalSurfaceDewarper::mapToDewarpedSpace(),
@@ -46,4 +45,3 @@ class DewarpingPointMapper {
   QTransform m_postTransform;
 };
 }  // namespace dewarping
-#endif  // ifndef SCANTAILOR_DEWARPING_DEWARPINGPOINTMAPPER_H_

@@ -101,12 +101,7 @@ MainWindow::MainWindow()
       m_stages(std::make_shared<StageSequence>(m_pages, newPageSelectionAccessor())),
       m_workerThreadPool(std::make_unique<WorkerThreadPool>()),
       m_interactiveQueue(std::make_unique<ProcessingTaskQueue>()),
-      m_outOfMemoryDialog(std::make_unique<OutOfMemoryDialog>()),
-      m_curFilter(0),
-      m_ignoreSelectionChanges(0),
-      m_ignorePageOrderingChanges(0),
-      m_debug(false),
-      m_closing(false) {
+      m_outOfMemoryDialog(std::make_unique<OutOfMemoryDialog>()) {
   ApplicationSettings& settings = ApplicationSettings::getInstance();
 
   m_maxLogicalThumbSize = settings.getMaxLogicalThumbnailSize();
@@ -517,7 +512,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev) {
       const QPoint& angleDelta = wheelEvent->angleDelta();
       const int wheelDist = angleDelta.x() + angleDelta.y();
       if (std::abs(wheelDist) >= 30) {
-        scaleThumbnails(std::copysign(1, wheelDist));
+        scaleThumbnails((wheelDist >= 0) ? 1 : -1);
       }
       wheelEvent->accept();
       return true;
@@ -600,8 +595,9 @@ std::shared_ptr<const PageOrderProvider> MainWindow::currentPageOrderProvider() 
     return nullptr;
   }
 
+  const auto idxSize_t = static_cast<size_t>(idx);
   const std::shared_ptr<AbstractFilter> filter(m_stages->filterAt(m_curFilter));
-  std::shared_ptr<const PageOrderProvider> currentOrderProvider = filter->pageOrderOptions()[idx].provider();
+  std::shared_ptr<const PageOrderProvider> currentOrderProvider = filter->pageOrderOptions()[idxSize_t].provider();
   return (currentOrderProvider && sortingOrderBtn->isChecked()) ? currentOrderProvider->reversed()
                                                                 : currentOrderProvider;
 }
@@ -738,7 +734,7 @@ void MainWindow::applyImageWidget(QWidget* widget,
     AutoRemovingFile file;
     QString label;
     while (!(file = debugImages->retrieveNext(&label)).get().isNull()) {
-      QWidget* view = new DebugImageView(file);
+      QWidget* view = new DebugImageView(std::move(file));
       m_imageWidgetCleanup.add(view);
       m_tabbedDebugImages->addTab(view, label);
     }
@@ -1039,7 +1035,9 @@ void MainWindow::filterSelectionChanged(const QItemSelection& selected) {
 
   const bool wasBelowFixOrientation = isBelowFixOrientation(m_curFilter);
   const bool wasBelowSelectContent = isBelowSelectContent(m_curFilter);
-  m_curFilter = selected.front().top();
+  auto selectedFront = selected.front().top();
+  assert(selectedFront>0);
+  m_curFilter = static_cast<size_t>(selectedFront);
   const bool nowBelowFixOrientation = isBelowFixOrientation(m_curFilter);
   const bool nowBelowSelectContent = isBelowSelectContent(m_curFilter);
 
@@ -1133,8 +1131,9 @@ void MainWindow::startBatchProcessing() {
 
   m_batchQueue = std::make_unique<ProcessingTaskQueue>();
   PageInfo page(m_thumbSequence->selectionLeader());
+  const size_t stagesCount{ m_stages->count() };
   for (; !page.isNull(); page = m_thumbSequence->nextPage(page.id())) {
-    for (int i = 0; i < m_stages->count(); i++) {
+    for (size_t i = 0; i < stagesCount; ++i) {
       m_stages->filterAt(i)->loadDefaultSettings(page);
     }
     m_batchQueue->addProcessingTask(page, createCompositeTask(page, m_curFilter, /*batch=*/true, m_debug));
@@ -1210,12 +1209,13 @@ void MainWindow::filterResult(const BackgroundTaskPtr& task, const FilterResultP
       // Error loading file.  No special action is necessary.
     } else if (result->filter() != m_stages->filterAt(m_curFilter)) {
       // Error from one of the previous filters.
-      const int idx = m_stages->findFilter(result->filter());
-      assert(idx >= 0);
-      m_curFilter = idx;
+
+      const auto idxOpt = m_stages->findFilter(result->filter());
+      assert(idxOpt);
+      m_curFilter = *idxOpt;
 
       ScopedIncDec<int> selectionGuard(m_ignoreSelectionChanges);
-      filterList->selectRow(idx);
+      filterList->selectRow(static_cast<int>(*idxOpt));
     }
   }
 
@@ -1249,11 +1249,11 @@ void MainWindow::filterResult(const BackgroundTaskPtr& task, const FilterResultP
     }
 
     do {
-      const BackgroundTaskPtr task(m_batchQueue->takeForProcessing());
-      if (!task) {
+      const BackgroundTaskPtr bgTask(m_batchQueue->takeForProcessing());
+      if (!bgTask) {
         break;
       }
-      m_workerThreadPool->submitTask(task);
+      m_workerThreadPool->submitTask(bgTask);
     } while (m_workerThreadPool->hasSpareCapacity());
 
     const PageInfo page(m_batchQueue->selectedPage());
@@ -1537,11 +1537,11 @@ bool MainWindow::isBelowSelectContent() const {
   return isBelowSelectContent(m_curFilter);
 }
 
-bool MainWindow::isBelowSelectContent(const int filterIdx) const {
+bool MainWindow::isBelowSelectContent(size_t filterIdx) const {
   return filterIdx > m_stages->selectContentFilterIdx();
 }
 
-bool MainWindow::isBelowFixOrientation(int filterIdx) const {
+bool MainWindow::isBelowFixOrientation(size_t filterIdx) const {
   return filterIdx > m_stages->fixOrientationFilterIdx();
 }
 
@@ -1549,7 +1549,7 @@ bool MainWindow::isOutputFilter() const {
   return isOutputFilter(m_curFilter);
 }
 
-bool MainWindow::isOutputFilter(const int filterIdx) const {
+bool MainWindow::isOutputFilter(size_t filterIdx) const {
   return filterIdx == m_stages->outputFilterIdx();
 }
 
@@ -1608,7 +1608,7 @@ void MainWindow::loadPageInteractive(const PageInfo& page) {
     return;
   }
 
-  for (int i = 0; i < m_stages->count(); i++) {
+  for (size_t i = 0; i < m_stages->count(); i++) {
     m_stages->filterAt(i)->loadDefaultSettings(page);
   }
 
@@ -1958,7 +1958,7 @@ void MainWindow::eraseOutputFiles(const std::set<PageId>& pages) {
 }
 
 BackgroundTaskPtr MainWindow::createCompositeTask(const PageInfo& page,
-                                                  const int lastFilterIdx,
+                                                  const size_t lastFilterIdx,
                                                   const bool batch,
                                                   bool debug) {
   std::shared_ptr<fix_orientation::Task> fixOrientationTask;
@@ -2000,7 +2000,7 @@ BackgroundTaskPtr MainWindow::createCompositeTask(const PageInfo& page,
                                         m_thumbnailCache, m_pages, fixOrientationTask);
 }  // MainWindow::createCompositeTask
 
-std::shared_ptr<CompositeCacheDrivenTask> MainWindow::createCompositeCacheDrivenTask(const int lastFilterIdx) {
+std::shared_ptr<CompositeCacheDrivenTask> MainWindow::createCompositeCacheDrivenTask(const size_t lastFilterIdx) {
   std::shared_ptr<fix_orientation::CacheDrivenTask> fixOrientationTask;
   std::shared_ptr<page_split::CacheDrivenTask> pageSplitTask;
   std::shared_ptr<deskew::CacheDrivenTask> deskewTask;
@@ -2102,10 +2102,20 @@ void MainWindow::execGotoPageDialog() {
   bool ok;
   const PageSequence pageSequence = m_thumbSequence->toPageSequence();
   const auto selectionLeader = m_thumbSequence->selectionLeader().id();
+
+  const auto pageNo = pageSequence.pageNo(selectionLeader);
+  const auto page = static_cast<int>(pageNo);
+
   int pageNumber = QInputDialog::getInt(this, tr("Go To Page"), tr("Enter the page number:"),
-                                        pageSequence.pageNo(selectionLeader) + 1, 1, pageSequence.numPages(), 1, &ok);
+                    page + 1, 1, static_cast<int>(pageSequence.numPages()), 1, &ok);
   if (ok) {
-    const PageId& newSelectionLeader = pageSequence.pageAt(pageNumber - 1).id();
+    if(pageNumber <= 0){
+      return;
+    }
+
+    const std::size_t idx = static_cast<std::size_t>(pageNumber);
+    const PageId& newSelectionLeader =  pageSequence.pageAt(idx - 1).id();
+
     if (selectionLeader != newSelectionLeader) {
       goToPage(newSelectionLeader);
     }

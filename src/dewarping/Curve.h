@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_DEWARPING_CURVE_H_
-#define SCANTAILOR_DEWARPING_CURVE_H_
+#pragma once
 
 #include <QPointF>
 #include <vector>
@@ -26,13 +25,13 @@ class Curve {
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  bool isValid() const;
+  [[nodiscard]] bool isValid() const;
 
-  bool matches(const Curve& other) const;
+  [[nodiscard]] bool matches(const Curve& other) const;
 
-  const XSpline& xspline() const { return m_xspline; }
+  [[nodiscard]] const XSpline& xspline() const { return m_xspline; }
 
-  const std::vector<QPointF>& polyline() const { return m_polyline; }
+  [[nodiscard]] const std::vector<QPointF>& polyline() const { return m_polyline; }
 
   static bool splineHasLoops(const XSpline& spline);
 
@@ -53,4 +52,3 @@ class Curve {
   std::vector<QPointF> m_polyline;
 };
 }  // namespace dewarping
-#endif  // ifndef SCANTAILOR_DEWARPING_CURVE_H_
