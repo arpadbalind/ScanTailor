@@ -64,7 +64,7 @@ class SEDM {
    * distance to, and borders are to DIST_TO_NO_BORDERS,
    * then the whole distance map will consist of these values.
    */
-  static const uint32_t INF_DIST;
+  static constexpr uint32_t INF_DIST = ~uint32_t{0} - 1;
 
   /**
    * \brief Constructs a null distance map.

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_DEWARPING_DISTORTIONMODEL_H_
-#define SCANTAILOR_DEWARPING_DISTORTIONMODEL_H_
+#pragma once
 
 #include "Curve.h"
 
@@ -30,23 +29,23 @@ class DistortionModel {
    * Returns true if the model is not null and in addition meets certain
    * criteria, like curve endpoints forming a convex quadrilateral.
    */
-  bool isValid() const;
+  [[nodiscard]] bool isValid() const;
 
   void setTopCurve(const Curve& curve) { m_topCurve = curve; }
 
   void setBottomCurve(const Curve& curve) { m_bottomCurve = curve; }
 
-  const Curve& topCurve() const { return m_topCurve; }
+  [[nodiscard]] const Curve& topCurve() const { return m_topCurve; }
 
-  const Curve& bottomCurve() const { return m_bottomCurve; }
+  [[nodiscard]] const Curve& bottomCurve() const { return m_bottomCurve; }
 
-  bool matches(const DistortionModel& other) const;
+  [[nodiscard]] bool matches(const DistortionModel& other) const;
 
   /**
    * Model domain is a rectangle in output image coordinates that
    * will be mapped to our curved quadrilateral.
    */
-  QRectF modelDomain(const CylindricalSurfaceDewarper& dewarper,
+  [[nodiscard]] QRectF modelDomain(const CylindricalSurfaceDewarper& dewarper,
                      const QTransform& toOutput,
                      const QRectF& outputContentRect) const;
 
@@ -58,10 +57,9 @@ class DistortionModel {
    *        where curve points are defined, to the desired coordinate
    *        system, for example to output image coordinates.
    */
-  QRectF boundingBox(const QTransform& transform) const;
+  [[nodiscard]] QRectF boundingBox(const QTransform& transform) const;
 
   Curve m_topCurve;
   Curve m_bottomCurve;
 };
 }  // namespace dewarping
-#endif  // ifndef SCANTAILOR_DEWARPING_DISTORTIONMODEL_H_

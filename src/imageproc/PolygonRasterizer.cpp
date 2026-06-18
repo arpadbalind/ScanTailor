@@ -298,7 +298,7 @@ void PolygonRasterizer::Rasterizer::fillBinary(BinaryImage& image, const BWColor
 
   uint32_t* line = image.data();
   const int wpl = image.wordsPerLine();
-  const uint32_t pattern = (color == BWColor::WHITE) ? 0 : ~uint32_t(0);
+  const uint32_t pattern = (color == BWColor::WHITE) ? 0 : ~uint32_t{0};
 
   int i = qRound(m_boundingBox.top());
   line += i * wpl;
@@ -433,7 +433,7 @@ void PolygonRasterizer::Rasterizer::fillBinarySegment(const int xFrom,
     return;
   }
 
-  const uint32_t fullMask = ~uint32_t(0);
+  const uint32_t fullMask = ~uint32_t{0};
   const uint32_t firstWordMask = fullMask >> (xFrom & 31);
   const uint32_t lastWordMask = fullMask << (31 - ((xTo - 1) & 31));
   const int firstWordIdx = xFrom >> 5;

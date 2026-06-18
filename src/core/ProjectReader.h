@@ -51,11 +51,10 @@ class ProjectReader {
  private:
   struct FileRecord {
     QString filePath;
-    bool compatMultiPage;  // Backwards compatibility.
+    bool compatMultiPage{ false };
 
-    FileRecord() : compatMultiPage(false) {}
-
-    FileRecord(const QString& filePath, bool compatMultiPage) : filePath(filePath), compatMultiPage(compatMultiPage) {}
+    FileRecord() = default;
+    FileRecord(const QString& pFilePath, bool pCompatMultiPage) : filePath(pFilePath), compatMultiPage(pCompatMultiPage) {}
   };
 
   using DirMap = std::unordered_map<int, QString>;

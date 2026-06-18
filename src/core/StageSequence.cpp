@@ -3,6 +3,9 @@
 
 #include "StageSequence.h"
 
+#include <ranges>
+#include <optional>
+
 #include "ProjectPages.h"
 
 StageSequence::StageSequence(const std::shared_ptr<ProjectPages>& pages,
@@ -13,22 +16,22 @@ StageSequence::StageSequence(const std::shared_ptr<ProjectPages>& pages,
       m_selectContentFilter(std::make_shared<select_content::Filter>(pageSelectionAccessor)),
       m_pageLayoutFilter(std::make_shared<page_layout::Filter>(pages, pageSelectionAccessor)),
       m_outputFilter(std::make_shared<output::Filter>(pageSelectionAccessor)) {
-  m_fixOrientationFilterIdx = static_cast<int>(m_filters.size());
+  m_fixOrientationFilterIdx = m_filters.size();
   m_filters.emplace_back(m_fixOrientationFilter);
 
-  m_pageSplitFilterIdx = static_cast<int>(m_filters.size());
+  m_pageSplitFilterIdx = m_filters.size();
   m_filters.emplace_back(m_pageSplitFilter);
 
-  m_deskewFilterIdx = static_cast<int>(m_filters.size());
+  m_deskewFilterIdx = m_filters.size();
   m_filters.emplace_back(m_deskewFilter);
 
-  m_selectContentFilterIdx = static_cast<int>(m_filters.size());
+  m_selectContentFilterIdx = m_filters.size();
   m_filters.emplace_back(m_selectContentFilter);
 
-  m_pageLayoutFilterIdx = static_cast<int>(m_filters.size());
+  m_pageLayoutFilterIdx = m_filters.size();
   m_filters.emplace_back(m_pageLayoutFilter);
 
-  m_outputFilterIdx = static_cast<int>(m_filters.size());
+  m_outputFilterIdx = m_filters.size();
   m_filters.emplace_back(m_outputFilter);
 }
 
@@ -38,13 +41,12 @@ void StageSequence::performRelinking(const AbstractRelinker& relinker) {
   }
 }
 
-int StageSequence::findFilter(const FilterPtr& filter) const {
-  int idx = 0;
-  for (const FilterPtr& f : m_filters) {
-    if (f == filter) {
-      return idx;
-    }
-    ++idx;
-  }
-  return -1;
+std::optional<std::size_t> StageSequence::findFilter(const FilterPtr& filter) const
+{
+  auto it = std::ranges::find(m_filters, filter);
+
+  if (it == m_filters.end())
+    return std::nullopt;
+
+  return static_cast<std::size_t>(std::distance(m_filters.begin(), it));
 }

@@ -8,6 +8,7 @@
 #include <QRectF>
 #include <list>
 #include <utility>
+#include <span>
 #include <vector>
 
 #include "Grid.h"
@@ -76,7 +77,7 @@ class TopBottomEdgeTracer {
 
   static void upTheHillSnake(std::vector<QPointF>& snake, const Grid<GridNode>& grid, Vec2f dir);
 
-  static int initDisplacementVectors(Vec2f vectors[], Vec2f validDirection);
+  static int initDisplacementVectors(std::span<Vec2f> vectors, Vec2f validDirection);
 
   template <typename Extractor>
   static float interpolatedGridValue(const Grid<GridNode>& grid, Extractor extractor, Vec2f pos, float defaultValue);

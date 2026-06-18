@@ -4,6 +4,8 @@
 #pragma once
 
 #include <memory>
+#include <ranges>
+#include <optional>
 #include <vector>
 
 #include "AbstractFilter.h"
@@ -33,11 +35,11 @@ class StageSequence : private NonCopyable {
 
   const std::vector<FilterPtr>& filters() const { return m_filters; }
 
-  int count() const { return static_cast<int>(m_filters.size()); }
+  size_t count() const { return m_filters.size(); }
 
-  const FilterPtr& filterAt(int idx) const { return m_filters[idx]; }
+  const FilterPtr& filterAt(size_t idx) const { return m_filters[idx]; }
 
-  int findFilter(const FilterPtr& filter) const;
+  std::optional<std::size_t> findFilter(const FilterPtr& filter) const;
 
   const std::shared_ptr<fix_orientation::Filter>& fixOrientationFilter() const { return m_fixOrientationFilter; }
 
@@ -51,17 +53,17 @@ class StageSequence : private NonCopyable {
 
   const std::shared_ptr<output::Filter>& outputFilter() const { return m_outputFilter; }
 
-  int fixOrientationFilterIdx() const { return m_fixOrientationFilterIdx; }
+  size_t fixOrientationFilterIdx() const { return m_fixOrientationFilterIdx; }
 
-  int pageSplitFilterIdx() const { return m_pageSplitFilterIdx; }
+  size_t pageSplitFilterIdx() const { return m_pageSplitFilterIdx; }
 
-  int deskewFilterIdx() const { return m_deskewFilterIdx; }
+  size_t deskewFilterIdx() const { return m_deskewFilterIdx; }
 
-  int selectContentFilterIdx() const { return m_selectContentFilterIdx; }
+  size_t selectContentFilterIdx() const { return m_selectContentFilterIdx; }
 
-  int pageLayoutFilterIdx() const { return m_pageLayoutFilterIdx; }
+  size_t pageLayoutFilterIdx() const { return m_pageLayoutFilterIdx; }
 
-  int outputFilterIdx() const { return m_outputFilterIdx; }
+  size_t outputFilterIdx() const { return m_outputFilterIdx; }
 
  private:
   std::shared_ptr<fix_orientation::Filter> m_fixOrientationFilter;
@@ -71,10 +73,10 @@ class StageSequence : private NonCopyable {
   std::shared_ptr<page_layout::Filter> m_pageLayoutFilter;
   std::shared_ptr<output::Filter> m_outputFilter;
   std::vector<FilterPtr> m_filters;
-  int m_fixOrientationFilterIdx;
-  int m_pageSplitFilterIdx;
-  int m_deskewFilterIdx;
-  int m_selectContentFilterIdx;
-  int m_pageLayoutFilterIdx;
-  int m_outputFilterIdx;
+  size_t m_fixOrientationFilterIdx{ 0 };
+  size_t m_pageSplitFilterIdx{ 0 };
+  size_t m_deskewFilterIdx{ 0 };
+  size_t m_selectContentFilterIdx { 0 };
+  size_t m_pageLayoutFilterIdx{ 0 };
+  size_t m_outputFilterIdx{ 0 };
 };

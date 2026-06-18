@@ -43,9 +43,9 @@ void SlicedHistogram::processHorizontalLines(const BinaryImage& image, const QRe
   const int wpl = image.wordsPerLine();
   const int firstWordIdx = area.left() >> 5;
   const int lastWordIdx = area.right() >> 5;  // area.right() is within area
-  const uint32_t firstWordMask = ~uint32_t(0) >> (area.left() & 31);
+  const uint32_t firstWordMask = ~uint32_t{0} >> (area.left() & 31);
   const int lastWordUnusedBits = (lastWordIdx << 5) + 31 - area.right();
-  const uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
+  const uint32_t lastWordMask = ~uint32_t{0} << lastWordUnusedBits;
   const uint32_t* line = image.data() + top * wpl;
 
   if (firstWordIdx == lastWordIdx) {

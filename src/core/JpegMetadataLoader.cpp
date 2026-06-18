@@ -209,7 +209,7 @@ ImageMetadataLoader::Status JpegMetadataLoader::loadMetadata(QIODevice& ioDevice
     dpi = Dpi(cinfo->X_density, cinfo->Y_density);
   } else if (cinfo->density_unit == 2) {
     // Dots per centimeter.
-    dpi = Dpm(cinfo->X_density * 100, cinfo->Y_density * 100);
+    dpi = static_cast<Dpi>(Dpm(cinfo->X_density * 100, cinfo->Y_density * 100));
   }
 
   out(ImageMetadata(size, dpi));

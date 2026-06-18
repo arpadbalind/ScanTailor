@@ -20,6 +20,7 @@ class GrayscaleHistogram;
 class BinaryThreshold {
   // Member-wise copying is OK.
  public:
+  static constexpr unsigned MIN_EDGE_MAGNITUDE{ 20 };
   /**
    * \brief Finds the threshold using Otsu’s thresholding method.
    */
@@ -47,7 +48,7 @@ class BinaryThreshold {
    * \param minEdgeMagnitude The minimum color difference in a gradient.
    * \return A black and white image.
    */
-  static BinaryThreshold mokjiThreshold(const QImage& image, unsigned maxEdgeWidth = 3, unsigned minEdgeMagnitude = 20);
+  static BinaryThreshold mokjiThreshold(const QImage& image, unsigned maxEdgeWidth = 3, unsigned minEdgeMagnitude = MIN_EDGE_MAGNITUDE);
 
   explicit BinaryThreshold(int threshold) : m_threshold(threshold) {}
 

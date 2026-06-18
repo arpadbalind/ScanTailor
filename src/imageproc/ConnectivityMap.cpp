@@ -11,7 +11,7 @@
 #include "InfluenceMap.h"
 
 namespace imageproc {
-const uint32_t ConnectivityMap::BACKGROUND = ~uint32_t(0);
+const uint32_t ConnectivityMap::BACKGROUND = ~uint32_t{0};
 const uint32_t ConnectivityMap::UNTAGGED_FG = BACKGROUND - 1;
 
 ConnectivityMap::ConnectivityMap() : m_plainData(nullptr), m_size(), m_stride(0), m_maxLabel(0) {}
@@ -48,7 +48,7 @@ ConnectivityMap::ConnectivityMap(const BinaryImage& image, const Connectivity co
   const uint32_t* src = image.data();
   const int srcStride = image.wordsPerLine();
 
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (src[x >> 5] & (msb >> (x & 31))) {
@@ -124,7 +124,7 @@ void ConnectivityMap::addComponent(const BinaryImage& image) {
   const int srcStride = image.wordsPerLine();
 
   const uint32_t newLabel = m_maxLabel + 1;
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (src[x >> 5] & (msb >> (x & 31))) {
@@ -225,7 +225,7 @@ BinaryImage ConnectivityMap::getBinaryMask() const {
   const uint32_t* srcLine = m_plainData;
   const int srcStride = m_stride;
 
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (srcLine[x] != 0) {
@@ -269,7 +269,7 @@ QImage ConnectivityMap::visualized(QColor bgColor) const {
 
       const int bitsUnused = countMostSignificantZeroes(val);
       const uint32_t reversed = reverseBits(val) >> bitsUnused;
-      const uint32_t mask = ~uint32_t(0) >> bitsUnused;
+      const uint32_t mask = ~uint32_t{0} >> bitsUnused;
 
       const double H = 0.99 * (double(reversed) / mask);
       const double S = 1.0;

@@ -5,13 +5,7 @@
 
 #include <QFile>
 
-AutoRemovingFile::AutoRemovingFile() = default;
-
-AutoRemovingFile::AutoRemovingFile(const QString& filePath) : m_file(filePath) {}
-
-AutoRemovingFile::AutoRemovingFile(AutoRemovingFile& other) : m_file(other.release()) {}
-
-AutoRemovingFile::AutoRemovingFile(CopyHelper other) : m_file(other.obj->release()) {}
+AutoRemovingFile::AutoRemovingFile(QString filePath) : m_file(std::move(filePath)) {}
 
 AutoRemovingFile::~AutoRemovingFile() {
   if (!m_file.isEmpty()) {
@@ -19,13 +13,20 @@ AutoRemovingFile::~AutoRemovingFile() {
   }
 }
 
-AutoRemovingFile& AutoRemovingFile::operator=(AutoRemovingFile& other) {
-  m_file = other.release();
-  return *this;
+AutoRemovingFile::AutoRemovingFile(AutoRemovingFile&& other) noexcept : m_file(std::move(other.m_file)) {
+  other.m_file.clear();
 }
 
-AutoRemovingFile& AutoRemovingFile::operator=(CopyHelper other) {
-  m_file = other.obj->release();
+AutoRemovingFile& AutoRemovingFile::operator=(AutoRemovingFile&& other) noexcept {
+  if (this != &other) {
+    if (!m_file.isEmpty()) {
+      QFile::remove(m_file);
+    }
+
+    m_file = std::move(other.m_file);
+    other.m_file.clear();
+  }
+
   return *this;
 }
 

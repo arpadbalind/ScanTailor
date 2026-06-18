@@ -2,14 +2,21 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "RasterDewarper.h"
-
-#include <ColorMixer.h>
-#include <GrayImage.h>
-
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
 #include <QDebug>
+
+#include <array>
+#include <cassert>
 #include <cmath>
+#include <cstdint>
+#include <stdexcept>
+#include <vector>
 
 #include "CylindricalSurfaceDewarper.h"
+#include "ColorMixer.h"
+#include "GrayImage.h"
+#include "HomographicTransform.h"
+#include "VecNT.h"
 
 #define INTERP_NONE 0
 #define INTERP_BILLINEAR 1
@@ -150,16 +157,16 @@ void areaMapGeneratrix(const PixelType* const srcData,
                        const PixelType bgColor,
                        const std::vector<Vec2f>& prevGridColumn,
                        const std::vector<Vec2f>& nextGridColumn) {
-  const int sw = srcSize.width();
-  const int sh = srcSize.height();
-  const int dstHeight = dstSize.height();
+  const auto sw = static_cast<uint32_t>(srcSize.width());
+  const auto sh = static_cast<uint32_t>(srcSize.height());
+  const auto dstHeight = static_cast<uint32_t>(dstSize.height());
 
   const Vec2f* srcLeftPoints = &prevGridColumn[0];
   const Vec2f* srcRightPoints = &nextGridColumn[0];
 
-  Vec2f f_src32_quad[4];
+  std::array<Vec2f, 4> f_src32_quad{};
 
-  for (int dstY = 0; dstY < dstHeight; ++dstY) {
+  for (uint32_t dstY = 0; dstY < dstHeight; ++dstY) {
     // Take a mid-point of each edge, pre-multiply by 32,
     // write the result to f_src32_quad. 16 comes from 32*0.5
     f_src32_quad[0] = 16.0f * (srcLeftPoints[0] + srcRightPoints[0]);
@@ -191,7 +198,7 @@ void areaMapGeneratrix(const PixelType* const srcData,
     }
 
     if ((fSrc32Top < -32.0f * 10000.0f) || (fSrc32Left < -32.0f * 10000.0f)
-        || (fSrc32Bottom > 32.0f * (float(sh) + 10000.f)) || (fSrc32Right > 32.0f * (float(sw) + 10000.f))) {
+        || (fSrc32Bottom > 32.0f * (static_cast<float>(sh) + 10000.f)) || (fSrc32Right > 32.0f * (static_cast<float>(sw) + 10000.f))) {
       // This helps to prevent integer overflows.
       *pDst = bgColor;
       pDst += dstStride;
@@ -204,14 +211,14 @@ void areaMapGeneratrix(const PixelType* const srcData,
     // Note that without using std::floor() and std::ceil()
     // we can't guarantee that srcBottom >= srcTop
     // and srcRight >= srcLeft.
-    auto src32Left = (int) std::floor(fSrc32Left);
-    auto src32Right = (int) std::ceil(fSrc32Right);
-    auto src32Top = (int) std::floor(fSrc32Top);
-    auto src32Bottom = (int) std::ceil(fSrc32Bottom);
-    int srcLeft = src32Left >> 5;
-    int srcRight = (src32Right - 1) >> 5;  // inclusive
-    int srcTop = src32Top >> 5;
-    int srcBottom = (src32Bottom - 1) >> 5;  // inclusive
+    auto src32Left = static_cast<uint32_t>(std::floor(fSrc32Left));
+    auto src32Right = static_cast<uint32_t>(std::ceil(fSrc32Right));
+    auto src32Top = static_cast<uint32_t>(std::floor(fSrc32Top));
+    auto src32Bottom = static_cast<uint32_t>(std::ceil(fSrc32Bottom));
+    uint32_t srcLeft = src32Left >> 5u;
+    uint32_t srcRight = (src32Right - 1u) >> 5u;  // inclusive
+    uint32_t srcTop = src32Top >> 5u;
+    uint32_t srcBottom = (src32Bottom - 1u) >> 5u;  // inclusive
     assert(srcBottom >= srcTop);
     assert(srcRight >= srcLeft);
 
@@ -232,43 +239,43 @@ void areaMapGeneratrix(const PixelType* const srcData,
      * works correctly with both positive and negative src32Top.
      */
 
-    unsigned backgroundArea = 0;
+    uint32_t backgroundArea = 0;
 
     if (srcTop < 0) {
-      const unsigned topFraction = 32 - (src32Top & 31);
-      const unsigned horFraction = src32Right - src32Left;
+      const uint32_t topFraction = 32 - (src32Top & 31u);
+      const uint32_t horFraction = src32Right - src32Left;
       backgroundArea += topFraction * horFraction;
-      const unsigned fullPixelsVer = -1 - srcTop;
-      backgroundArea += horFraction * (fullPixelsVer << 5);
+      const uint32_t fullPixelsVer = -1 - srcTop;
+      backgroundArea += horFraction * (fullPixelsVer << 5u);
       srcTop = 0;
       src32Top = 0;
     }
     if (srcBottom >= sh) {
-      const unsigned bottomFraction = src32Bottom - (srcBottom << 5);
-      const unsigned horFraction = src32Right - src32Left;
+      const uint32_t bottomFraction = src32Bottom - (srcBottom << 5u);
+      const uint32_t horFraction = src32Right - src32Left;
       backgroundArea += bottomFraction * horFraction;
-      const unsigned fullPixelsVer = srcBottom - sh;
-      backgroundArea += horFraction * (fullPixelsVer << 5);
-      srcBottom = sh - 1;     // inclusive
-      src32Bottom = sh << 5;  // exclusive
+      const uint32_t fullPixelsVer = srcBottom - sh;
+      backgroundArea += horFraction * (fullPixelsVer << 5u);
+      srcBottom = sh - 1u;     // inclusive
+      src32Bottom = sh << 5u;  // exclusive
     }
     if (srcLeft < 0) {
-      const unsigned leftFraction = 32 - (src32Left & 31);
-      const unsigned vertFraction = src32Bottom - src32Top;
+      const uint32_t leftFraction = 32u - (src32Left & 31u);
+      const uint32_t vertFraction = src32Bottom - src32Top;
       backgroundArea += leftFraction * vertFraction;
-      const unsigned fullPixelsHor = -1 - srcLeft;
-      backgroundArea += vertFraction * (fullPixelsHor << 5);
+      const uint32_t fullPixelsHor = -1 - srcLeft;
+      backgroundArea += vertFraction * (fullPixelsHor << 5u);
       srcLeft = 0;
       src32Left = 0;
     }
     if (srcRight >= sw) {
-      const unsigned rightFraction = src32Right - (srcRight << 5);
-      const unsigned vertFraction = src32Bottom - src32Top;
+      const uint32_t rightFraction = src32Right - (srcRight << 5u);
+      const uint32_t vertFraction = src32Bottom - src32Top;
       backgroundArea += rightFraction * vertFraction;
-      const unsigned fullPixelsHor = srcRight - sw;
-      backgroundArea += vertFraction * (fullPixelsHor << 5);
-      srcRight = sw - 1;     // inclusive
-      src32Right = sw << 5;  // exclusive
+      const uint32_t fullPixelsHor = srcRight - sw;
+      backgroundArea += vertFraction * (fullPixelsHor << 5u);
+      srcRight = sw - 1u;     // inclusive
+      src32Right = sw << 5u;  // exclusive
     }
     assert(srcBottom >= srcTop);
     assert(srcRight >= srcLeft);
@@ -280,24 +287,24 @@ void areaMapGeneratrix(const PixelType* const srcData,
     mixer.add(bgColor, backgroundArea);
     // }
 
-    const unsigned leftFraction = 32 - (src32Left & 31);
-    const unsigned topFraction = 32 - (src32Top & 31);
-    const unsigned rightFraction = src32Right - (srcRight << 5);
-    const unsigned bottomFraction = src32Bottom - (srcBottom << 5);
+    const uint32_t leftFraction = 32 - (src32Left & 31u);
+    const uint32_t topFraction = 32 - (src32Top & 31u);
+    const uint32_t rightFraction = src32Right - (srcRight << 5u);
+    const uint32_t bottomFraction = src32Bottom - (srcBottom << 5u);
 
     assert(leftFraction + rightFraction + (srcRight - srcLeft - 1) * 32
-           == static_cast<unsigned>(src32Right - src32Left));
+           == static_cast<uint32_t>(src32Right - src32Left));
     assert(topFraction + bottomFraction + (srcBottom - srcTop - 1) * 32
-           == static_cast<unsigned>(src32Bottom - src32Top));
+           == static_cast<uint32_t>(src32Bottom - src32Top));
 
-    const unsigned srcArea = (src32Bottom - src32Top) * (src32Right - src32Left);
+    const uint32_t srcArea = (src32Bottom - src32Top) * (src32Right - src32Left);
     if (srcArea == 0) {
       *pDst = bgColor;
       pDst += dstStride;
       continue;
     }
 
-    const PixelType* srcLine = &srcData[srcTop * srcStride];
+    const PixelType* srcLine = &srcData[static_cast<size_t>(srcTop) * srcStride];
 
     if (srcTop == srcBottom) {
       if (srcLeft == srcRight) {
@@ -312,14 +319,14 @@ void areaMapGeneratrix(const PixelType* const srcData,
         mixer.add(c, srcArea);
       } else {
         // dst pixel maps to a horizontal line of src pixels
-        const unsigned vertFraction = src32Bottom - src32Top;
-        const unsigned leftArea = vertFraction * leftFraction;
-        const unsigned middleArea = vertFraction << 5;
-        const unsigned rightArea = vertFraction * rightFraction;
+        const uint32_t vertFraction = src32Bottom - src32Top;
+        const uint32_t leftArea = vertFraction * leftFraction;
+        const uint32_t middleArea = vertFraction << 5u;
+        const uint32_t rightArea = vertFraction * rightFraction;
 
         mixer.add(srcLine[srcLeft], leftArea);
 
-        for (int sx = srcLeft + 1; sx < srcRight; ++sx) {
+        for (uint32_t sx = srcLeft + 1; sx < srcRight; ++sx) {
           mixer.add(srcLine[sx], middleArea);
         }
 
@@ -327,17 +334,17 @@ void areaMapGeneratrix(const PixelType* const srcData,
       }
     } else if (srcLeft == srcRight) {
       // dst pixel maps to a vertical line of src pixels
-      const unsigned horFraction = src32Right - src32Left;
-      const unsigned topArea = horFraction * topFraction;
-      const unsigned middleArea = horFraction << 5;
-      const unsigned bottomArea = horFraction * bottomFraction;
+      const uint32_t horFraction = src32Right - src32Left;
+      const uint32_t topArea = horFraction * topFraction;
+      const uint32_t middleArea = horFraction << 5u;
+      const uint32_t bottomArea = horFraction * bottomFraction;
 
       srcLine += srcLeft;
       mixer.add(*srcLine, topArea);
 
       srcLine += srcStride;
 
-      for (int sy = srcTop + 1; sy < srcBottom; ++sy) {
+      for (uint32_t sy = srcTop + 1; sy < srcBottom; ++sy) {
         mixer.add(*srcLine, middleArea);
         srcLine += srcStride;
       }
@@ -345,20 +352,20 @@ void areaMapGeneratrix(const PixelType* const srcData,
       mixer.add(*srcLine, bottomArea);
     } else {
       // dst pixel maps to a block of src pixels
-      const unsigned topArea = topFraction << 5;
-      const unsigned bottomArea = bottomFraction << 5;
-      const unsigned leftArea = leftFraction << 5;
-      const unsigned rightArea = rightFraction << 5;
-      const unsigned topleftArea = topFraction * leftFraction;
-      const unsigned toprightArea = topFraction * rightFraction;
-      const unsigned bottomleftArea = bottomFraction * leftFraction;
-      const unsigned bottomrightArea = bottomFraction * rightFraction;
+      const uint32_t topArea = topFraction << 5u;
+      const uint32_t bottomArea = bottomFraction << 5u;
+      const uint32_t leftArea = leftFraction << 5u;
+      const uint32_t rightArea = rightFraction << 5u;
+      const uint32_t topleftArea = topFraction * leftFraction;
+      const uint32_t toprightArea = topFraction * rightFraction;
+      const uint32_t bottomleftArea = bottomFraction * leftFraction;
+      const uint32_t bottomrightArea = bottomFraction * rightFraction;
 
       // process the top-left corner
       mixer.add(srcLine[srcLeft], topleftArea);
 
       // process the top line (without corners)
-      for (int sx = srcLeft + 1; sx < srcRight; ++sx) {
+      for (uint32_t sx = srcLeft + 1; sx < srcRight; ++sx) {
         mixer.add(srcLine[sx], topArea);
       }
 
@@ -367,10 +374,10 @@ void areaMapGeneratrix(const PixelType* const srcData,
 
       srcLine += srcStride;
       // process middle lines
-      for (int sy = srcTop + 1; sy < srcBottom; ++sy) {
+      for (uint32_t sy = srcTop + 1; sy < srcBottom; ++sy) {
         mixer.add(srcLine[srcLeft], leftArea);
 
-        for (int sx = srcLeft + 1; sx < srcRight; ++sx) {
+        for (uint32_t sx = srcLeft + 1; sx < srcRight; ++sx) {
           mixer.add(srcLine[sx], 32 * 32);
         }
 
@@ -383,7 +390,7 @@ void areaMapGeneratrix(const PixelType* const srcData,
       mixer.add(srcLine[srcLeft], bottomleftArea);
 
       // process the bottom line (without corners)
-      for (int sx = srcLeft + 1; sx < srcRight; ++sx) {
+      for (uint32_t sx = srcLeft + 1; sx < srcRight; ++sx) {
         mixer.add(srcLine[sx], bottomArea);
       }
       // process the bottom-right corner
@@ -429,7 +436,7 @@ void dewarpGeneric(const PixelType* const srcData,
     const Vec2f origin(generatrix.imgLine.p1());
     const Vec2f vec(generatrix.imgLine.p2() - generatrix.imgLine.p1());
     for (int dstY = 0; dstY <= dstHeight; ++dstY) {
-      const float modelY = (float(dstY) - modelDomainTop) * modelYScale;
+      const float modelY = (static_cast<float>(dstY) - modelDomainTop) * modelYScale;
       nextGridColumn[dstY] = origin + vec * homog(modelY);
     }
 
@@ -468,9 +475,18 @@ QImage dewarpRgb(const QImage& src,
                  const QColor& bgColor) {
   QImage dst(dstSize, QImage::Format_RGB32);
   dst.fill(bgColor.rgb());
-  dewarpGeneric<RgbColorMixer<MixingWeight>, uint32_t>((const uint32_t*) src.bits(), src.size(), src.bytesPerLine() / 4,
-                                                       (uint32_t*) dst.bits(), dstSize, dst.bytesPerLine() / 4,
-                                                       distortionModel, modelDomain, bgColor.rgb());
+  // NOLINTBEGIN(bugprone-casting-through-void,cppcoreguidelines-pro-type-reinterpret-cast)
+  dewarpGeneric<RgbColorMixer<MixingWeight>, uint32_t>(
+      reinterpret_cast<const uint32_t*>(src.bits()),
+      src.size(),
+      src.bytesPerLine() / 4,
+      reinterpret_cast<uint32_t*>(dst.bits()),
+      dstSize,
+      dst.bytesPerLine() / 4,
+      distortionModel,
+      modelDomain,
+      bgColor.rgb());
+  // NOLINTEND(bugprone-casting-through-void,cppcoreguidelines-pro-type-reinterpret-cast)
   return dst;
 }
 
@@ -481,9 +497,18 @@ QImage dewarpArgb(const QImage& src,
                   const QColor& bgColor) {
   QImage dst(dstSize, QImage::Format_ARGB32);
   dst.fill(bgColor.rgba());
+  // NOLINTBEGIN(bugprone-casting-through-void,cppcoreguidelines-pro-type-reinterpret-cast)
   dewarpGeneric<ArgbColorMixer<MixingWeight>, uint32_t>(
-      (const uint32_t*) src.bits(), src.size(), src.bytesPerLine() / 4, (uint32_t*) dst.bits(), dstSize,
-      dst.bytesPerLine() / 4, distortionModel, modelDomain, bgColor.rgba());
+      reinterpret_cast<const uint32_t*>(src.bits()),
+      src.size(),
+      src.bytesPerLine() / 4,
+      reinterpret_cast<uint32_t*>(dst.bits()),
+      dstSize,
+      dst.bytesPerLine() / 4,
+      distortionModel,
+      modelDomain,
+      bgColor.rgba());
+  // NOLINTEND(bugprone-casting-through-void,cppcoreguidelines-pro-type-reinterpret-cast)
   return dst;
 }
 }  // namespace
@@ -499,7 +524,7 @@ QImage RasterDewarper::dewarp(const QImage& src,
 
   switch (src.format()) {
     case QImage::Format_Invalid:
-      return QImage();
+      return {};
     case QImage::Format_RGB32:
       return dewarpRgb(src, dstSize, distortionModel, modelDomain, bgColor);
     case QImage::Format_ARGB32:
@@ -528,3 +553,4 @@ QImage RasterDewarper::dewarp(const QImage& src,
   }
 }  // RasterDewarper::dewarp
 }  // namespace dewarping
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)

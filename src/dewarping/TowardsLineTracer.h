@@ -6,6 +6,8 @@
 #include <QLineF>
 #include <QPoint>
 #include <QRect>
+
+#include <array>
 #include <cstdint>
 
 #include "Grid.h"
@@ -22,9 +24,8 @@ namespace dewarping {
 class TowardsLineTracer {
  public:
   TowardsLineTracer(const imageproc::SEDM* dm, const Grid<float>* pm, const QLineF& line, const QPoint& initialPos);
-
   const QPoint* trace(float maxDist);
-
+  static constexpr int STEP_SIZE{ 5 };
  private:
   struct Step {
     Vec2d unitVec;
@@ -43,8 +44,8 @@ class TowardsLineTracer {
   QLineF m_line;
   Vec2d m_normalTowardsLine;
   QPoint m_lastOutputPos;
-  Step m_steps[5];
-  int m_numSteps;
-  bool m_finished;
+  std::array<Step, STEP_SIZE> m_steps;
+  int m_numSteps{ 0 };
+  bool m_finished{ false };
 };
 }  // namespace dewarping

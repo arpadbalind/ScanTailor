@@ -1,9 +1,9 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_RASTEROPGENERIC_H_
-#define SCANTAILOR_IMAGEPROC_RASTEROPGENERIC_H_
+#pragma once
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 #include <QSize>
 #include <cassert>
 #include <cstdint>
@@ -115,15 +115,15 @@ void rasterOpGeneric(const BinaryImage& image1, T2* data2, int stride2, Op opera
     return;
   }
 
-  const int w = image1.width();
-  const int h = image1.height();
-  const int stride1 = image1.wordsPerLine();
+  const auto w = static_cast<uint32_t>(image1.width());
+  const auto h = static_cast<uint32_t>(image1.height());
+  const auto stride1 = static_cast<uint32_t>(image1.wordsPerLine());
   const uint32_t* data1 = image1.data();
 
-  for (int y = 0; y < h; ++y) {
-    for (int x = 0; x < w; ++x) {
-      const int shift = 31 - (x & 31);
-      operation((data1[x >> 5] >> shift) & uint32_t(1), data2[x]);
+  for (uint32_t y = 0; y < h; ++y) {
+    for (uint32_t x = 0; x < w; ++x) {
+      const uint32_t shift = 31 - (x & 31u);
+      operation((data1[x >> 5u] >> shift) & uint32_t{1}, data2[x]);
     }
     data1 += stride1;
     data2 += stride2;
@@ -135,20 +135,28 @@ class BitProxy {
  public:
   BitProxy(uint32_t& word, int shift) : m_word(word), m_shift(shift) {}
 
-  BitProxy(const BitProxy& other) = default;
+  ~BitProxy() = default;
+
+  BitProxy(const BitProxy& other) = delete;
+
+  BitProxy& operator=(const BitProxy& other) = delete;
+
+  BitProxy(BitProxy&& other) = delete;
+
+  BitProxy& operator=(BitProxy&& other) = delete;
 
   BitProxy& operator=(uint32_t bit) {
     assert(bit <= 1);
-    const uint32_t mask = uint32_t(1) << m_shift;
+    const uint32_t mask = uint32_t{1} << m_shift;
     m_word = (m_word & ~mask) | (bit << m_shift);
     return *this;
   }
 
-  operator uint32_t() const { return (m_word >> m_shift) & uint32_t(1); }
+  explicit operator uint32_t() const { return (m_word >> m_shift) & uint32_t{1}; }
 
  private:
   uint32_t& m_word;
-  int m_shift;
+  uint32_t m_shift{};
 };
 }  // namespace rop_generic_impl
 
@@ -160,14 +168,14 @@ void rasterOpGeneric(BinaryImage& image1, T2* data2, int stride2, Op operation) 
     return;
   }
 
-  const int w = image1.width();
-  const int h = image1.height();
-  const int stride1 = image1.wordsPerLine();
+  const auto w = static_cast<uint32_t>(image1.width());
+  const auto h = static_cast<uint32_t>(image1.height());
+  const auto stride1 = static_cast<uint32_t>(image1.wordsPerLine());
   uint32_t* data1 = image1.data();
 
-  for (int y = 0; y < h; ++y) {
-    for (int x = 0; x < w; ++x) {
-      BitProxy bit1(data1[x >> 5], 31 - (x & 31));
+  for (uint32_t y = 0; y < h; ++y) {
+    for (uint32_t x = 0; x < w; ++x) {
+      BitProxy bit1(data1[x >> 5u], 31 - (x & 31u));
       operation(bit1, data2[x]);
     }
     data1 += stride1;
@@ -175,4 +183,4 @@ void rasterOpGeneric(BinaryImage& image1, T2* data2, int stride2, Op operation) 
   }
 }
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_RASTEROPGENERIC_H_
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

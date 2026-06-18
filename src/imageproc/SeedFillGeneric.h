@@ -86,7 +86,7 @@ inline void processNeighbor(SpreadOp spreadOp,
     const int x = basePos.x + xDelta;
     const int y = basePos.y + yDelta;
     uint32_t& inQueueWord = inQueueLine[x >> 5];
-    const uint32_t inQueueMask = (uint32_t(1) << 31) >> (x & 31);
+    const uint32_t inQueueMask = (uint32_t{1} << 31) >> (x & 31);
     if (!(inQueueWord & inQueueMask)) {  // If not already in the queue.
       queue.push(Position<T>(neighbor, neighborMask, x, y));
       inQueueWord |= inQueueMask;  // Mark as already in the queue.

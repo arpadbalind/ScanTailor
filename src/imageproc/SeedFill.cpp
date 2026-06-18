@@ -28,7 +28,7 @@ void seedFill4Iteration(BinaryImage& seed, const BinaryImage& mask) {
   const int seedWpl = seed.wordsPerLine();
   const int maskWpl = mask.wordsPerLine();
   const int lastWordIdx = (w - 1) >> 5;
-  const uint32_t lastWordMask = ~uint32_t(0) << (((lastWordIdx + 1) << 5) - w);
+  const uint32_t lastWordMask = ~uint32_t{0} << (((lastWordIdx + 1) << 5) - w);
 
   uint32_t* seedLine = seed.data();
   const uint32_t* maskLine = mask.data();
@@ -101,7 +101,7 @@ void seedFill8Iteration(BinaryImage& seed, const BinaryImage& mask) {
   const int seedWpl = seed.wordsPerLine();
   const int maskWpl = mask.wordsPerLine();
   const int lastWordIdx = (w - 1) >> 5;
-  const uint32_t lastWordMask = ~uint32_t(0) << (((lastWordIdx + 1) << 5) - w);
+  const uint32_t lastWordMask = ~uint32_t{0} << (((lastWordIdx + 1) << 5) - w);
 
   uint32_t* seedLine = seed.data();
   const uint32_t* maskLine = mask.data();

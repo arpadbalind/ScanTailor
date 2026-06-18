@@ -2,7 +2,7 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "Binarize.h"
-
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 #include <QDebug>
 #include <cassert>
 #include <cmath>
@@ -81,7 +81,7 @@ BinaryImage binarizeSauvola(const QImage& src, const QSize windowSize, const dou
 
       const double threshold = mean * (1.0 + k * (deviation / 128.0 - 1.0));
 
-      const uint32_t msb = uint32_t(1) << 31;
+      const uint32_t msb = uint32_t{1} << 31;
       const uint32_t mask = msb >> (x & 31);
       if (int(grayLine[x]) < threshold) {
         // black
@@ -182,7 +182,7 @@ BinaryImage binarizeWolf(const QImage& src,
       const double a = 1.0 - deviation / maxDeviation;
       const double threshold = mean - k * a * (mean - minGrayLevel);
 
-      const uint32_t msb = uint32_t(1) << 31;
+      const uint32_t msb = uint32_t{1} << 31;
       const uint32_t mask = msb >> (x & 31);
       if ((grayLine[x] < lowerBound) || ((grayLine[x] <= upperBound) && (int(grayLine[x]) < threshold))) {
         // black
@@ -200,3 +200,4 @@ BinaryImage peakThreshold(const QImage& image) {
   return BinaryImage(image, BinaryThreshold::peakThreshold(image));
 }
 }  // namespace imageproc
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

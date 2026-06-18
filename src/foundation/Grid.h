@@ -11,8 +11,9 @@ class Grid {
   /**
    * Creates a null grid.
    */
-  Grid();
+  Grid() = default;
 
+  ~Grid() = default;
   /**
    * \brief Creates a width x height grid with specified padding on each side.
    */
@@ -25,7 +26,13 @@ class Grid {
    */
   Grid(const Grid& other);
 
-  bool isNull() const { return m_width <= 0 || m_height <= 0; }
+  Grid(Grid&& other) noexcept;
+
+  Grid& operator=(const Grid& other);
+
+  Grid& operator=(Grid&& other) noexcept;
+
+  [[nodiscard]] bool isNull() const { return m_width <= 0 || m_height <= 0; }
 
   void initPadding(const Node& paddingNode);
 
@@ -39,7 +46,7 @@ class Grid {
   /**
    * \brief Returns a pointer to the beginning of unpadded data.
    */
-  const Node* data() const { return m_data; }
+  [[nodiscard]] const Node* data() const { return m_data; }
 
   /**
    * \brief Returns a pointer to the beginning of padded data.
@@ -49,29 +56,29 @@ class Grid {
   /**
    * \brief Returns a pointer to the beginning of padded data.
    */
-  const Node* paddedData() const { return m_storage.data(); }
+  [[nodiscard]] const Node* paddedData() const { return m_storage.data(); }
 
   /**
    * Returns the number of nodes in a row, including padding nodes.
    */
-  int stride() const { return m_stride; }
+  [[nodiscard]] int stride() const { return m_stride; }
 
   /**
    * Returns the number of nodes in a row, excluding padding nodes.
    */
-  int width() const { return m_width; }
+  [[nodiscard]] int width() const { return m_width; }
 
   /**
    * Returns the number of nodes in a column, excluding padding nodes.
    */
-  int height() const { return m_height; }
+  [[nodiscard]] int height() const { return m_height; }
 
   /**
    * Returns the number of padding layers from each side.
    */
-  int padding() const { return m_padding; }
+   [[nodiscard]] int padding() const { return m_padding; }
 
-  void swap(Grid& other);
+  void swap(Grid& other) noexcept;
 
  private:
   template <typename T>
@@ -83,16 +90,12 @@ class Grid {
   }
 
   std::vector<Node> m_storage;
-  Node* m_data;
-  int m_width;
-  int m_height;
-  int m_stride;
-  int m_padding;
+  Node* m_data{ nullptr };
+  int m_width{ 0 };
+  int m_height{ 0 };
+  int m_stride{ 0 };
+  int m_padding{ 0 };
 };
-
-
-template <typename Node>
-Grid<Node>::Grid() : m_data(0), m_width(0), m_height(0), m_stride(0), m_padding(0) {}
 
 template <typename Node>
 Grid<Node>::Grid(int width, int height, int padding)
@@ -115,6 +118,77 @@ Grid<Node>::Grid(const Grid& other)
   for (int i = 0; i < len; ++i) {
     m_storage[i] = other.m_storage[i];
   }
+}
+
+template <typename Node>
+Grid<Node>::Grid(Grid&& other) noexcept
+    : m_storage(std::move(other.m_storage)),
+      m_data(nullptr),
+      m_width(other.m_width),
+      m_height(other.m_height),
+      m_stride(other.m_stride),
+      m_padding(other.m_padding)
+{
+  // Recompute pointer based on moved storage
+  m_data = m_storage.data()
+           + m_stride * m_padding
+           + m_padding;
+
+  // Leave other in a valid state
+  other.m_data = nullptr;
+  other.m_width = 0;
+  other.m_height = 0;
+  other.m_stride = 0;
+  other.m_padding = 0;
+}
+
+template <typename Node>
+Grid<Node>& Grid<Node>::operator=(const Grid& other)
+{
+  if (this == &other) {
+    return *this;
+  }
+
+  m_storage.resize(other.m_storage.size());
+  m_storage = other.m_storage;
+
+  m_width   = other.m_width;
+  m_height  = other.m_height;
+  m_stride  = other.m_stride;
+  m_padding = other.m_padding;
+
+  m_data = m_storage.data()
+           + m_stride * m_padding
+           + m_padding;
+
+  return *this;
+}
+
+template <typename Node>
+Grid<Node>& Grid<Node>::operator=(Grid&& other) noexcept
+{
+  if (this == &other) {
+    return *this;
+  }
+
+  m_storage = std::move(other.m_storage);
+
+  m_width   = other.m_width;
+  m_height  = other.m_height;
+  m_stride  = other.m_stride;
+  m_padding = other.m_padding;
+
+  m_data = m_storage.data()
+           + m_stride * m_padding
+           + m_padding;
+
+  other.m_data = nullptr;
+  other.m_width = 0;
+  other.m_height = 0;
+  other.m_stride = 0;
+  other.m_padding = 0;
+
+  return *this;
 }
 
 template <typename Node>
@@ -162,7 +236,7 @@ void Grid<Node>::initInterior(const Node& interiorNode) {
 }
 
 template <typename Node>
-void Grid<Node>::swap(Grid& other) {
+void Grid<Node>::swap(Grid& other) noexcept {
   m_storage.swap(other.m_storage);
   basicSwap(m_data, other.m_data);
   basicSwap(m_width, other.m_width);
@@ -172,6 +246,6 @@ void Grid<Node>::swap(Grid& other) {
 }
 
 template <typename Node>
-void swap(Grid<Node>& o1, Grid<Node>& o2) {
+void swap(Grid<Node>& o1, Grid<Node>& o2) noexcept {
   o1.swap(o2);
 }

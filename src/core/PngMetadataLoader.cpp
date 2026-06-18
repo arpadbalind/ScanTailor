@@ -89,7 +89,7 @@ ImageMetadataLoader::Status PngMetadataLoader::loadMetadata(QIODevice& ioDevice,
   int unitType;
   if (png_get_pHYs(png.handle(), png.info(), &resX, &res_y, &unitType)) {
     if (unitType == PNG_RESOLUTION_METER) {
-      dpi = Dpm(resX, res_y);
+      dpi = Dpi(Dpm(resX, res_y));
     }
   }
 

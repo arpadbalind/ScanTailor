@@ -373,9 +373,9 @@ int BinaryImage::countBlackPixels(const QRect& rect) const {
   const int bottom = r.bottom();
   const int firstWordIdx = r.left() >> 5;
   const int lastWordIdx = r.right() >> 5;  // r.right() is within rect
-  const uint32_t firstWordMask = ~uint32_t(0) >> (r.left() & 31);
+  const uint32_t firstWordMask = ~uint32_t{0} >> (r.left() & 31);
   const int lastWordUnusedBits = (lastWordIdx << 5) + 31 - r.right();
-  const uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
+  const uint32_t lastWordMask = ~uint32_t{0} << lastWordUnusedBits;
   const uint32_t* line = data() + top * m_wpl;
 
   int count = 0;
@@ -423,8 +423,8 @@ QRect BinaryImage::contentBoundingBox(const BWColor contentColor) const {
   const int lastWordIdx = (w - 1) >> 5;
   const int lastWordBits = w - (lastWordIdx << 5);
   const int lastWordUnusedBits = 32 - lastWordBits;
-  const uint32_t lastWordMask = ~uint32_t(0) << lastWordUnusedBits;
-  const uint32_t modifier = (contentColor == BWColor::WHITE) ? ~uint32_t(0) : 0;
+  const uint32_t lastWordMask = ~uint32_t{0} << lastWordUnusedBits;
+  const uint32_t modifier = (contentColor == BWColor::WHITE) ? ~uint32_t{0} : 0;
   const uint32_t* const data = this->data();
 
   int bottom = -1;  // inclusive
@@ -580,7 +580,7 @@ void BinaryImage::copyIfShared() {
 }
 
 void BinaryImage::fillRectImpl(uint32_t* const data, const QRect& rect, const BWColor color) {
-  const uint32_t pattern = (color == BWColor::BLACK) ? ~uint32_t(0) : 0;
+  const uint32_t pattern = (color == BWColor::BLACK) ? ~uint32_t{0} : 0;
 
   if ((rect.x() == 0) && (rect.width() == m_width)) {
     memset(data + rect.y() * m_wpl, pattern, rect.height() * m_wpl * 4);
@@ -590,8 +590,8 @@ void BinaryImage::fillRectImpl(uint32_t* const data, const QRect& rect, const BW
   const uint32_t firstWordIdx = rect.left() >> 5;
   // Note: rect.right() == rect.left() + rect.width() - 1
   const uint32_t lastWordIdx = rect.right() >> 5;
-  const uint32_t firstWordMask = ~uint32_t(0) >> (rect.left() & 31);
-  const uint32_t lastWordMask = ~uint32_t(0) << (31 - (rect.right() & 31));
+  const uint32_t firstWordMask = ~uint32_t{0} >> (rect.left() & 31);
+  const uint32_t lastWordMask = ~uint32_t{0} << (31 - (rect.right() & 31));
   uint32_t* line = data + rect.top() * m_wpl;
 
   if (firstWordIdx == lastWordIdx) {
@@ -629,7 +629,7 @@ BinaryImage BinaryImage::fromMono(const QImage& image) {
   const int dstWpl = dst.wordsPerLine();
   uint32_t* dstLine = dst.data();
 
-  uint32_t modifier = ~uint32_t(0);
+  uint32_t modifier = ~uint32_t{0};
   if (image.colorCount() >= 2) {
     if (qGray(image.color(0)) > qGray(image.color(1))) {
       // if color 0 is lighter than color 1
@@ -664,7 +664,7 @@ BinaryImage BinaryImage::fromMono(const QImage& image, const QRect& rect) {
   uint32_t* dstLine = dst.data();
   const int dstLastWordUnusedBits = (dstWpl << 5) - width;
 
-  uint32_t modifier = ~uint32_t(0);
+  uint32_t modifier = ~uint32_t{0};
   if (image.colorCount() >= 2) {
     if (qGray(image.color(0)) > qGray(image.color(1))) {
       // if color 0 is lighter than color 1
@@ -750,7 +750,7 @@ BinaryImage BinaryImage::fromIndexed8(const QImage& image, const QRect& rect, co
       for (int bit = 0; bit < 32; ++bit) {
         word <<= 1;
         if (color_to_gray[srcPos[bit]] < threshold) {
-          word |= uint32_t(1);
+          word |= uint32_t{1};
         }
       }
       dstLine[j] = word;
@@ -762,7 +762,7 @@ BinaryImage BinaryImage::fromIndexed8(const QImage& image, const QRect& rect, co
     for (int bit = 0; bit < lastWordBits; ++bit) {
       word <<= 1;
       if (color_to_gray[srcPos[bit]] < threshold) {
-        word |= uint32_t(1);
+        word |= uint32_t{1};
       }
     }
     word <<= lastWordUnusedBits;
@@ -957,7 +957,7 @@ BinaryImage BinaryImage::fromRgb16(const QImage& image, const QRect& rect, const
  * \param lastWordIdx Index of the last (possibly incomplete) word.
  * \param lastWordMask The mask to by applied to the last word.
  * \param modifier If 0, this function check if the line is completely black.
- *        If ~uint32_t(0), this function checks if the line is completely white.
+ *        If ~uint32_t{0}, this function checks if the line is completely white.
  */
 bool BinaryImage::isLineMonotone(const uint32_t* const line,
                                  const int lastWordIdx,
@@ -1026,7 +1026,7 @@ bool operator==(const BinaryImage& lhs, const BinaryImage& rhs) {
   const int rhsWpl = rhs.wordsPerLine();
   const int lastBitIdx = lhs.width() - 1;
   const int lastWordIdx = lastBitIdx / 32;
-  const uint32_t lastWordMask = ~uint32_t(0) << (31 - lastBitIdx % 32);
+  const uint32_t lastWordMask = ~uint32_t{0} << (31 - lastBitIdx % 32);
 
   for (int i = lhs.height(); i > 0; --i) {
     int j = 0;

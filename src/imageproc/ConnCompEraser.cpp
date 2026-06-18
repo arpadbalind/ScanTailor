@@ -27,12 +27,12 @@ struct ConnCompEraser::BBox {
 
 
 inline uint32_t ConnCompEraser::getBit(const uint32_t* const line, const int x) {
-  const uint32_t mask = (uint32_t(1) << 31) >> (x & 31);
+  const uint32_t mask = (uint32_t{1} << 31) >> (x & 31);
   return line[x >> 5] & mask;
 }
 
 inline void ConnCompEraser::clearBit(uint32_t* const line, const int x) {
-  const uint32_t mask = (uint32_t(1) << 31) >> (x & 31);
+  const uint32_t mask = (uint32_t{1} << 31) >> (x & 31);
   line[x >> 5] &= ~mask;
 }
 
@@ -148,7 +148,7 @@ bool ConnCompEraser::moveToNextBlackPixel() {
   // Stop word is a last word in line that holds data.
   const int lastBitIdx = m_width - 1;
   const uint32_t* pStopWord = line + (lastBitIdx >> 5);
-  const uint32_t stopWordMask = ~uint32_t(0) << (31 - (lastBitIdx & 31));
+  const uint32_t stopWordMask = ~uint32_t{0} << (31 - (lastBitIdx & 31));
 
   uint32_t word = *pword;
   if (pword == pStopWord) {

@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_DEWARPING_DISTORTIONMODELBUILDER_H_
-#define SCANTAILOR_DEWARPING_DISTORTIONMODELBUILDER_H_
+#pragma once
 
 #include <QLineF>
 #include <QPointF>
@@ -45,7 +44,7 @@ class DistortionModelBuilder {
    *
    * It's not specified which one is the left and which one is the right bound.
    */
-  std::pair<QLineF, QLineF> verticalBounds() const;
+  [[nodiscard]] std::pair<QLineF, QLineF> verticalBounds() const;
 
   /**
    * \brief Add a curve that's meant to become straight and horizontal after dewarping.
@@ -77,11 +76,11 @@ class DistortionModelBuilder {
   class RansacAlgo;
   class BadCurve;
 
-  TracedCurve polylineToCurve(const std::vector<QPointF>& polyline) const;
+  [[nodiscard]] TracedCurve polylineToCurve(const std::vector<QPointF>& polyline) const;
 
   static Vec2d centroid(const std::vector<QPointF>& polyline);
 
-  std::pair<QLineF, QLineF> frontBackBounds(const std::vector<QPointF>& polyline) const;
+  [[nodiscard]] std::pair<QLineF, QLineF> frontBackBounds(const std::vector<QPointF>& polyline) const;
 
   static std::vector<QPointF> maybeTrimPolyline(const std::vector<QPointF>& polyline,
                                                 const std::pair<QLineF, QLineF>& bounds);
@@ -98,9 +97,9 @@ class DistortionModelBuilder {
                                    const Vec2d& centroid,
                                    const std::pair<QLineF, QLineF>& bounds);
 
-  QImage visualizeTrimmedPolylines(const QImage& background, const std::vector<TracedCurve>& curves) const;
+  [[nodiscard]] QImage visualizeTrimmedPolylines(const QImage& background, const std::vector<TracedCurve>& curves) const;
 
-  QImage visualizeModel(const QImage& background,
+  [[nodiscard]] QImage visualizeModel(const QImage& background,
                         const std::vector<TracedCurve>& curves,
                         const RansacModel& model) const;
 
@@ -113,4 +112,3 @@ class DistortionModelBuilder {
   std::deque<std::vector<QPointF>> m_ltrPolylines;
 };
 }  // namespace dewarping
-#endif  // ifndef SCANTAILOR_DEWARPING_DISTORTIONMODELBUILDER_H_

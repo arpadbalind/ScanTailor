@@ -43,7 +43,7 @@ QRect ContentMask::findContentInArea(const QRect& area) const {
 
   const uint32_t* imageLine = m_image.data();
   const int imageStride = m_image.wordsPerLine();
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   int top = std::numeric_limits<int>::max();
   int left = std::numeric_limits<int>::max();

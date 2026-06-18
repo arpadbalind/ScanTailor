@@ -1,14 +1,22 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
+// NOLINTBEGIN(misc-include-cleaner)
 #include "DistortionModel.h"
 
 #include <QDomDocument>
+#include <QPoint>
+#include <QPointF>
 #include <QRectF>
 #include <QTransform>
 
+#include <algorithm>
 #include <array>
+#include <cmath>
+
 #include "CylindricalSurfaceDewarper.h"
+#include "NumericTraits.h"
+#include "VecNT.h"
 
 namespace dewarping {
 DistortionModel::DistortionModel() = default;
@@ -18,7 +26,7 @@ DistortionModel::DistortionModel(const QDomElement& el)
 
 QDomElement DistortionModel::toXml(QDomDocument& doc, const QString& name) const {
   if (!isValid()) {
-    return QDomElement();
+    return {};
   }
 
   QDomElement el(doc.createElement(name));
@@ -40,8 +48,8 @@ bool DistortionModel::isValid() const {
 
   for (int i = 0; i < 4; ++i) {
     const Vec2d cur(poly[i]);
-    const Vec2d prev(poly[(i + 3) & 3]);
-    const Vec2d next(poly[(i + 1) & 3]);
+    const Vec2d prev(poly[(i + 3) % 4]);
+    const Vec2d next(poly[(i + 1) % 4]);
 
     Vec2d prevNormal(cur - prev);
     std::swap(prevNormal[0], prevNormal[1]);
@@ -61,6 +69,7 @@ bool DistortionModel::isValid() const {
     return false;
   }
 
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   if ((std::fabs(minDot) < 0.01) || (std::fabs(maxDot) < 0.01)) {
     // Too close - possible problems with calculating homography.
     return false;
@@ -69,20 +78,16 @@ bool DistortionModel::isValid() const {
 }  // DistortionModel::isValid
 
 bool DistortionModel::matches(const DistortionModel& other) const {
-  const bool thisValid = isValid();
-  const bool otherValid = other.isValid();
-  if (!thisValid && !otherValid) {
-    return true;
-  } else if (thisValid != otherValid) {
+  if (isValid() != other.isValid()) {
     return false;
   }
 
-  if (!m_topCurve.matches(other.m_topCurve)) {
-    return false;
-  } else if (!m_bottomCurve.matches(other.m_bottomCurve)) {
-    return false;
+  if (!isValid()) {
+    return true;
   }
-  return true;
+
+  return m_topCurve.matches(other.m_topCurve) &&
+         m_bottomCurve.matches(other.m_bottomCurve);
 }
 
 QRectF DistortionModel::modelDomain(const CylindricalSurfaceDewarper& dewarper,
@@ -127,9 +132,10 @@ QRectF DistortionModel::boundingBox(const QTransform& transform) const {
   }
 
   if ((top > bottom) || (left > right)) {
-    return QRectF();
+    return {};
   } else {
-    return QRectF(left, top, right - left, bottom - top);
+    return {left, top, right - left, bottom - top};
   }
 }
 }  // namespace dewarping
+// NOLINTEND(misc-include-cleaner)

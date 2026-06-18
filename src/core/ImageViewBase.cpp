@@ -129,7 +129,7 @@ ImageViewBase::ImageViewBase(const QImage& image,
       m_ignoreScrollEvents(0),
       m_ignoreResizeEvents(0),
       m_hqTransformEnabled(true),
-      m_infoProvider(Dpm(m_image)) {
+      m_infoProvider(static_cast<Dpi>(Dpm(m_image))) {
   /* For some reason, the default viewport fills background with
    * a color different from QPalette::Window at the first show on Windows.
    * Here we make it not fill it automatically at all

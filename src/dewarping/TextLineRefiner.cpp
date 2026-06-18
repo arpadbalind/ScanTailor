@@ -2,16 +2,29 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "TextLineRefiner.h"
-
-#include <GaussBlur.h>
-#include <Sobel.h>
-
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
 #include <QDebug>
 #include <QPainter>
+#include <QPoint>
+#include <QPointF>
+#include <QVector>
+
+#include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <cmath>
+#include <limits>
+#include <list>
+#include <utility>
+#include <vector>
 
 #include "DebugImages.h"
+#include "GaussBlur.h"
+#include "Grid.h"
 #include "NumericTraits.h"
+#include "Sobel.h"
+#include "VecNT.h"
 
 using namespace imageproc;
 
@@ -20,23 +33,23 @@ class TextLineRefiner::SnakeLength {
  public:
   explicit SnakeLength(const Snake& snake);
 
-  float totalLength() const { return m_totalLength; }
+  [[nodiscard]] float totalLength() const { return m_totalLength; }
 
-  float avgSegmentLength() const { return m_avgSegmentLength; }
+  [[nodiscard]] float avgSegmentLength() const { return m_avgSegmentLength; }
 
-  float arcLengthAt(size_t nodeIdx) const { return m_integralLength[nodeIdx]; }
+  [[nodiscard]] float arcLengthAt(size_t nodeIdx) const { return m_integralLength[nodeIdx]; }
 
-  float arcLengthFractionAt(size_t nodeIdx) const { return m_integralLength[nodeIdx] * m_reciprocalTotalLength; }
+  [[nodiscard]] float arcLengthFractionAt(size_t nodeIdx) const { return m_integralLength[nodeIdx] * m_reciprocalTotalLength; }
 
-  float lengthFromTo(size_t fromNodeIdx, size_t toNodeIdx) const {
+  [[nodiscard]] float lengthFromTo(size_t fromNodeIdx, size_t toNodeIdx) const {
     return m_integralLength[toNodeIdx] - m_integralLength[fromNodeIdx];
   }
 
  private:
   std::vector<float> m_integralLength;
-  float m_totalLength;
-  float m_reciprocalTotalLength;
-  float m_avgSegmentLength;
+  float m_totalLength{};
+  float m_reciprocalTotalLength{};
+  float m_avgSegmentLength{};
 };
 
 
@@ -67,14 +80,14 @@ class TextLineRefiner::Optimizer {
   static const float m_bendingWeight;
   static const float m_topExternalWeight;
   static const float m_bottomExternalWeight;
-  const float m_factor;
+  float m_factor;
   SnakeLength m_snakeLength;
   std::vector<FrenetFrame> m_frenetFrames;
 };
 
 
-TextLineRefiner::TextLineRefiner(const GrayImage& image, const Dpi& dpi, const Vec2f& unitDownVector)
-    : m_image(image), m_dpi(dpi), m_unitDownVec(unitDownVector) {}
+TextLineRefiner::TextLineRefiner(GrayImage image, const Dpi& dpi, const Vec2f& unitDownVector)
+    : m_image(std::move(image)), m_dpi(dpi), m_unitDownVec(unitDownVector) {}
 
 void TextLineRefiner::refine(std::list<std::vector<QPointF>>& polylines, const int iterations, DebugImages* dbg) const {
   if (polylines.empty()) {
@@ -101,7 +114,7 @@ void TextLineRefiner::refine(std::list<std::vector<QPointF>>& polylines, const i
   calcBlurredGradient(gradient, hSigma, vSigma);
 
   for (Snake& snake : snakes) {
-    evolveSnake(snake, gradient, ON_CONVERGENCE_STOP);
+    evolveSnake(snake, gradient, OnConvergence::STOP);
   }
   if (dbg) {
     dbg->add(visualizeSnakes(snakes, &gradient), "evolved_snakes1");
@@ -113,7 +126,7 @@ void TextLineRefiner::refine(std::list<std::vector<QPointF>>& polylines, const i
   calcBlurredGradient(gradient, hSigma, vSigma);
 
   for (Snake& snake : snakes) {
-    evolveSnake(snake, gradient, ON_CONVERGENCE_GO_FINER);
+    evolveSnake(snake, gradient, OnConvergence::GO_FINER);
   }
   if (dbg) {
     dbg->add(visualizeSnakes(snakes, &gradient), "evolved_snakes2");
@@ -167,8 +180,8 @@ void TextLineRefiner::calcBlurredGradient(Grid<float>& gradient, float hSigma, f
 float TextLineRefiner::externalEnergyAt(const Grid<float>& gradient, const Vec2f& pos, float penaltyIfOutside) {
   const auto xBase = static_cast<float>(std::floor(pos[0]));
   const auto yBase = static_cast<float>(std::floor(pos[1]));
-  const auto xBaseI = (int) xBase;
-  const auto yBaseI = (int) yBase;
+  const auto xBaseI = static_cast<int>(xBase);
+  const auto yBaseI = static_cast<int>(yBase);
 
   if ((xBaseI < 0) || (yBaseI < 0) || (xBaseI + 1 >= gradient.width()) || (yBaseI + 1 >= gradient.height())) {
     return penaltyIfOutside;
@@ -180,7 +193,7 @@ float TextLineRefiner::externalEnergyAt(const Grid<float>& gradient, const Vec2f
   const float y1 = 1.0f - y;
 
   const int stride = gradient.stride();
-  const float* base = gradient.data() + yBaseI * stride + xBaseI;
+  const float* base = gradient.data() + static_cast<ptrdiff_t>(yBaseI * stride) + xBaseI;
   return base[0] * x1 * y1 + base[1] * x * y1 + base[stride] * x1 * y + base[stride + 1] * x * y;
 }
 
@@ -291,7 +304,7 @@ void TextLineRefiner::evolveSnake(Snake& snake, const Grid<float>& gradient, con
 
     if (!changed) {
       // qDebug() << "Converged.  Iterations remaining = " << snake.iterationsRemaining;
-      if (onConvergence == ON_CONVERGENCE_STOP) {
+      if (onConvergence == OnConvergence::STOP) {
         break;
       } else {
         factor *= 0.5f;
@@ -327,14 +340,15 @@ QImage TextLineRefiner::visualizeGradient(const Grid<float>& gradient) const {
   }
 
   QImage overlay(width, height, QImage::Format_ARGB32_Premultiplied);
-  auto* overlayLine = (uint32_t*) overlay.bits();
+  // NOLINTNEXTLINE(bugprone-casting-through-void,cppcoreguidelines-pro-type-reinterpret-cast)
+  auto* overlayLine = reinterpret_cast<uint32_t*>(overlay.bits());
   const int overlayStride = overlay.bytesPerLine() / 4;
 
   gradientLine = gradient.data();
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       const float value = gradientLine[x] * scale;
-      const int magnitude = qBound(0, static_cast<const int&>(std::round(std::fabs(value))), 255);
+      const int magnitude = std::clamp(static_cast<int>(std::lround(std::abs(value))), 0, 255);
       if (value > 0) {
         // Red for positive gradients which indicate bottom edges.
         overlayLine[x] = qRgba(magnitude, 0, 0, magnitude);
@@ -372,7 +386,7 @@ QImage TextLineRefiner::visualizeSnakes(const std::vector<Snake>& snakes, const 
   QPen middlePen(QColor(255, 0, 255));
   middlePen.setWidth(static_cast<int>(1.5));
 
-  QBrush knotBrush(QColor(255, 255, 0, 180));
+  const QBrush knotBrush(QColor(255, 255, 0, 180));
   painter.setBrush(knotBrush);
 
   QRectF knotRect(0, 0, 7, 7);
@@ -418,7 +432,7 @@ QImage TextLineRefiner::visualizeSnakes(const std::vector<Snake>& snakes, const 
 /*============================ SnakeLength =============================*/
 
 TextLineRefiner::SnakeLength::SnakeLength(const Snake& snake)
-    : m_integralLength(snake.nodes.size()), m_totalLength(), m_reciprocalTotalLength(), m_avgSegmentLength() {
+    : m_integralLength(snake.nodes.size()) {
   const size_t numNodes = snake.nodes.size();
   float arcLengthAccum = 0;
   for (size_t i = 1; i < numNodes; ++i) {
@@ -450,19 +464,18 @@ TextLineRefiner::Optimizer::Optimizer(const Snake& snake, const Vec2f& unitDownV
 bool TextLineRefiner::Optimizer::thicknessAdjustment(Snake& snake, const Grid<float>& gradient) {
   const size_t numNodes = snake.nodes.size();
 
-  const float rib_adjustments[] = {0.0f * m_factor, 0.5f * m_factor, -0.5f * m_factor};
-  enum { NUM_RIB_ADJUSTMENTS = sizeof(rib_adjustments) / sizeof(rib_adjustments[0]) };
+  const std::array<float, 3> rib_adjustments = {0.0f * m_factor, 0.5f * m_factor, -0.5f * m_factor};
 
   int bestI = 0;
   int bestJ = 0;
   float bestCost = NumericTraits<float>::max();
-  for (int i = 0; i < NUM_RIB_ADJUSTMENTS; ++i) {
+  for (int i = 0; i < rib_adjustments.size(); ++i) {
     const float headRib = snake.nodes.front().ribHalfLength + rib_adjustments[i];
     if (headRib <= std::numeric_limits<float>::epsilon()) {
       continue;
     }
 
-    for (int j = 0; j < NUM_RIB_ADJUSTMENTS; ++j) {
+    for (int j = 0; j < rib_adjustments.size(); ++j) {
       const float tailRib = snake.nodes.back().ribHalfLength + rib_adjustments[j];
       if (tailRib <= std::numeric_limits<float>::epsilon()) {
         continue;
@@ -503,8 +516,7 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
     return false;
   }
 
-  const float tangent_movements[] = {0.0f * m_factor, 1.0f * m_factor, -1.0f * m_factor};
-  enum { NUM_TANGENT_MOVEMENTS = sizeof(tangent_movements) / sizeof(tangent_movements[0]) };
+  const std::array<float, 3> tangent_movements = {0.0f * m_factor, 1.0f * m_factor, -1.0f * m_factor};
 
   std::vector<uint32_t> paths;
   std::vector<uint32_t> newPaths;
@@ -512,7 +524,7 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
   // Note that we don't move the first and the last node in tangent direction.
   paths.push_back(static_cast<unsigned int&&>(stepStorage.size()));
   stepStorage.emplace_back();
-  stepStorage.back().prevStepIdx = ~uint32_t(0);
+  stepStorage.back().prevStepIdx = ~uint32_t{0};
   stepStorage.back().node = snake.nodes.front();
   stepStorage.back().pathCost = 0;
 
@@ -522,9 +534,9 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
     const Vec2f unitTangent(m_frenetFrames[nodeIdx].unitTangent);
     const Vec2f downNormal(m_frenetFrames[nodeIdx].unitDownNormal);
 
-    for (float tangentMovement : tangent_movements) {
+    for (const float tangentMovement : tangent_movements) {
       Step step;
-      step.prevStepIdx = ~uint32_t(0);
+      step.prevStepIdx = ~uint32_t{0};
       step.node.center = initialPos + tangentMovement * unitTangent;
       step.node.ribHalfLength = rib;
       step.pathCost = NumericTraits<float>::max();
@@ -537,7 +549,7 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
       }
 
       // Now find the best step for the previous node to combine with.
-      for (uint32_t prevStepIdx : paths) {
+      for (const uint32_t prevStepIdx : paths) {
         const Step& prevStep = stepStorage[prevStepIdx];
         const float cost = baseCost + prevStep.pathCost
                            + calcElasticityEnergy(step.node, prevStep.node, m_snakeLength.avgSegmentLength());
@@ -547,7 +559,7 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
           step.prevStepIdx = prevStepIdx;
         }
       }
-      assert(step.prevStepIdx != ~uint32_t(0));
+      assert(step.prevStepIdx != ~uint32_t{0});
       newPaths.push_back(static_cast<unsigned int&&>(stepStorage.size()));
       stepStorage.push_back(step);
     }
@@ -557,9 +569,9 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
   }
 
   // Find the best overall path.
-  uint32_t bestPathIdx = ~uint32_t(0);
+  uint32_t bestPathIdx = ~uint32_t{0};
   float bestCost = NumericTraits<float>::max();
-  for (uint32_t lastStepIdx : paths) {
+  for (const uint32_t lastStepIdx : paths) {
     const Step& step = stepStorage[lastStepIdx];
     if (step.pathCost < bestCost) {
       bestCost = step.pathCost;
@@ -570,7 +582,7 @@ bool TextLineRefiner::Optimizer::tangentMovement(Snake& snake, const Grid<float>
   float maxSqdist = 0;
   uint32_t stepIdx = bestPathIdx;
   for (auto nodeIdx = static_cast<int>(numNodes - 2); nodeIdx > 0; --nodeIdx) {
-    assert(stepIdx != ~uint32_t(0));
+    assert(stepIdx != ~uint32_t{0});
     const Step& step = stepStorage[stepIdx];
     SnakeNode& node = snake.nodes[nodeIdx];
 
@@ -589,8 +601,7 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
     return false;
   }
 
-  const float normal_movements[] = {0.0f * m_factor, 1.0f * m_factor, -1.0f * m_factor};
-  enum { NUM_NORMAL_MOVEMENTS = sizeof(normal_movements) / sizeof(normal_movements[0]) };
+  const std::array<float, 3> normal_movements = {0.0f * m_factor, 1.0f * m_factor, -1.0f * m_factor};
 
   std::vector<uint32_t> paths;
   std::vector<uint32_t> newPaths;
@@ -601,7 +612,7 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
   // our calculations less accurate.  The proper solution is to provide not N but N*N
   // paths to the 3rd node, each path corresponding to a combination of movement of
   // the first and the second node.  That's the approach we are taking here.
-  for (float normalMovement : normal_movements) {
+  for (const float normalMovement : normal_movements) {
     const auto prevStepIdx = static_cast<uint32_t>(stepStorage.size());
     {
       // Movements of the first node.
@@ -609,13 +620,13 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
       Step step;
       step.node.center = snake.nodes[0].center + normalMovement * downNormal;
       step.node.ribHalfLength = snake.nodes[0].ribHalfLength;
-      step.prevStepIdx = ~uint32_t(0);
+      step.prevStepIdx = ~uint32_t{0};
       step.pathCost = calcExternalEnergy(gradient, step.node, downNormal);
 
       stepStorage.push_back(step);
     }
 
-    for (float j : normal_movements) {
+    for (const float j : normal_movements) {
       // Movements of the second node.
       const Vec2f downNormal(m_frenetFrames[1].unitDownNormal);
 
@@ -634,9 +645,9 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
     const SnakeNode& node = snake.nodes[nodeIdx];
     const Vec2f downNormal(m_frenetFrames[nodeIdx].unitDownNormal);
 
-    for (float normalMovement : normal_movements) {
+    for (const float normalMovement : normal_movements) {
       Step step;
-      step.prevStepIdx = ~uint32_t(0);
+      step.prevStepIdx = ~uint32_t{0};
       step.node.center = node.center + normalMovement * downNormal;
       step.node.ribHalfLength = node.ribHalfLength;
       step.pathCost = NumericTraits<float>::max();
@@ -644,7 +655,7 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
       const float baseCost = calcExternalEnergy(gradient, step.node, downNormal);
 
       // Now find the best step for the previous node to combine with.
-      for (uint32_t prevStepIdx : paths) {
+      for (const uint32_t prevStepIdx : paths) {
         const Step& prevStep = stepStorage[prevStepIdx];
         const Step& prevPrevStep = stepStorage[prevStep.prevStepIdx];
 
@@ -656,7 +667,7 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
           step.prevStepIdx = prevStepIdx;
         }
       }
-      assert(step.prevStepIdx != ~uint32_t(0));
+      assert(step.prevStepIdx != ~uint32_t{0});
       newPaths.push_back(static_cast<unsigned int&&>(stepStorage.size()));
       stepStorage.push_back(step);
     }
@@ -666,9 +677,9 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
   }
 
   // Find the best overall path.
-  uint32_t bestPathIdx = ~uint32_t(0);
+  uint32_t bestPathIdx = ~uint32_t{0};
   float bestCost = NumericTraits<float>::max();
-  for (uint32_t lastStepIdx : paths) {
+  for (const uint32_t lastStepIdx : paths) {
     const Step& step = stepStorage[lastStepIdx];
     if (step.pathCost < bestCost) {
       bestCost = step.pathCost;
@@ -679,7 +690,7 @@ bool TextLineRefiner::Optimizer::normalMovement(Snake& snake, const Grid<float>&
   float maxSqdist = 0;
   uint32_t stepIdx = bestPathIdx;
   for (auto nodeIdx = static_cast<int>(numNodes - 1); nodeIdx >= 0; --nodeIdx) {
-    assert(stepIdx != ~uint32_t(0));
+    assert(stepIdx != ~uint32_t{0});
     const Step& step = stepStorage[stepIdx];
     SnakeNode& node = snake.nodes[nodeIdx];
 
@@ -745,3 +756,4 @@ float TextLineRefiner::Optimizer::calcBendingEnergy(const SnakeNode& node,
   return m_bendingWeight * bendVec.squaredNorm();
 }
 }  // namespace dewarping
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)

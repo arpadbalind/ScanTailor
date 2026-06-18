@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_MORPHOLOGY_H_
-#define SCANTAILOR_IMAGEPROC_MORPHOLOGY_H_
+#pragma once
 
 #include <vector>
 
@@ -86,6 +85,7 @@ class Brick {
   int m_maxY;
 };
 
+inline constexpr unsigned char kDefaultSurrounding = 0xFF;
 
 /**
  * \brief Turn every black pixel into a brick of black pixels.
@@ -122,12 +122,12 @@ BinaryImage dilateBrick(const BinaryImage& src, const Brick& brick, BWColor srcS
 GrayImage dilateGray(const GrayImage& src,
                      const Brick& brick,
                      const QRect& dstArea,
-                     unsigned char srcSurroundings = 0xff);
+                     unsigned char srcSurroundings = kDefaultSurrounding);
 
 /**
  * \brief Same as above, but assumes dst_rect == src.rect()
  */
-GrayImage dilateGray(const GrayImage& src, const Brick& brick, unsigned char srcSurroundings = 0xff);
+GrayImage dilateGray(const GrayImage& src, const Brick& brick, unsigned char srcSurroundings = kDefaultSurrounding);
 
 /**
  * \brief Turn every white pixel into a brick of white pixels.
@@ -399,4 +399,3 @@ void hitMissReplaceInPlace(BinaryImage& img,
                            int patternWidth,
                            int patternHeight);
 }  // namespace imageproc
-#endif  // ifndef SCANTAILOR_IMAGEPROC_MORPHOLOGY_H_

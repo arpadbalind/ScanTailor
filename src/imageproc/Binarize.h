@@ -1,9 +1,8 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_IMAGEPROC_BINARIZE_H_
-#define SCANTAILOR_IMAGEPROC_BINARIZE_H_
-
+#pragma once
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 #include <QSize>
 
 class QImage;
@@ -62,4 +61,5 @@ BinaryImage binarizeWolf(const QImage& src,
 
 BinaryImage peakThreshold(const QImage& image);
 }  // namespace imageproc
-#endif
+
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

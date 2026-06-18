@@ -14,8 +14,6 @@ namespace imageproc {
 using namespace enumflags;
 // Note that -1 is an implementation detail.
 // It exists to make sure INF_DIST + 1 doesn't overflow.
-const uint32_t SEDM::INF_DIST = ~uint32_t(0) - 1;
-
 SEDM::SEDM() : m_plainData(nullptr), m_size(), m_stride(0) {}
 
 SEDM::SEDM(const BinaryImage& image, const DistType distType, const Borders borders)
@@ -381,7 +379,7 @@ BinaryImage SEDM::buildEqualMapNonPadded(const uint32_t* src1, const uint32_t* s
   const int srcStride = m_stride;
   const uint32_t* src1Line = src1 + srcStride + 1;
   const uint32_t* src2Line = src2 + srcStride + 1;
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
 
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
@@ -469,7 +467,7 @@ void SEDM::incrementMaskedPadded(const BinaryImage& mask) {
   const uint32_t* maskLine = mask.data();
   const int maskWpl = mask.wordsPerLine();
 
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   for (int y = 0; y < height; ++y) {
     for (int x = 0; x < width; ++x) {
       if (maskLine[x >> 5] & (msb >> (x & 31))) {

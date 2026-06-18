@@ -74,6 +74,7 @@ class BinaryImage {
    * Colors in a QImage are converted to gray first, and then
    * compared against the provided threshold.
    */
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   explicit BinaryImage(const QImage& image, BinaryThreshold threshold = BinaryThreshold(128));
 
   /**
@@ -85,6 +86,7 @@ class BinaryImage {
    * Colors in a QImage are converted to gray first, and then
    * compared against the provided threshold.
    */
+  // NOLINTNEXTLINE(cppcoreguidelines-avoid-magic-numbers)
   explicit BinaryImage(const QImage& image, const QRect& rect, BinaryThreshold threshold = BinaryThreshold(128));
 
   ~BinaryImage();

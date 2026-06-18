@@ -240,13 +240,13 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
 
   bool isBelowSelectContent() const;
 
-  bool isBelowSelectContent(int filterIdx) const;
+  bool isBelowSelectContent(size_t filterIdx) const;
 
-  bool isBelowFixOrientation(int filterIdx) const;
+  bool isBelowFixOrientation(size_t filterIdx) const;
 
   bool isOutputFilter() const;
 
-  bool isOutputFilter(int filterIdx) const;
+  bool isOutputFilter(size_t filterIdx) const;
 
   PageView getCurrentView() const;
 
@@ -274,9 +274,9 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
 
   void eraseOutputFiles(const std::set<PageId>& pages);
 
-  BackgroundTaskPtr createCompositeTask(const PageInfo& page, int lastFilterIdx, bool batch, bool debug);
+  BackgroundTaskPtr createCompositeTask(const PageInfo& page, const size_t lastFilterIdx, bool batch, bool debug);
 
-  std::shared_ptr<CompositeCacheDrivenTask> createCompositeCacheDrivenTask(int lastFilterIdx);
+  std::shared_ptr<CompositeCacheDrivenTask> createCompositeCacheDrivenTask(size_t lastFilterIdx);
 
   void createBatchProcessingWidget();
 
@@ -324,11 +324,11 @@ class MainWindow : public QMainWindow, private FilterUiInterface, private Ui::Ma
   QObjectCleanupHandler m_optionsWidgetCleanup;
   QObjectCleanupHandler m_imageWidgetCleanup;
   std::unique_ptr<OutOfMemoryDialog> m_outOfMemoryDialog;
-  int m_curFilter;
-  int m_ignoreSelectionChanges;
-  int m_ignorePageOrderingChanges;
-  bool m_debug;
-  bool m_closing;
+  size_t m_curFilter{ 0 };
+  int m_ignoreSelectionChanges{ 0 };
+  int m_ignorePageOrderingChanges{ 0 };
+  bool m_debug{ false };
+  bool m_closing{ false };
   QTimer m_autoSaveTimer;
   StatusBarPanel* m_statusBarPanel;
   QActionGroup* m_unitsMenuActionGroup;

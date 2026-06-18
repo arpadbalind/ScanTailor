@@ -115,8 +115,8 @@ Settings Settings::get(const double level, const Dpi& dpi) {
 }
 
 struct Component {
-  static const uint32_t ANCHORED_TO_BIG = uint32_t(1) << 31;
-  static const uint32_t ANCHORED_TO_SMALL = uint32_t(1) << 30;
+  static const uint32_t ANCHORED_TO_BIG = uint32_t{1} << 31;
+  static const uint32_t ANCHORED_TO_SMALL = uint32_t{1} << 30;
   static const uint32_t TAG_MASK = ANCHORED_TO_BIG | ANCHORED_TO_SMALL;
 
   /**
@@ -858,7 +858,7 @@ void despeckleImpl(BinaryImage& image,
   // with a specified target.
   std::vector<size_t> targetSourceIdx;
   const size_t numTargetSources = targetSource.size();
-  uint32_t prevLabel = uint32_t(0) - 1;
+  uint32_t prevLabel = uint32_t{0} - 1;
   for (size_t i = 0; i < numTargetSources; ++i) {
     const TargetSourceConn& conn = targetSource[i];
     assert(conn.target != 0);
@@ -894,7 +894,7 @@ void despeckleImpl(BinaryImage& image,
 
   status.throwIfCancelled();
   // Remove unmarked components from the binary image.
-  const uint32_t msb = uint32_t(1) << 31;
+  const uint32_t msb = uint32_t{1} << 31;
   uint32_t* imageLine = image.data();
   const int imageStride = image.wordsPerLine();
   cmapLine = cmapData;
