@@ -17,7 +17,7 @@
 #include "RenderParams.h"
 #include "Settings.h"
 #include "Thumbnail.h"
-#include "Utils.h"
+#include "OutputUtils.h"
 #include "core/AbstractFilterDataCollector.h"
 #include "core/ThumbnailCollector.h"
 

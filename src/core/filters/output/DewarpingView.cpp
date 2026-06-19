@@ -7,7 +7,7 @@
 
 #include <QDebug>
 #include <QPainter>
-#include <QtWidgets/QShortcut>
+#include <QtGui/QShortcut>
 
 #include "ImagePresentation.h"
 #include "ToLineProjector.h"

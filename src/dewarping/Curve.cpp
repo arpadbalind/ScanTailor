@@ -4,6 +4,8 @@
 #include "Curve.h"
 
 #include <QDataStream>
+#include <QIODevice>
+
 #include <algorithm>
 #include <cstddef>
 #include <vector>

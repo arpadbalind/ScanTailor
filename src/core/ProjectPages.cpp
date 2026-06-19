@@ -4,6 +4,7 @@
 #include "ProjectPages.h"
 
 #include <QDebug>
+
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/sequenced_index.hpp>
@@ -272,7 +273,7 @@ struct File {
 
   explicit File(const QString& fname) : fileName(fname) {}
 
-  explicit operator ImageFileInfo() const { return ImageFileInfo(fileName, metadata); }
+  explicit operator ImageFileInfo() const { return ImageFileInfo(QFileInfo(fileName), metadata); }
 };
 }  // anonymous namespace
 

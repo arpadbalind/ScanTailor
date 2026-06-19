@@ -3,14 +3,17 @@
 
 #include "ProjectFilesDialog.h"
 
-#include <core/IconProvider.h>
-
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
 #include <QSortFilterProxyModel>
-#include <deque>
 
+#include <algorithm>
+#include <cstddef>
+#include <deque>
+#include <ranges>
+
+#include "core/IconProvider.h"
 #include "ImageMetadataLoader.h"
 #include "NonCopyable.h"
 #include "SmartFilenameOrdering.h"
@@ -55,7 +58,7 @@ class ProjectFilesDialog::FileList : private QAbstractListModel, private NonCopy
   template <typename OutFunc>
   void files(OutFunc out) const;
 
-  const Item& item(const QModelIndex& index) { return m_items[index.row()]; }
+  const Item& item(const QModelIndex& index) { return m_items.at(static_cast<std::size_t>(index.row()));}
 
   template <typename OutFunc>
   void items(OutFunc out) const;
@@ -495,25 +498,33 @@ void ProjectFilesDialog::FileList::remove(const QItemSelection& selection) {
   }
 
   using Range = std::pair<int, int>;
-  QVector<Range> sortedRanges;
-  for (const auto& range : selection) {
-    sortedRanges.push_back(Range(range.top(), range.bottom()));
-  }
 
-  std::sort(sortedRanges.begin(), sortedRanges.end(),
-            [](const Range& lhs, const Range& rhs) { return lhs.first < rhs.first; });
+  std::vector<Range> sortedRanges;
+  sortedRanges.reserve(static_cast<size_t>(selection.size()));
 
-  QVectorIterator<Range> it(sortedRanges);
+  std::ranges::transform(selection, std::back_inserter(sortedRanges),
+                         [](const auto& range) {
+                           return Range{range.top(), range.bottom()};
+                         });
+
+  std::ranges::sort(sortedRanges, {}, &Range::first);
+
   int rowsRemoved = 0;
-  while (it.hasNext()) {
-    const Range& range = it.next();
-    const int first = range.first - rowsRemoved;
-    const int last = range.second - rowsRemoved;
-    beginRemoveRows(QModelIndex(), first, last);
-    m_items.erase(m_items.begin() + first, m_items.begin() + (last + 1));
+
+  for (const auto& [firstRaw, lastRaw] : sortedRanges) {
+    const int first = firstRaw - rowsRemoved;
+    const int last  = lastRaw  - rowsRemoved;
+
+    beginRemoveRows(QModelIndex{}, first, last);
+
+    m_items.erase(m_items.begin() + first,
+                  m_items.begin() + (last + 1));
+
     endRemoveRows();
-    rowsRemoved += last - first + 1;
+
+    rowsRemoved += (last - first + 1);
   }
+
 }  // ProjectFilesDialog::FileList::remove
 
 int ProjectFilesDialog::FileList::rowCount(const QModelIndex&) const {
@@ -521,7 +532,7 @@ int ProjectFilesDialog::FileList::rowCount(const QModelIndex&) const {
 }
 
 QVariant ProjectFilesDialog::FileList::data(const QModelIndex& index, const int role) const {
-  const Item& item = m_items[index.row()];
+  const Item& item = m_items[static_cast<size_t>(index.row())];
   switch (role) {
     case Qt::DisplayRole:
       return item.fileInfo().fileName();
@@ -542,7 +553,7 @@ QVariant ProjectFilesDialog::FileList::data(const QModelIndex& index, const int 
 }
 
 Qt::ItemFlags ProjectFilesDialog::FileList::flags(const QModelIndex& index) const {
-  return m_items[index.row()].flags();
+  return m_items[static_cast<size_t>(index.row())].flags();
 }
 
 void ProjectFilesDialog::FileList::prepareForLoadingFiles() {
@@ -553,7 +564,7 @@ void ProjectFilesDialog::FileList::prepareForLoadingFiles() {
   }
 
   std::sort(itemIndexes.begin(), itemIndexes.end(),
-            [&](int lhs, int rhs) { return ItemVisualOrdering()(m_items[lhs], m_items[rhs]); });
+            [&](int lhs, int rhs) { return ItemVisualOrdering()(m_items[static_cast<size_t>(lhs)], m_items[static_cast<size_t>(rhs)]); });
 
   m_itemsToLoad.swap(itemIndexes);
 }
@@ -564,7 +575,7 @@ ProjectFilesDialog::FileList::LoadStatus ProjectFilesDialog::FileList::loadNextF
   }
 
   const int itemIdx = m_itemsToLoad.front();
-  Item& item = m_items[itemIdx];
+  Item& item = m_items[static_cast<size_t>(itemIdx)];
   std::vector<ImageMetadata> perPageMetadata;
   const QString filePath(item.fileInfo().absoluteFilePath());
   const ImageMetadataLoader::Status st = ImageMetadataLoader::load(

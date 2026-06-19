@@ -17,7 +17,7 @@
 #include "ProjectWriter.h"
 #include "Settings.h"
 #include "Task.h"
-#include "Utils.h"
+#include "FixOrientationUtils.h"
 #include "XmlMarshaller.h"
 
 namespace fix_orientation {

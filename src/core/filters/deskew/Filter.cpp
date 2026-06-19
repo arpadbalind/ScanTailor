@@ -16,7 +16,7 @@
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "Task.h"
-#include "Utils.h"
+#include "DeskewUtils.h"
 
 namespace deskew {
 Filter::Filter(const PageSelectionAccessor& pageSelectionAccessor)
