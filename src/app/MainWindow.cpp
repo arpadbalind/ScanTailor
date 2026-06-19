@@ -6,6 +6,7 @@
 #include <core/ApplicationSettings.h>
 #include <core/IconProvider.h>
 
+#include <QActionGroup>
 #include <QDir>
 #include <QFileDialog>
 #include <QFileSystemModel>
@@ -1773,19 +1774,22 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
     return;
   }
 
-  QStringList files(dialog->selectedFiles());
-  if (files.empty()) {
+  const auto fileNames = dialog->selectedFiles();
+  if (fileNames.isEmpty()) {
     return;
   }
 
-  // The order of items returned by QFileDialog is platform-dependent,
-  // so we enforce our own ordering.
-  std::sort(files.begin(), files.end(), SmartFilenameOrdering());
+  std::vector<QFileInfo> files;
+  files.reserve(fileNames.size());
 
-  // I suspect on some platforms it may be possible to select the same file twice,
-  // so to be safe, remove duplicates.
+  std::ranges::transform(fileNames, std::back_inserter(files),
+                         [](const auto& name) {
+                           return QFileInfo{name};
+                         });
+
+  std::ranges::sort(files, SmartFilenameOrdering());
+
   files.erase(std::unique(files.begin(), files.end()), files.end());
-
 
   std::vector<ImageFileInfo> newFiles;
   std::vector<QString> loadedFiles;
@@ -1795,8 +1799,12 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
     const QFileInfo fileInfo(files[i]);
     ImageFileInfo imageFileInfo(fileInfo, std::vector<ImageMetadata>());
 
-    const ImageMetadataLoader::Status status = ImageMetadataLoader::load(
-        files.at(i), [&](const ImageMetadata& metadata) { imageFileInfo.imageInfo().push_back(metadata); });
+    const ImageMetadataLoader::Status status =
+        ImageMetadataLoader::load(
+            files.at(i).absoluteFilePath(),
+            [&](const ImageMetadata& metadata) {
+              imageFileInfo.imageInfo().push_back(metadata);
+            });
 
     if (status == ImageMetadataLoader::LOADED) {
       newFiles.push_back(imageFileInfo);

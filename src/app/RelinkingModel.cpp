@@ -163,7 +163,7 @@ void RelinkingModel::replacePrefix(const QString& prefix, const QString& replace
     } else {
       assert(type == RelinkablePath::Dir);
       if (item.uncommittedPath.startsWith(slashTerminatedPrefix)) {
-        const int suffixLen = item.uncommittedPath.length() - slashTerminatedPrefix.length() + 1;
+        const qsizetype suffixLen = item.uncommittedPath.length() - slashTerminatedPrefix.length() + 1;
         item.uncommittedPath = replacement + item.uncommittedPath.right(suffixLen);
         modified = true;
       } else if (item.uncommittedPath == prefix) {
@@ -377,7 +377,7 @@ void RelinkingModel::StatusUpdateThread::run() try {
       continue;
     }
 
-    const Task task(m_tasksByPriority.front());
+    const Task& task = m_tasksByPriority.front();
     m_pathBeingProcessed = task.path;
     m_tasksByPriority.pop_front();
 

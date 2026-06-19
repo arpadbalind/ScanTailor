@@ -4,7 +4,7 @@
 #include "ZoomHandler.h"
 
 #include <QWheelEvent>
-#include <QtWidgets/QShortcut>
+#include <QtGui/QShortcut>
 #include <cmath>
 
 #include "ImageViewBase.h"

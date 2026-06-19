@@ -3,17 +3,18 @@
 
 #include "ImageViewBase.h"
 
-#include <PolygonUtils.h>
-#include <Transform.h>
+#include "PolygonUtils.h"
+#include "Transform.h"
 
 #include <QApplication>
-#include <QGLWidget>
 #include <QMouseEvent>
+#include <QOpenGLWidget>
 #include <QPaintEngine>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPointer>
 #include <QScrollBar>
+#include <QSurfaceFormat>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QStatusBar>
 
@@ -148,17 +149,13 @@ ImageViewBase::ImageViewBase(const QImage& image,
 
   if (ApplicationSettings::getInstance().isOpenGlEnabled()) {
     if (OpenGLSupport::supported()) {
-      QGLFormat format;
-      format.setSampleBuffers(true);
-      format.setStencil(true);
-      format.setAlpha(true);
-      format.setRgba(true);
-      format.setDepth(false);
-
-      // Most of hardware refuses to work for us with direct rendering enabled.
-      format.setDirectRendering(false);
-
-      setViewport(new QGLWidget(format));
+      QSurfaceFormat format;
+      format.setSamples(4);  // or 8 depending on quality/performance tradeoff
+      format.setStencilBufferSize(8);
+      format.setAlphaBufferSize(8);
+      format.setDepthBufferSize(0);
+      QSurfaceFormat::setDefaultFormat(format);
+      setViewport(new QOpenGLWidget());
     }
   }
 
@@ -510,7 +507,7 @@ void ImageViewBase::mouseMoveEvent(QMouseEvent* event) {
   event->setAccepted(true);
   updateStatusTipAndCursor();
   maybeQueueRedraw();
-  updateCursorPos(event->localPos());
+  updateCursorPos(event->position());
 }
 
 void ImageViewBase::wheelEvent(QWheelEvent* event) {
@@ -549,7 +546,7 @@ void ImageViewBase::resizeEvent(QResizeEvent* event) {
   }
 }
 
-void ImageViewBase::enterEvent(QEvent* event) {
+void ImageViewBase::enterEvent(QEnterEvent* event) {
   viewport()->setFocus();
   QAbstractScrollArea::enterEvent(event);
 }

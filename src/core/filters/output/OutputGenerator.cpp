@@ -65,7 +65,7 @@
 #include "RenderParams.h"
 #include "Settings.h"
 #include "TaskStatus.h"
-#include "Utils.h"
+#include "OutputUtils.h"
 #include "ZoneCategoryProperty.h"
 
 using namespace imageproc;

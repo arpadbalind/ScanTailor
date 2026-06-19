@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QPainter>
-#include <QtWidgets/QShortcut>
+#include <QtGui/QShortcut>
 
 #include "ImageViewBase.h"
 #include "ZoneInteractionContext.h"

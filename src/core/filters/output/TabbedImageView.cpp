@@ -1,15 +1,15 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#include <ImageViewBase.h>
-#include <filters/output/TabbedImageView.h>
+#include "TabbedImageView.h"
 
-#include <QtWidgets/QShortcut>
+#include <QShortcut>
+#include <QKeySequence>
+#include <Qt>
 
-#include "../../Utils.h"
 #include "DespeckleView.h"
-
-using namespace core;
+#include "ImageViewBase.h"
+#include "core/Utils.h"
 
 namespace output {
 TabbedImageView::TabbedImageView(QWidget* parent) : QTabWidget(parent), m_prevImageViewTabIndex(0) {
@@ -17,7 +17,7 @@ TabbedImageView::TabbedImageView(QWidget* parent) : QTabWidget(parent), m_prevIm
   setStatusTip(tr("Use Ctrl+1..5 to switch the tabs."));
 
   for (int i = 0; i < 5; ++i) {
-    m_tabShortcuts[i] = new QShortcut(static_cast<Qt::Key>(Qt::CTRL + (Qt::Key_1 + i)), this);
+    m_tabShortcuts[i] = new QShortcut(QKeySequence(Qt::CTRL | (Qt::Key_1 | i)), this);
     m_tabShortcuts[i]->setAutoRepeat(false);
     connect(m_tabShortcuts[i], &QShortcut::activated, std::bind(&QTabWidget::setCurrentIndex, this, i));
   }
@@ -56,7 +56,7 @@ void TabbedImageView::tabChangedSlot(const int idx) {
 
   copyViewZoomAndPos(m_prevImageViewTabIndex, idx);
 
-  if (Utils::castOrFindChild<ImageViewBase*>(widget(idx)) != nullptr) {
+  if (core::Utils::castOrFindChild<ImageViewBase*>(widget(idx)) != nullptr) {
     m_prevImageViewTabIndex = idx;
   }
 }
@@ -83,8 +83,8 @@ void TabbedImageView::copyViewZoomAndPos(const int oldIdx, const int newIdx) con
   const QRectF& oldViewRect = m_tabImageRectMap->at(oldViewTab);
   const QRectF& newViewRect = m_tabImageRectMap->at(newViewTab);
 
-  auto* oldImageView = Utils::castOrFindChild<ImageViewBase*>(widget(oldIdx));
-  auto* newImageView = Utils::castOrFindChild<ImageViewBase*>(widget(newIdx));
+  auto* oldImageView = core::Utils::castOrFindChild<ImageViewBase*>(widget(oldIdx));
+  auto* newImageView = core::Utils::castOrFindChild<ImageViewBase*>(widget(newIdx));
   if ((oldImageView == nullptr) || (newImageView == nullptr)) {
     return;
   }

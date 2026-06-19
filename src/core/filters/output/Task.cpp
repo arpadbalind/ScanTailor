@@ -37,7 +37,7 @@
 #include "TabbedImageView.h"
 #include "TaskStatus.h"
 #include "ThumbnailPixmapCache.h"
-#include "Utils.h"
+#include "OutputUtils.h"
 
 using namespace imageproc;
 using namespace dewarping;

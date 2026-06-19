@@ -15,7 +15,7 @@
 #include "Settings.h"
 #include "Task.h"
 #include "ThumbnailPixmapCache.h"
-#include "Utils.h"
+#include "OutputUtils.h"
 
 namespace output {
 Filter::Filter(const PageSelectionAccessor& pageSelectionAccessor)

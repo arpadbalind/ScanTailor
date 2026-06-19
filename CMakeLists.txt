@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
 project("ScanTailor Advanced")
 
-# Set compiler flags.
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
@@ -58,10 +57,10 @@ endif()
 
 #=================================== Qt ===================================#
 
-set(qt_min_version 5.6)
+set(qt_min_version 6.9)
 find_package(
-    Qt5 ${qt_min_version}
-    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGL Svg
+    Qt6 ${qt_min_version}
+    COMPONENTS Core Gui Widgets Xml Network LinguistTools OpenGLWidgets Svg
     CONFIG REQUIRED)
 
 #=================================== Threads ===================================#
@@ -136,7 +135,7 @@ finalize_translations(scantailor ${translation_files})
 update_translations_target(update_translations scantailor)
 
 list(FILTER translation_files EXCLUDE REGEX ".*untranslated.ts")
-qt5_add_translation(qm_files ${translation_files})
+qt_add_translation(qm_files ${translation_files})
 add_custom_target(compile_translations ALL DEPENDS ${qm_files})
 install(FILES ${qm_files} DESTINATION "share/${APPLICATION_NAME}/translations")
 install(FILES "${SCANTAILOR_RESOURCES_DIR}/unix/scantailor.desktop"

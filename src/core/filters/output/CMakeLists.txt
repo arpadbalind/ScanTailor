@@ -24,7 +24,7 @@ set(sources
     OutputMargins.h
     Settings.cpp Settings.h
     Thumbnail.cpp Thumbnail.h
-    Utils.cpp Utils.h
+    OutputUtils.cpp OutputUtils.h
     Params.cpp Params.h
     BlackWhiteOptions.cpp BlackWhiteOptions.h
     ColorCommonOptions.cpp ColorCommonOptions.h
@@ -69,6 +69,5 @@ set(sources
 
 add_library(output STATIC ${sources} ${ui_files})
 target_link_libraries(output PUBLIC core PRIVATE dewarping)
-target_include_directories(output PRIVATE "$<TARGET_PROPERTY:TIFF::TIFF,INTERFACE_INCLUDE_DIRECTORIES>")
-
+target_include_directories(output PRIVATE "$<TARGET_PROPERTY:TIFF::TIFF,INTERFACE_INCLUDE_DIRECTORIES>" "${PROJECT_SOURCE_DIR}")
 translation_sources(scantailor ${sources} ${ui_files})
