@@ -1,8 +1,6 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-// NOLINTBEGIN(misc-include-cleaner)
-// TODO: remove no linting in qt6
 #include <QBrush>
 #include <QColor>
 #include <QPainter>
@@ -147,4 +145,3 @@ TEST(PolygonRasterizerTestSuite, regression_test_1) {
   EXPECT_TRUE(testFillExceptShape(QSize(938, 1299), shape, Qt::WindingFill));
 }
 }
-// NOLINTEND(misc-include-cleaner)

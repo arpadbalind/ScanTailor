@@ -1,7 +1,6 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-// NOLINTBEGIN(misc-include-cleaner)
 #include <QImage>
 #include <QRect>
 
@@ -131,4 +130,3 @@ TEST(BinaryImageTestSuite, test_content_bounding_box4) {
   EXPECT_EQ(img.contentBoundingBox(), QRect(1, 1, 6, 6));
 }
 }
-// NOLINTEND(misc-include-cleaner)
