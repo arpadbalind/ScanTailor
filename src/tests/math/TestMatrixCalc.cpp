@@ -4,7 +4,7 @@
 #include <array>
 #include <gtest/gtest.h>
 #include <stdexcept>
-
+#include <tuple>
 #include "MatrixCalc.h"
 #include "TestUtils.h"
 
