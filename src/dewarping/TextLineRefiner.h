@@ -4,9 +4,6 @@
 #pragma once
 // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 
-#include <QLineF>
-#include <QPointF>
-
 #include <cstdint>
 #include <list>
 #include <vector>
@@ -19,6 +16,7 @@
 class Dpi;
 class DebugImages;
 class QImage;
+class QPointF;
 
 namespace dewarping {
 class TextLineRefiner {

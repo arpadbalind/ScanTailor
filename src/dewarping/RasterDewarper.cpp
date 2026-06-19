@@ -2,12 +2,14 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "RasterDewarper.h"
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, cppcoreguidelines-macro-usage)
+#include <QColor>
 #include <QDebug>
 
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <stdexcept>
 #include <vector>
@@ -461,7 +463,7 @@ QImage dewarpGrayscale(const QImage& src,
                        const QRectF& modelDomain,
                        const QColor& bgColor) {
   GrayImage dst(dstSize);
-  const auto bgSample = static_cast<uint8_t>(qGray(bgColor.rgb()));
+  const auto bgSample = static_cast<uint8_t>((bgColor.red() + bgColor.green() + bgColor.blue()) / 3);
   dst.fill(bgSample);
   dewarpGeneric<GrayColorMixer<MixingWeight>, uint8_t>(src.bits(), src.size(), src.bytesPerLine(), dst.data(), dstSize,
                                                        dst.stride(), distortionModel, modelDomain, bgSample);
@@ -553,4 +555,4 @@ QImage RasterDewarper::dewarp(const QImage& src,
   }
 }  // RasterDewarper::dewarp
 }  // namespace dewarping
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, cppcoreguidelines-macro-usage)

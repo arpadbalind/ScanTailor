@@ -30,7 +30,7 @@
 #include "VecNT.h"
 
 using namespace imageproc;
-// NOLINTBEGIN(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers)
 namespace dewarping {
 namespace {
 struct VertRange {
@@ -473,4 +473,4 @@ std::pair<QLineF, QLineF> detectVertContentBounds(const imageproc::BinaryImage& 
   return bounds;
 }  // detectVertContentBounds
 }  // namespace dewarping
-// NOLINTEND(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTEND(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers)

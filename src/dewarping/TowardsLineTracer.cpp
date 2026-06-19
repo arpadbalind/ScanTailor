@@ -6,8 +6,10 @@
 #include <QPoint>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 
 #include "Grid.h"
@@ -15,7 +17,7 @@
 #include "SEDM.h"
 #include "SidesOfLine.h"
 
-// NOLINTBEGIN(misc-include-cleaner, cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 using namespace imageproc;
 
 namespace dewarping {
@@ -157,4 +159,4 @@ void TowardsLineTracer::setupSteps() {
             });
 }  // TowardsLineTracer::setupSteps
 }  // namespace dewarping
-// NOLINTEND(misc-include-cleaner, cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

@@ -8,7 +8,6 @@
 #include <QPainter>
 #include <QRandomGenerator>
 #include <Qt>
-#include <QVector>
 
 #include <algorithm>
 #include <array>
@@ -29,6 +28,7 @@
 #include "DistortionModel.h"
 #include "FlagOps.h"
 #include "LineBoundedByRect.h"
+#include "MatrixCalc.h"
 #include "NumericTraits.h"
 #include "SidesOfLine.h"
 #include "ToLineProjector.h"
@@ -41,7 +41,7 @@
 #include "VecNT.h"
 
 using namespace imageproc;
-// NOLINTBEGIN(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers)
 namespace dewarping {
 struct DistortionModelBuilder::TracedCurve {
   std::vector<QPointF> trimmedPolyline;   // Both are left to right.
@@ -620,17 +620,18 @@ QImage DistortionModelBuilder::visualizeModel(const QImage& background,
       }
     }
 
-    QVector<QPointF> polyline;
+    std::vector<QPointF> polyline;
 
     if (!reverseSegments.empty()) {
       painter.setPen(reverseSegmentsPen);
+      polyline.reserve(reverseSegments.size());
       for (const std::vector<int>& sequence : reverseSegments) {
         assert(!sequence.empty());
         polyline.clear();
         for (const int idx : sequence) {
-          polyline << curve.extendedPolyline[idx];
+          polyline.push_back(curve.extendedPolyline[idx]);
         }
-        painter.drawPolyline(polyline);
+        painter.drawPolyline(polyline.data(), static_cast<int>(polyline.size()));
       }
     }
 
@@ -656,4 +657,4 @@ QImage DistortionModelBuilder::visualizeModel(const QImage& background,
   return canvas;
 }  // DistortionModelBuilder::visualizeModel
 }  // namespace dewarping
-// NOLINTEND(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTEND(misc-non-private-member-variables-in-classes, cppcoreguidelines-avoid-magic-numbers)

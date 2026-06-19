@@ -1,14 +1,11 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-// NOLINTBEGIN(misc-include-cleaner)
 #include "DewarpingPointMapper.h"
 
 #include <QPoint>
 #include <QPointF>
 #include <QTransform>
-
-#include <utility>
 
 #include "DistortionModel.h"
 
@@ -24,7 +21,7 @@ DewarpingPointMapper::DewarpingPointMapper(
               distortionModel.topCurve().polyline(),
               distortionModel.bottomCurve().polyline(),
               depthPerception)),
-      m_postTransform(std::move(postTransform))
+      m_postTransform(postTransform)
 {
   const QRect modelDomain =
       distortionModel.modelDomain(m_dewarper,
@@ -62,4 +59,3 @@ QPointF DewarpingPointMapper::mapToWarpedSpace(const QPointF& dewarpedPt) const 
   return m_dewarper.mapToWarpedSpace(QPointF(crvX, crvY));
 }
 }  // namespace dewarping
-// NOLINTEND(misc-include-cleaner)

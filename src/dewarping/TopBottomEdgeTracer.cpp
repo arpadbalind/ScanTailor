@@ -1,7 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner, misc-non-private-member-variables-in-classes)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-non-private-member-variables-in-classes)
 #include "TopBottomEdgeTracer.h"
 
 #include <QDebug>
@@ -11,11 +11,16 @@
 #include <Qt>
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 #include <list>
+#include <span>
+#include <utility>
+#include <vector>
 
 #include "DebugImages.h"
 #include "DistortionModelBuilder.h"
@@ -1220,4 +1225,4 @@ QImage TopBottomEdgeTracer::visualizePolylines(const QImage& background,
   return canvas;
 }
 }  // namespace dewarping
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner, misc-non-private-member-variables-in-classes)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-non-private-member-variables-in-classes)

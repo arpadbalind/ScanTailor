@@ -1,7 +1,6 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-//NOLINTBEGIN(misc-include-cleaner)
 #include "FrenetFrame.h"
 #include "VecNT.h"
 
@@ -23,4 +22,3 @@ FrenetFrame::FrenetFrame(const Vec2d& origin, const Vec2d& tangentVector, YAxisD
   }
 }
 }  // namespace spfit
-//NOLINTEND(misc-include-cleaner)
