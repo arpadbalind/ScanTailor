@@ -2,10 +2,11 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "TextLineTracer.h"
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 #include <QPainter>
 #include <QPen>
 #include <Qt>
+#include <QRgba64>
 
 #include <algorithm>
 #include <cassert>
@@ -556,9 +557,9 @@ QImage TextLineTracer::visualizeGradient(const QImage& background, const Grid<fl
       const float value = gradLine[x] * scale;
       const int magnitude = std::clamp(static_cast<int>(std::lround(std::abs(value))), 0, 255);
       if (value < 0) {
-        overlayLine[x] = qRgba(0, 0, magnitude, magnitude);
+        overlayLine[x] = QRgba64::fromRgba(0, 0, magnitude, magnitude);
       } else {
-        overlayLine[x] = qRgba(magnitude, 0, 0, magnitude);
+        overlayLine[x] = QRgba64::fromRgba(magnitude, 0, 0, magnitude);
       }
     }
     gradLine += gradStride;
@@ -630,4 +631,4 @@ QImage TextLineTracer::visualizePolylines(const QImage& background,
 }
 }  // namespace dewarping
 
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)

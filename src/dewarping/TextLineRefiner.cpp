@@ -2,15 +2,19 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "TextLineRefiner.h"
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
 #include <QDebug>
 #include <QPainter>
 #include <QPoint>
 #include <QPointF>
-#include <QVector>
+#include <QRect>
+#include <QRectF>
+#include <QRgba64>
+#include <Qt>
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cmath>
@@ -351,9 +355,9 @@ QImage TextLineRefiner::visualizeGradient(const Grid<float>& gradient) const {
       const int magnitude = std::clamp(static_cast<int>(std::lround(std::abs(value))), 0, 255);
       if (value > 0) {
         // Red for positive gradients which indicate bottom edges.
-        overlayLine[x] = qRgba(magnitude, 0, 0, magnitude);
+        overlayLine[x] = QRgba64::fromRgba(magnitude, 0, 0, magnitude);
       } else {
-        overlayLine[x] = qRgba(0, 0, magnitude, magnitude);
+        overlayLine[x] = QRgba64::fromRgba(0, 0, magnitude, magnitude);
       }
     }
     gradientLine += gradientStride;
@@ -395,29 +399,29 @@ QImage TextLineRefiner::visualizeSnakes(const std::vector<Snake>& snakes, const 
   for (const Snake& snake : snakes) {
     const SnakeLength snakeLength(snake);
     calcFrenetFrames(frenetFrames, snake, snakeLength, m_unitDownVec);
-    QVector<QPointF> topPolyline;
-    QVector<QPointF> middlePolyline;
-    QVector<QPointF> bottomPolyline;
+    std::vector<QPointF> topPolyline;
+    std::vector<QPointF> middlePolyline;
+    std::vector<QPointF> bottomPolyline;
 
     const size_t numNodes = snake.nodes.size();
     for (size_t i = 0; i < numNodes; ++i) {
       const QPointF mid(QPointF(snake.nodes[i].center + Vec2f(0.5, 0.5)));
       const QPointF top(QPointF(Vec2f(mid) - snake.nodes[i].ribHalfLength * frenetFrames[i].unitDownNormal));
       const QPointF bottom(QPointF(Vec2f(mid) + snake.nodes[i].ribHalfLength * frenetFrames[i].unitDownNormal));
-      topPolyline << top;
-      middlePolyline << mid;
-      bottomPolyline << bottom;
+      topPolyline.push_back(top);
+      middlePolyline.push_back(mid);
+      bottomPolyline.push_back(bottom);
     }
 
     // Draw polylines.
     painter.setPen(topPen);
-    painter.drawPolyline(topPolyline);
+    painter.drawPolyline(topPolyline.data(), static_cast<int>(topPolyline.size()));
 
     painter.setPen(bottomPen);
-    painter.drawPolyline(bottomPolyline);
+    painter.drawPolyline(bottomPolyline.data(), static_cast<int>(bottomPolyline.size()));
 
     painter.setPen(middlePen);
-    painter.drawPolyline(middlePolyline);
+    painter.drawPolyline(middlePolyline.data(), static_cast<int>(middlePolyline.size()));
 
     // Draw knots.
     painter.setPen(Qt::NoPen);
@@ -756,4 +760,4 @@ float TextLineRefiner::Optimizer::calcBendingEnergy(const SnakeNode& node,
   return m_bendingWeight * bendVec.squaredNorm();
 }
 }  // namespace dewarping
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, misc-include-cleaner)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
