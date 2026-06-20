@@ -58,7 +58,7 @@ class FixDpiDialog : public QDialog, private Ui::FixDpiDialog {
 
   void updateDpiCombo();
 
-  void decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpiStatus) const;
+  void decorateDpiInputField(QLineEdit* field, ImageMetadata::Status dpiStatus) const;
 
   std::unique_ptr<TreeModel> m_pages;
   std::unique_ptr<FilterModel> m_undefinedDpiPages;

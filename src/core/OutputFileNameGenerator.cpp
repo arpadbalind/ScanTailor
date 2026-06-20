@@ -38,10 +38,10 @@ QString OutputFileNameGenerator::fileNameFor(const PageId& page) const {
   if (page.imageId().isMultiPageFile()) {
     name += QString::fromLatin1("_page%1").arg(page.imageId().page(), 4, 10, QLatin1Char('0'));
   }
-  if (subPage != PageId::SINGLE_PAGE) {
+  if (subPage != PageId::SubPage::SINGLE_PAGE) {
     name += QLatin1Char('_');
-    name += QLatin1Char(ltr == (subPage == PageId::LEFT_PAGE) ? '1' : '2');
-    name += QLatin1Char(subPage == PageId::LEFT_PAGE ? 'L' : 'R');
+    name += QLatin1Char(ltr == (subPage == PageId::SubPage::LEFT_PAGE) ? '1' : '2');
+    name += QLatin1Char(subPage == PageId::SubPage::LEFT_PAGE ? 'L' : 'R');
   }
   name += QString::fromLatin1(".tif");
   return name;

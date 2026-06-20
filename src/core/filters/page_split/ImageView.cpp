@@ -351,7 +351,7 @@ QPointF ImageView::rightPageCenter() const {
 }
 
 void ImageView::unremoveLeftPage() {
-  PageInfo pageInfo(m_pages->unremovePage(PageId(m_imageId, PageId::LEFT_PAGE)));
+  PageInfo pageInfo(m_pages->unremovePage(PageId(m_imageId, PageId::SubPage::LEFT_PAGE)));
   m_leftUnremoveButton.unlink();
   m_leftPageRemoved = false;
 
@@ -359,12 +359,12 @@ void ImageView::unremoveLeftPage() {
 
   // We need invalidateThumbnail(PageInfo) rather than (PageId),
   // as we are updating page removal status.
-  pageInfo.setId(PageId(m_imageId, PageId::SINGLE_PAGE));
+  pageInfo.setId(PageId(m_imageId, PageId::SubPage::SINGLE_PAGE));
   emit invalidateThumbnail(pageInfo);
 }
 
 void ImageView::unremoveRightPage() {
-  PageInfo pageInfo(m_pages->unremovePage(PageId(m_imageId, PageId::RIGHT_PAGE)));
+  PageInfo pageInfo(m_pages->unremovePage(PageId(m_imageId, PageId::SubPage::RIGHT_PAGE)));
   m_rightUnremoveButton.unlink();
   m_rightPageRemoved = false;
 
@@ -372,7 +372,7 @@ void ImageView::unremoveRightPage() {
 
   // We need invalidateThumbnail(PageInfo) rather than (PageId),
   // as we are updating page removal status.
-  pageInfo.setId(PageId(m_imageId, PageId::SINGLE_PAGE));
+  pageInfo.setId(PageId(m_imageId, PageId::SubPage::SINGLE_PAGE));
   emit invalidateThumbnail(pageInfo);
 }
 }  // namespace page_split

@@ -444,13 +444,13 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data, 
  */
 void Task::deleteMutuallyExclusiveOutputFiles() {
   switch (m_pageId.subPage()) {
-    case PageId::SINGLE_PAGE:
-      QFile::remove(m_outFileNameGen.filePathFor(PageId(m_pageId.imageId(), PageId::LEFT_PAGE)));
-      QFile::remove(m_outFileNameGen.filePathFor(PageId(m_pageId.imageId(), PageId::RIGHT_PAGE)));
+    case PageId::SubPage::SINGLE_PAGE:
+      QFile::remove(m_outFileNameGen.filePathFor(PageId(m_pageId.imageId(), PageId::SubPage::LEFT_PAGE)));
+      QFile::remove(m_outFileNameGen.filePathFor(PageId(m_pageId.imageId(), PageId::SubPage::RIGHT_PAGE)));
       break;
-    case PageId::LEFT_PAGE:
-    case PageId::RIGHT_PAGE:
-      QFile::remove(m_outFileNameGen.filePathFor(PageId(m_pageId.imageId(), PageId::SINGLE_PAGE)));
+    case PageId::SubPage::LEFT_PAGE:
+    case PageId::SubPage::RIGHT_PAGE:
+      QFile::remove(m_outFileNameGen.filePathFor(PageId(m_pageId.imageId(), PageId::SubPage::SINGLE_PAGE)));
       break;
   }
 }

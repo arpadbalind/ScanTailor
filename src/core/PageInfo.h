@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_PAGEINFO_H_
-#define SCANTAILOR_CORE_PAGEINFO_H_
+#pragma once
 
 #include "ImageMetadata.h"
 #include "PageId.h"
@@ -18,21 +17,21 @@ class PageInfo {
            bool leftHalfRemoved,
            bool rightHalfRemoved);
 
-  bool isNull() const { return m_pageId.isNull(); }
+  [[nodiscard]] bool isNull() const { return m_pageId.isNull(); }
 
-  const PageId& id() const { return m_pageId; }
+  [[nodiscard]] const PageId& id() const { return m_pageId; }
 
   void setId(const PageId& id) { m_pageId = id; }
 
-  const ImageId& imageId() const { return m_pageId.imageId(); }
+  [[nodiscard]] const ImageId& imageId() const { return m_pageId.imageId(); }
 
-  const ImageMetadata& metadata() const { return m_metadata; }
+  [[nodiscard]] const ImageMetadata& metadata() const { return m_metadata; }
 
-  int imageSubPages() const { return m_imageSubPages; }
+  [[nodiscard]] int imageSubPages() const { return m_imageSubPages; }
 
-  bool leftHalfRemoved() const { return m_leftHalfRemoved; }
+  [[nodiscard]] bool leftHalfRemoved() const { return m_leftHalfRemoved; }
 
-  bool rightHalfRemoved() const { return m_rightHalfRemoved; }
+  [[nodiscard]] bool rightHalfRemoved() const { return m_rightHalfRemoved; }
 
  private:
   PageId m_pageId;
@@ -41,6 +40,3 @@ class PageInfo {
   bool m_leftHalfRemoved;
   bool m_rightHalfRemoved;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_PAGEINFO_H_

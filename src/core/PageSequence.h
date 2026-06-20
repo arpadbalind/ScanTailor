@@ -15,27 +15,27 @@ class PageSequence {
  public:
   void append(const PageInfo& pageInfo);
 
-  size_t numPages() const;
+  [[nodiscard]] size_t numPages() const;
 
-  const PageInfo& pageAt(PageId page) const;
+  [[nodiscard]] const PageInfo& pageAt(PageId page) const;
 
-  const PageInfo& pageAt(size_t idx) const;
+  [[nodiscard]] const PageInfo& pageAt(size_t idx) const;
 
-  int pageNo(const PageId& page) const;
+  [[nodiscard]] int pageNo(const PageId& page) const;
 
-  std::set<PageId> selectAll() const;
+  [[nodiscard]] std::set<PageId> selectAll() const;
 
-  std::set<PageId> selectPagePlusFollowers(const PageId& page) const;
+  [[nodiscard]] std::set<PageId> selectPagePlusFollowers(const PageId& page) const;
 
-  std::set<PageId> selectEveryOther(const PageId& base) const;
+  [[nodiscard]] std::set<PageId> selectEveryOther(const PageId& base) const;
 
   std::vector<PageInfo>::iterator begin();
 
   std::vector<PageInfo>::iterator end();
 
-  std::vector<PageInfo>::const_iterator begin() const;
+  [[nodiscard]] std::vector<PageInfo>::const_iterator begin() const;
 
-  std::vector<PageInfo>::const_iterator end() const;
+  [[nodiscard]] std::vector<PageInfo>::const_iterator end() const;
 
  private:
   std::vector<PageInfo> m_pages;

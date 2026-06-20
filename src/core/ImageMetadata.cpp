@@ -18,28 +18,28 @@ bool ImageMetadata::operator==(const ImageMetadata& other) const {
 }
 
 bool ImageMetadata::isDpiOK() const {
-  return horizontalDpiStatus() != DPI_UNDEFINED && verticalDpiStatus() != DPI_UNDEFINED;
+  return horizontalDpiStatus() != Status::DPI_UNDEFINED && verticalDpiStatus() != Status::DPI_UNDEFINED;
 }
 
-ImageMetadata::DpiStatus ImageMetadata::horizontalDpiStatus() const {
+ImageMetadata::Status ImageMetadata::horizontalDpiStatus() const {
   return dpiStatus(m_size.width(), m_dpi.horizontal());
 }
 
-ImageMetadata::DpiStatus ImageMetadata::verticalDpiStatus() const {
+ImageMetadata::Status ImageMetadata::verticalDpiStatus() const {
   return dpiStatus(m_size.height(), m_dpi.vertical());
 }
 
-ImageMetadata::DpiStatus ImageMetadata::dpiStatus(int pixelSize, int dpi) {
+ImageMetadata::Status ImageMetadata::dpiStatus(int pixelSize, int dpi) {
   if (dpi <= 1) {
-    return DPI_UNDEFINED;
+    return Status::DPI_UNDEFINED;
   }
 
   if (dpi < 150) {
-    return DPI_TOO_SMALL;
+    return Status::DPI_TOO_SMALL;
   }
 
   if (dpi > 9999) {
-    return DPI_TOO_LARGE;
+    return Status::DPI_TOO_LARGE;
   }
 
   const double mm = INCH2MM * pixelSize / dpi;
@@ -51,7 +51,7 @@ ImageMetadata::DpiStatus ImageMetadata::dpiStatus(int pixelSize, int dpi) {
     // (real_hor_dpi / provided_hor_dpi) * (real_vert_dpi / provided_vert_dpi).
     // For example, if the real DPI is 600x600 but 200x200 is specified,
     // memory consumption is increased 9 times.
-    return DPI_TOO_SMALL_FOR_THIS_PIXEL_SIZE;
+    return Status::DPI_TOO_SMALL_FOR_THIS_PIXEL_SIZE;
   }
-  return DPI_OK;
+  return Status::DPI_OK;
 }

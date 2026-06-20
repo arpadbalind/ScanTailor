@@ -2479,7 +2479,7 @@ DistortionModel OutputGenerator::Processor::buildAutoDistortionModel(const GrayI
 
   float maxAngle = 2.75;
 
-  if ((m_pageId.subPage() == PageId::SINGLE_PAGE) || (m_pageId.subPage() == PageId::LEFT_PAGE)) {
+  if ((m_pageId.subPage() == PageId::SubPage::SINGLE_PAGE) || (m_pageId.subPage() == PageId::SubPage::LEFT_PAGE)) {
     float vertSkewAngleLeft = vertBorderSkewAngle(topPolyline.front(), bottomPolyline.front());
 
     stAngle.setNum(vertSkewAngleLeft);
@@ -2576,7 +2576,7 @@ DistortionModel OutputGenerator::Processor::buildMarginalDistortionModel() const
 
   topSpline.appendControlPoint(topLine.p1(), 0);
 
-  if ((m_pageId.subPage() == PageId::SINGLE_PAGE) || (m_pageId.subPage() == PageId::LEFT_PAGE)) {
+  if ((m_pageId.subPage() == PageId::SubPage::SINGLE_PAGE) || (m_pageId.subPage() == PageId::SubPage::LEFT_PAGE)) {
     for (int i = 29 - maxRedPoints; i < 29; i++) {
       topSpline.appendControlPoint(topLine.pointAt((float) i / 29.0), 1);
     }
@@ -2607,7 +2607,7 @@ DistortionModel OutputGenerator::Processor::buildMarginalDistortionModel() const
 
   bottomSpline.appendControlPoint(bottomLine.p1(), 0);
 
-  if ((m_pageId.subPage() == PageId::SINGLE_PAGE) || (m_pageId.subPage() == PageId::LEFT_PAGE)) {
+  if ((m_pageId.subPage() == PageId::SubPage::SINGLE_PAGE) || (m_pageId.subPage() == PageId::SubPage::LEFT_PAGE)) {
     for (int i = 29 - maxRedPoints; i < 29; i++) {
       bottomSpline.appendControlPoint(topLine.pointAt((float) i / 29.0), 1);
     }

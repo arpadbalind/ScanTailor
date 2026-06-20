@@ -17,7 +17,7 @@
 #include <stdexcept>
 
 #include "BitOps.h"
-#include "ByteOrder.h"
+#include <netinet/in.h>
 
 namespace imageproc {
 class BinaryImage::SharedData {

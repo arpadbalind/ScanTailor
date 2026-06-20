@@ -44,8 +44,8 @@ void StatusBarPanel::updatePage(int pageNumber, size_t pageCount, const PageId& 
   if (pageFileInfo.size() > 15) {
     pageFileInfo = "..." + pageFileInfo.right(13);
   }
-  if (pageId.subPage() != PageId::SINGLE_PAGE) {
-    pageFileInfo = pageFileInfo.right(11) + ((pageId.subPage() == PageId::LEFT_PAGE) ? tr(" [L]") : tr(" [R]"));
+  if (pageId.subPage() != PageId::SubPage::SINGLE_PAGE) {
+    pageFileInfo = pageFileInfo.right(11) + ((pageId.subPage() == PageId::SubPage::LEFT_PAGE) ? tr(" [L]") : tr(" [R]"));
   }
 
   ui.pageInfoLine->setVisible(true);

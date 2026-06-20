@@ -5,21 +5,19 @@
 
 #include <cassert>
 
-PageId::PageId() : m_subPage(SINGLE_PAGE) {}
-
 PageId::PageId(const ImageId& imageId, SubPage subpage) : m_imageId(imageId), m_subPage(subpage) {}
 
 QString PageId::subPageToString(const SubPage subPage) {
   const char* str = nullptr;
 
   switch (subPage) {
-    case SINGLE_PAGE:
+    case SubPage::SINGLE_PAGE:
       str = "single";
       break;
-    case LEFT_PAGE:
+    case SubPage::LEFT_PAGE:
       str = "left";
       break;
-    case RIGHT_PAGE:
+    case SubPage::RIGHT_PAGE:
       str = "right";
       break;
   }
@@ -30,14 +28,14 @@ QString PageId::subPageToString(const SubPage subPage) {
 
 PageId::SubPage PageId::subPageFromString(const QString& string, bool* ok) {
   bool recognized = true;
-  SubPage subPage = SINGLE_PAGE;
+  SubPage subPage = SubPage::SINGLE_PAGE;
 
   if (string == "single") {
-    subPage = SINGLE_PAGE;
+    subPage = SubPage::SINGLE_PAGE;
   } else if (string == "left") {
-    subPage = LEFT_PAGE;
+    subPage = SubPage::LEFT_PAGE;
   } else if (string == "right") {
-    subPage = RIGHT_PAGE;
+    subPage = SubPage::RIGHT_PAGE;
   } else {
     recognized = false;
   }

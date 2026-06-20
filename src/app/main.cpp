@@ -16,15 +16,7 @@
 #include "MainWindow.h"
 
 int main(int argc, char* argv[]) {
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
   Application app(argc, argv);
-
-#ifdef _WIN32
-  // Get rid of all references to Qt's installation directory.
-  Application::setLibraryPaths(QStringList(Application::applicationDirPath()));
-#endif
 
   QStringList args = Application::arguments();
 

@@ -17,6 +17,6 @@ PageId SelectedPage::get(PageView view) const {
   if (view == PAGE_VIEW) {
     return m_pageId;
   } else {
-    return PageId(m_pageId.imageId(), PageId::SINGLE_PAGE);
+    return PageId(m_pageId.imageId(), PageId::SubPage::SINGLE_PAGE);
   }
 }

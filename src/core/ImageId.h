@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_IMAGEID_H_
-#define SCANTAILOR_CORE_IMAGEID_H_
+#pragma once
 
 #include <foundation/Hashes.h>
 
@@ -19,19 +18,19 @@ class ImageId {
 
   explicit ImageId(const QFileInfo& fileInfo, int page = 0);
 
-  bool isNull() const { return m_filePath.isNull(); }
+  [[nodiscard]] bool isNull() const { return m_filePath.isNull(); }
 
-  const QString& filePath() const { return m_filePath; }
+  [[nodiscard]] const QString& filePath() const { return m_filePath; }
 
   void setFilePath(const QString& path) { m_filePath = path; }
 
-  int page() const { return m_page; }
+  [[nodiscard]] int page() const { return m_page; }
 
   void setPage(int page) { m_page = page; }
 
-  int zeroBasedPage() const { return m_page > 0 ? m_page - 1 : 0; }
+  [[nodiscard]] int zeroBasedPage() const { return m_page > 0 ? m_page - 1 : 0; }
 
-  bool isMultiPageFile() const { return m_page > 0; }
+  [[nodiscard]] bool isMultiPageFile() const { return m_page > 0; }
 
  private:
   QString m_filePath;
@@ -54,9 +53,8 @@ namespace std {
 template <>
 struct hash<ImageId> {
   size_t operator()(const ImageId& imageId) const noexcept {
+    // NOLINTNEXTLINE(bugprone-signed-bitwise)
     return (hashes::hash<QString>()(imageId.filePath()) ^ hash<int>()(imageId.page()) << 1);
   }
 };
 }  // namespace std
-
-#endif  // ifndef SCANTAILOR_CORE_IMAGEID_H_

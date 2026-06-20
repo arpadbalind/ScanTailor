@@ -233,11 +233,11 @@ QPolygonF PageLayout::rightPageOutline() const {
 
 QPolygonF PageLayout::pageOutline(const PageId::SubPage page) const {
   switch (page) {
-    case PageId::SINGLE_PAGE:
+    case PageId::SubPage::SINGLE_PAGE:
       return singlePageOutline();
-    case PageId::LEFT_PAGE:
+    case PageId::SubPage::LEFT_PAGE:
       return leftPageOutline();
-    case PageId::RIGHT_PAGE:
+    case PageId::SubPage::RIGHT_PAGE:
       return rightPageOutline();
   }
 

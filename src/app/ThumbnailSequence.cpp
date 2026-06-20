@@ -47,8 +47,8 @@ class ThumbnailSequence::Item {
   mutable bool incompleteThumbnail;
 
  private:
-  mutable bool m_isSelected;
-  mutable bool m_isSelectionLeader;
+  mutable bool m_isSelected { false };
+  mutable bool m_isSelectionLeader{ false };
 };
 
 
@@ -485,13 +485,13 @@ void ThumbnailSequence::Impl::reset(const PageSequence& pages,
     bool itemFound = (selected.find(pageInfo.id()) != selected.end());
     if (!itemFound) {
       switch (pageInfo.id().subPage()) {
-        case PageId::LEFT_PAGE:
-        case PageId::RIGHT_PAGE:
-          itemFound = (selected.find(PageId(imageId, PageId::SINGLE_PAGE)) != selected.end());
+        case PageId::SubPage::LEFT_PAGE:
+        case PageId::SubPage::RIGHT_PAGE:
+          itemFound = (selected.find(PageId(imageId, PageId::SubPage::SINGLE_PAGE)) != selected.end());
           break;
-        case PageId::SINGLE_PAGE:
-          itemFound = (selected.find(PageId(imageId, PageId::LEFT_PAGE)) != selected.end())
-                      || (selected.find(PageId(imageId, PageId::RIGHT_PAGE)) != selected.end());
+        case PageId::SubPage::SINGLE_PAGE:
+          itemFound = (selected.find(PageId(imageId, PageId::SubPage::LEFT_PAGE)) != selected.end())
+                      || (selected.find(PageId(imageId, PageId::SubPage::RIGHT_PAGE)) != selected.end());
           break;
       }
     }
@@ -883,7 +883,7 @@ void ThumbnailSequence::Impl::insert(const PageInfo& newPage, BeforeOrAfter befo
   } else {
     // Note that we have to use lower_bound() rather than find() because
     // we are not searching for PageId(image) exactly, which implies
-    // PageId::SINGLE_PAGE configuration, but rather we search for
+    // PageId::SubPage::SINGLE_PAGE configuration, but rather we search for
     // a page with any configuration, as long as it references the same image.
     ItemsById::iterator idIt(m_itemsById.find(PageId(image)));
     if ((idIt == m_itemsById.end()) || (idIt->pageInfo.imageId() != image)) {
@@ -1008,8 +1008,8 @@ std::set<PageId> ThumbnailSequence::Impl::selectedItems() const {
 std::vector<PageRange> ThumbnailSequence::Impl::selectedRanges() const {
   std::vector<PageRange> ranges;
 
-  ItemsInOrder::iterator it(m_itemsInOrder.begin());
-  const ItemsInOrder::iterator end(m_itemsInOrder.end());
+  auto it = m_itemsInOrder.cbegin();
+  const auto end = m_itemsInOrder.cend();
   while (true) {
     for (; it != end && !it->isSelected(); ++it) {
       // Skip unselected items.
@@ -1021,7 +1021,7 @@ std::vector<PageRange> ThumbnailSequence::Impl::selectedRanges() const {
     ranges.emplace_back();
     PageRange& range = ranges.back();
     for (; it != end && it->isSelected(); ++it) {
-      range.pages.push_back(it->pageInfo.id());
+      range.pages().push_back(it->pageInfo.id());
     }
   }
   return ranges;
@@ -1321,10 +1321,10 @@ std::unique_ptr<ThumbnailSequence::LabelGroup> ThumbnailSequence::Impl::getLabel
 
   QIcon pageThumb;
   switch (pageId.subPage()) {
-    case PageId::LEFT_PAGE:
+    case PageId::SubPage::LEFT_PAGE:
       pageThumb = IconProvider::getInstance().getIcon("left_page_thumb");
       break;
-    case PageId::RIGHT_PAGE:
+    case PageId::SubPage::RIGHT_PAGE:
       pageThumb = IconProvider::getInstance().getIcon("right_page_thumb");
       break;
     default:
@@ -1390,12 +1390,10 @@ void ThumbnailSequence::Impl::setSelectionModeEnabled(bool enabled) {
 
 /*==================== ThumbnailSequence::Item ======================*/
 
-ThumbnailSequence::Item::Item(const PageInfo& pageInfo, CompositeItem* compItem)
-    : pageInfo(pageInfo),
+ThumbnailSequence::Item::Item(const PageInfo& pPageInfo, CompositeItem* compItem)
+    : pageInfo(pPageInfo),
       composite(compItem),
-      incompleteThumbnail(compItem->incompleteThumbnail()),
-      m_isSelected(false),
-      m_isSelectionLeader(false) {}
+      incompleteThumbnail(compItem->incompleteThumbnail()) {}
 
 void ThumbnailSequence::Item::setSelected(bool selected) const {
   const bool wasSelected = m_isSelected;

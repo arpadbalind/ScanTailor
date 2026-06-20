@@ -160,10 +160,10 @@ QDomElement ProjectWriter::processPages(QDomDocument& doc) const {
 
   PageId pageLeft;
   PageId pageRight;
-  if (selOpt2.subPage() == PageId::SINGLE_PAGE) {
+  if (selOpt2.subPage() == PageId::SubPage::SINGLE_PAGE) {
     // In case it was split later select first of its pages found
-    pageLeft = PageId(selOpt2.imageId(), PageId::LEFT_PAGE);
-    pageRight = PageId(selOpt2.imageId(), PageId::RIGHT_PAGE);
+    pageLeft = PageId(selOpt2.imageId(), PageId::SubPage::LEFT_PAGE);
+    pageRight = PageId(selOpt2.imageId(), PageId::SubPage::RIGHT_PAGE);
   }
 
 

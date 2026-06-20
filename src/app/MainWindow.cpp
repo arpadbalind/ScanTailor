@@ -642,11 +642,11 @@ void MainWindow::resetThumbSequence(const std::shared_ptr<const PageOrderProvide
     const PageId page(m_selectedPage.get(getCurrentView()));
     if (m_thumbSequence->setSelection(page)) {
       // OK
-    } else if (m_thumbSequence->setSelection(PageId(page.imageId(), PageId::LEFT_PAGE))) {
+    } else if (m_thumbSequence->setSelection(PageId(page.imageId(), PageId::SubPage::LEFT_PAGE))) {
       // OK
-    } else if (m_thumbSequence->setSelection(PageId(page.imageId(), PageId::RIGHT_PAGE))) {
+    } else if (m_thumbSequence->setSelection(PageId(page.imageId(), PageId::SubPage::RIGHT_PAGE))) {
       // OK
-    } else if (m_thumbSequence->setSelection(PageId(page.imageId(), PageId::SINGLE_PAGE))) {
+    } else if (m_thumbSequence->setSelection(PageId(page.imageId(), PageId::SubPage::SINGLE_PAGE))) {
       // OK
     } else {
       // Last resort.
@@ -1637,8 +1637,7 @@ void MainWindow::updateWindowTitle() {
   } else {
     projectName = QFileInfo(m_projectFile).completeBaseName();
   }
-  const QString version(QString::fromUtf8(VERSION));
-  setWindowTitle(tr("%2 - ScanTailor Advanced [%1bit]").arg(sizeof(void*) * 8).arg(projectName));
+  setWindowTitle(tr("%2 - ScanTailor Advanced").arg(projectName));
 }
 
 /**
@@ -1944,22 +1943,22 @@ void MainWindow::eraseOutputFiles(const std::set<PageId>& pages) {
   for (const PageId& pageId : pages) {
     eraseVariations.clear();
     switch (pageId.subPage()) {
-      case PageId::SINGLE_PAGE:
-        eraseVariations.push_back(PageId::SINGLE_PAGE);
-        eraseVariations.push_back(PageId::LEFT_PAGE);
-        eraseVariations.push_back(PageId::RIGHT_PAGE);
+      case PageId::SubPage::SINGLE_PAGE:
+        eraseVariations.push_back(PageId::SubPage::SINGLE_PAGE);
+        eraseVariations.push_back(PageId::SubPage::LEFT_PAGE);
+        eraseVariations.push_back(PageId::SubPage::RIGHT_PAGE);
         break;
-      case PageId::LEFT_PAGE:
-        eraseVariations.push_back(PageId::SINGLE_PAGE);
-        eraseVariations.push_back(PageId::LEFT_PAGE);
+      case PageId::SubPage::LEFT_PAGE:
+        eraseVariations.push_back(PageId::SubPage::SINGLE_PAGE);
+        eraseVariations.push_back(PageId::SubPage::LEFT_PAGE);
         break;
-      case PageId::RIGHT_PAGE:
-        eraseVariations.push_back(PageId::SINGLE_PAGE);
-        eraseVariations.push_back(PageId::RIGHT_PAGE);
+      case PageId::SubPage::RIGHT_PAGE:
+        eraseVariations.push_back(PageId::SubPage::SINGLE_PAGE);
+        eraseVariations.push_back(PageId::SubPage::RIGHT_PAGE);
         break;
     }
 
-    for (PageId::SubPage subpage : eraseVariations) {
+    for (const PageId::SubPage& subpage : eraseVariations) {
       QFile::remove(m_outFileNameGen.filePathFor(PageId(pageId.imageId(), subpage)));
     }
   }

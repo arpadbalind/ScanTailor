@@ -14,11 +14,7 @@ QString RelinkablePath::normalize(const QString& path) {
   QStringList newComponents;
   for (const QString& comp : frontSlashes.split(QChar('/'), Qt::KeepEmptyParts)) {
     if (comp.isEmpty()) {
-      if (newComponents.isEmpty()
-#if _WIN32
-          || (newComponents.size() == 1 && newComponents.front().isEmpty())
-#endif
-      ) {
+      if (newComponents.isEmpty()) {
         newComponents.push_back(comp);
       } else {
         // This will get rid of redundant slashes, including the trailing slash.

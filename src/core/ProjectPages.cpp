@@ -64,21 +64,21 @@ ProjectPages::ProjectPages(const std::vector<ImageFileInfo>& files,
 ProjectPages::~ProjectPages() = default;
 
 Qt::LayoutDirection ProjectPages::layoutDirection() const {
-  if (m_subPagesInOrder[0] == PageId::LEFT_PAGE) {
+  if (m_subPagesInOrder[0] == PageId::SubPage::LEFT_PAGE) {
     return Qt::LeftToRight;
   } else {
-    assert(m_subPagesInOrder[0] == PageId::RIGHT_PAGE);
+    assert(m_subPagesInOrder[0] == PageId::SubPage::RIGHT_PAGE);
     return Qt::RightToLeft;
   }
 }
 
 void ProjectPages::initSubPagesInOrder(const Qt::LayoutDirection layoutDirection) {
   if (layoutDirection == Qt::LeftToRight) {
-    m_subPagesInOrder[0] = PageId::LEFT_PAGE;
-    m_subPagesInOrder[1] = PageId::RIGHT_PAGE;
+    m_subPagesInOrder[0] = PageId::SubPage::LEFT_PAGE;
+    m_subPagesInOrder[1] = PageId::SubPage::RIGHT_PAGE;
   } else {
-    m_subPagesInOrder[0] = PageId::RIGHT_PAGE;
-    m_subPagesInOrder[1] = PageId::LEFT_PAGE;
+    m_subPagesInOrder[0] = PageId::SubPage::RIGHT_PAGE;
+    m_subPagesInOrder[1] = PageId::SubPage::LEFT_PAGE;
   }
 }
 
@@ -106,7 +106,7 @@ PageSequence ProjectPages::toPageSequence(const PageView view) const {
     const auto numImages = static_cast<int>(m_images.size());
     for (int i = 0; i < numImages; ++i) {
       const ImageDesc& image = m_images[i];
-      const PageId id(image.id, PageId::SINGLE_PAGE);
+      const PageId id(image.id, PageId::SubPage::SINGLE_PAGE);
       pages.append(PageInfo(id, image.metadata, image.numLogicalPages, image.leftHalfRemoved, image.rightHalfRemoved));
     }
   }
@@ -441,7 +441,7 @@ std::vector<PageInfo> ProjectPages::insertImageImpl(const ImageInfo& newImage,
 
   m_images.insert(it, imageDesc);
 
-  PageInfo pageInfoTempl(PageId(newImage.id(), PageId::SINGLE_PAGE), imageDesc.metadata, imageDesc.numLogicalPages,
+  PageInfo pageInfoTempl(PageId(newImage.id(), PageId::SubPage::SINGLE_PAGE), imageDesc.metadata, imageDesc.numLogicalPages,
                          imageDesc.leftHalfRemoved, imageDesc.rightHalfRemoved);
 
   if ((view == IMAGE_VIEW)
@@ -471,16 +471,16 @@ void ProjectPages::removePagesImpl(const std::set<PageId>& toRemove, bool& modif
   for (int i = 0; i < numOldImages; ++i) {
     ImageDesc image(m_images[i]);
 
-    if (toRemove.find(PageId(image.id, PageId::SINGLE_PAGE)) != toRemoveEnd) {
+    if (toRemove.find(PageId(image.id, PageId::SubPage::SINGLE_PAGE)) != toRemoveEnd) {
       image.numLogicalPages = 0;
       modified = true;
     } else {
-      if (toRemove.find(PageId(image.id, PageId::LEFT_PAGE)) != toRemoveEnd) {
+      if (toRemove.find(PageId(image.id, PageId::SubPage::LEFT_PAGE)) != toRemoveEnd) {
         image.leftHalfRemoved = true;
         --image.numLogicalPages;
         modified = true;
       }
-      if (toRemove.find(PageId(image.id, PageId::RIGHT_PAGE)) != toRemoveEnd) {
+      if (toRemove.find(PageId(image.id, PageId::SubPage::RIGHT_PAGE)) != toRemoveEnd) {
         image.rightHalfRemoved = true;
         --image.numLogicalPages;
         modified = true;
@@ -497,9 +497,9 @@ void ProjectPages::removePagesImpl(const std::set<PageId>& toRemove, bool& modif
 }  // ProjectPages::removePagesImpl
 
 PageInfo ProjectPages::unremovePageImpl(const PageId& pageId, [[maybe_unused]] bool& modified) {
-  if (pageId.subPage() == PageId::SINGLE_PAGE) {
+  if (pageId.subPage() == PageId::SubPage::SINGLE_PAGE) {
     // These can't be unremoved.
-    return PageInfo();
+    return {};
   }
 
   auto it(m_images.begin());
@@ -518,9 +518,9 @@ PageInfo ProjectPages::unremovePageImpl(const PageId& pageId, [[maybe_unused]] b
     return PageInfo();
   }
 
-  if ((pageId.subPage() == PageId::LEFT_PAGE) && image.leftHalfRemoved) {
+  if ((pageId.subPage() == PageId::SubPage::LEFT_PAGE) && image.leftHalfRemoved) {
     image.leftHalfRemoved = false;
-  } else if ((pageId.subPage() == PageId::RIGHT_PAGE) && image.rightHalfRemoved) {
+  } else if ((pageId.subPage() == PageId::SubPage::RIGHT_PAGE) && image.rightHalfRemoved) {
     image.rightHalfRemoved = false;
   } else {
     return PageInfo();
@@ -561,11 +561,11 @@ PageId::SubPage ProjectPages::ImageDesc::logicalPageToSubPage(const int logicalP
 
   if (numLogicalPages == 1) {
     if (leftHalfRemoved && !rightHalfRemoved) {
-      return PageId::RIGHT_PAGE;
+      return PageId::SubPage::RIGHT_PAGE;
     } else if (rightHalfRemoved && !leftHalfRemoved) {
-      return PageId::LEFT_PAGE;
+      return PageId::SubPage::LEFT_PAGE;
     } else {
-      return PageId::SINGLE_PAGE;
+      return PageId::SubPage::SINGLE_PAGE;
     }
   } else {
     return subPagesInOrder[logicalPage];

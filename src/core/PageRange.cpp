@@ -2,26 +2,23 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #include "PageRange.h"
+#include <algorithm>
 
 std::set<PageId> PageRange::selectEveryOther(const PageId& base) const {
   std::set<PageId> selection;
-
-  auto it(pages.begin());
-  const auto end(pages.end());
-  for (; it != end && *it != base; ++it) {
-    // Continue until we have a match.
-  }
-  if (it == end) {
+  auto& pages = this->pages();
+  const auto baseIt = std::ranges::find(pages, base);
+  if (baseIt == pages.end()) {
     return selection;
   }
 
-  const int baseIdx = static_cast<int>(it - pages.begin());
-  int idx = 0;
-  for (const PageId& pageId : pages) {
-    if (((idx - baseIdx) & 1) == 0) {
-      selection.insert(pageId);
+  const auto parity = std::distance(pages.begin(), baseIt) % 2;
+
+  for (std::ptrdiff_t idx = 0; idx < std::ssize(pages); ++idx) {
+    if (idx % 2 == parity) {
+      selection.insert(pages[static_cast<std::size_t>(idx)]);
     }
-    ++idx;
   }
+
   return selection;
 }

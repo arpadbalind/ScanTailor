@@ -372,26 +372,26 @@ void FixDpiDialog::updateDpiCombo() {
   dpiCombo->setCurrentIndex(0);
 }
 
-void FixDpiDialog::decorateDpiInputField(QLineEdit* field, ImageMetadata::DpiStatus dpiStatus) const {
-  if (dpiStatus == ImageMetadata::DPI_OK) {
+void FixDpiDialog::decorateDpiInputField(QLineEdit* field, ImageMetadata::Status dpiStatus) const {
+  if (dpiStatus == ImageMetadata::Status::DPI_OK) {
     field->setPalette(m_normalPalette);
   } else {
     field->setPalette(m_errorPalette);
   }
 
   switch (dpiStatus) {
-    case ImageMetadata::DPI_OK:
-    case ImageMetadata::DPI_UNDEFINED:
+    case ImageMetadata::Status::DPI_OK:
+    case ImageMetadata::Status::DPI_UNDEFINED:
       field->setToolTip(QString());
       break;
-    case ImageMetadata::DPI_TOO_LARGE:
+    case ImageMetadata::Status::DPI_TOO_LARGE:
       field->setToolTip(tr("DPI is too large and most likely wrong."));
       break;
-    case ImageMetadata::DPI_TOO_SMALL:
+    case ImageMetadata::Status::DPI_TOO_SMALL:
       field->setToolTip(
           tr("DPI is too small. Even if it's correct, you are not going to get acceptable results with it."));
       break;
-    case ImageMetadata::DPI_TOO_SMALL_FOR_THIS_PIXEL_SIZE:
+    case ImageMetadata::Status::DPI_TOO_SMALL_FOR_THIS_PIXEL_SIZE:
       field->setToolTip(
           tr("DPI is too small for this pixel size. Such combination would probably lead to out of "
              "memory errors."));

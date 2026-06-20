@@ -72,11 +72,7 @@ void LightColorScheme::loadStyleSheet() {
     styleSheetFile.close();
   }
 
-#ifdef _WIN32
-  m_styleSheet = Utils::qssConvertPxToEm(m_styleSheet, 13, 4);
-#else
   m_styleSheet = Utils::qssConvertPxToEm(m_styleSheet, 16, 4);
-#endif
 }
 
 void LightColorScheme::loadColorParams() {

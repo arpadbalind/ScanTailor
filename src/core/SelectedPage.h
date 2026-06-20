@@ -12,8 +12,8 @@
  * \code
  * ImageId image_id = ...;
  * SelectedPage page;
- * page.set(PageId(image_id, PageId::RIGHT_PAGE), PAGE_VIEW);
- * page.set(PageId(image_id, PageId::SINGLE_PAGE), IMAGE_VIEW);
+ * page.set(PageId(image_id, PageId::SubPage::RIGHT_PAGE), PAGE_VIEW);
+ * page.set(PageId(image_id, PageId::SubPage::SINGLE_PAGE), IMAGE_VIEW);
  * page.get(PAGE_VIEW);  * \endcode
  * As seen above, this class remembers the sub-page as long as image id
  * stays the same.  Note that set(..., PAGE_VIEW) will always overwrite
