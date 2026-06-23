@@ -3,16 +3,19 @@
 
 #include "CacheDrivenTask.h"
 
+#include <QRectF>
+
+#include <memory>
 #include <utility>
 
-#include "ImageTransformation.h"
-#include "PageInfo.h"
-#include "Settings.h"
-#include "ThumbnailBase.h"
 #include "core/AbstractFilterDataCollector.h"
 #include "core/PageOrientationCollector.h"
 #include "core/ThumbnailCollector.h"
 #include "filters/page_split/CacheDrivenTask.h"
+#include "ImageTransformation.h"
+#include "PageInfo.h"
+#include "Settings.h"
+#include "ThumbnailBase.h"
 
 namespace fix_orientation {
 CacheDrivenTask::CacheDrivenTask(std::shared_ptr<Settings> settings,

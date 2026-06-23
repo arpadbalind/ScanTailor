@@ -1,14 +1,15 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_THUMBNAILLOADRESULT_H_
-#define SCANTAILOR_CORE_THUMBNAILLOADRESULT_H_
+#pragma once
 
 #include <QPixmap>
+#include <cstdint>
+#include <utility>
 
 class ThumbnailLoadResult {
  public:
-  enum Status {
+  enum class Status : std::uint8_t {
     /**
      * \brief Thumbnail loaded successfully.  Pixmap is not null.
      */
@@ -37,16 +38,13 @@ class ThumbnailLoadResult {
     REQUEST_EXPIRED
   };
 
-  ThumbnailLoadResult(Status status, const QPixmap& pixmap) : m_pixmap(pixmap), m_status(status) {}
+  ThumbnailLoadResult(Status status, QPixmap pixmap) : m_pixmap(std::move(pixmap)), m_status(status) {}
 
-  Status status() const { return m_status; }
+  [[nodiscard]] Status status() const { return m_status; }
 
-  const QPixmap& pixmap() const { return m_pixmap; }
+  [[nodiscard]] const QPixmap& pixmap() const { return m_pixmap; }
 
  private:
   QPixmap m_pixmap;
   Status m_status;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_THUMBNAILLOADRESULT_H_

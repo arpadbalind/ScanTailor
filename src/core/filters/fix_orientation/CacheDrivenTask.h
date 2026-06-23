@@ -23,7 +23,7 @@ class CacheDrivenTask : public CompositeCacheDrivenTask, private NonCopyable {
  public:
   CacheDrivenTask(std::shared_ptr<Settings> settings, std::shared_ptr<page_split::CacheDrivenTask> nextTask);
 
-  virtual ~CacheDrivenTask();
+  ~CacheDrivenTask() override;
 
   void process(const PageInfo& pageInfo, AbstractFilterDataCollector* collector) override;
 

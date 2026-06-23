@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 
 #include "AbstractCommand.h"
@@ -18,7 +19,11 @@ class QSize;
 class ThumbnailPixmapCache : private NonCopyable {
 
  public:
-  enum Status { LOADED, LOAD_FAILED, QUEUED };
+  enum class ThumbnailPmCacheStatus : std::uint8_t {
+    LOADED,
+    LOAD_FAILED,
+    QUEUED
+  };
 
   using CompletionHandler = AbstractCommand<void, const ThumbnailLoadResult&>;
 
@@ -45,11 +50,11 @@ class ThumbnailPixmapCache : private NonCopyable {
   /**
    * \brief Destructor.  To be called from the GUI thread only.
    */
-  virtual ~ThumbnailPixmapCache();
+  ~ThumbnailPixmapCache();
 
   void setThumbDir(const QString& thumbDir);
 
-  const QSize& getMaxThumbSize() const;
+  [[nodiscard]] const QSize& getMaxThumbSize() const;
 
   void setMaxThumbSize(const QSize& maxSize);
 
@@ -60,14 +65,14 @@ class ThumbnailPixmapCache : private NonCopyable {
    *
    * \note This function is to be called from the GUI thread only.
    */
-  Status loadFromCache(const ImageId& imageId, QPixmap& pixmap);
+  ThumbnailPmCacheStatus loadFromCache(const ImageId& imageId, QPixmap& pixmap);
 
   /**
    * \brief Take the pixmap from cache or from disk, blocking if necessary.
    *
    * \note This function is to be called from the GUI thread only.
    */
-  Status loadNow(const ImageId& imageId, QPixmap& pixmap);
+  ThumbnailPmCacheStatus loadNow(const ImageId& imageId, QPixmap& pixmap);
 
   /**
    * \brief Take the pixmap from cache or schedule a load request.
@@ -99,7 +104,7 @@ class ThumbnailPixmapCache : private NonCopyable {
    * keep in mind is that only boost::bind() can handle trackable binds.
    * Other methods, for example boost::lambda::bind() can't do that.
    */
-  Status loadRequest(const ImageId& imageId,
+  ThumbnailPmCacheStatus loadRequest(const ImageId& imageId,
                      QPixmap& pixmap,
                      const std::weak_ptr<CompletionHandler>& completionHandler);
 

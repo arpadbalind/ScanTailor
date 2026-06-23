@@ -59,8 +59,8 @@ void ThumbnailBase::paint(QPainter* painter, [[maybe_unused]] const QStyleOption
 
   if (!m_completionHandler) {
     auto handler = std::make_shared<LoadCompletionHandler>(this);
-    const ThumbnailPixmapCache::Status status = m_thumbnailCache->loadRequest(m_imageId, pixmap, handler);
-    if (status == ThumbnailPixmapCache::QUEUED) {
+    const ThumbnailPixmapCache::ThumbnailPmCacheStatus status = m_thumbnailCache->loadRequest(m_imageId, pixmap, handler);
+    if (status == ThumbnailPixmapCache::ThumbnailPmCacheStatus::QUEUED) {
       m_completionHandler.swap(handler);
     }
   }
@@ -204,7 +204,7 @@ void ThumbnailBase::setImageXform(const ImageTransformation& imageXform) {
 void ThumbnailBase::handleLoadResult(const ThumbnailLoadResult& result) {
   m_completionHandler.reset();
 
-  if (result.status() != ThumbnailLoadResult::LOAD_FAILED) {
+  if (result.status() != ThumbnailLoadResult::Status::LOAD_FAILED) {
     // Note that we don't store result.pixmap() in
     // this object, because we may have already went
     // out of view, so we may never receive a paint event.
