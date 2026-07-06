@@ -3,13 +3,11 @@
 
 #pragma once
 
-#include "NonCopyable.h"
-
 template <typename T>
-class SafeDeletingQObjectPtr : private NonCopyable {
+class SafeDeletingQObjectPtr {
 
  public:
-  explicit SafeDeletingQObjectPtr(T* obj = 0) : m_obj(obj) {}
+  explicit SafeDeletingQObjectPtr(T* obj = nullptr) : m_obj(obj) {}
 
   ~SafeDeletingQObjectPtr() {
     if (m_obj) {
@@ -18,15 +16,21 @@ class SafeDeletingQObjectPtr : private NonCopyable {
     }
   }
 
+  SafeDeletingQObjectPtr(const SafeDeletingQObjectPtr&) = delete;
+  SafeDeletingQObjectPtr& operator=(const SafeDeletingQObjectPtr&) = delete;
+
+  SafeDeletingQObjectPtr(SafeDeletingQObjectPtr&&) = delete;
+  SafeDeletingQObjectPtr& operator=(SafeDeletingQObjectPtr&&) = delete;
+
   void reset(T* other) { SafeDeletingQObjectPtr(other).swap(*this); }
 
   T& operator*() const { return *m_obj; }
 
   T* operator->() const { return m_obj; }
 
-  T* get() const { return m_obj; }
+  [[nodiscard]] T* get() const { return m_obj; }
 
-  void swap(SafeDeletingQObjectPtr& other) {
+  void swap(SafeDeletingQObjectPtr& other) noexcept {
     T* tmp = m_obj;
     m_obj = other.m_obj;
     other.m_obj = tmp;
@@ -38,6 +42,6 @@ class SafeDeletingQObjectPtr : private NonCopyable {
 
 
 template <typename T>
-void swap(SafeDeletingQObjectPtr<T>& o1, SafeDeletingQObjectPtr<T>& o2) {
+void swap(SafeDeletingQObjectPtr<T>& o1, SafeDeletingQObjectPtr<T>& o2) noexcept {
   o1.swap(o2);
 }

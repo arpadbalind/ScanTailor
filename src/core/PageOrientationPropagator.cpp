@@ -30,7 +30,7 @@ PageOrientationPropagator::PageOrientationPropagator(std::shared_ptr<page_split:
 PageOrientationPropagator::~PageOrientationPropagator() = default;
 
 void PageOrientationPropagator::propagate(const ProjectPages& pages) {
-  const PageSequence sequence(pages.toPageSequence(PAGE_VIEW));
+  const PageSequence sequence(pages.toPageSequence(PageView::PAGE_VIEW));
 
   for (const PageInfo& pageInfo : sequence) {
     Collector collector;

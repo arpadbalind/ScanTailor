@@ -379,7 +379,7 @@ void MainWindow::switchToNewProject(const std::shared_ptr<ProjectPages>& pages,
 
   m_outFileNameGen = OutputFileNameGenerator(disambiguator, outDir, pages->layoutDirection());
   // These two need to go in this order.
-  updateDisambiguationRecords(pages->toPageSequence(IMAGE_VIEW));
+  updateDisambiguationRecords(pages->toPageSequence(PageView::IMAGE_VIEW));
 
   // Recreate the stages and load their state.
   m_stages = std::make_shared<StageSequence>(pages, newPageSelectionAccessor());
@@ -446,7 +446,7 @@ void MainWindow::showNewOpenProjectPanel() {
   layout->setColumnStretch(2, 1);
   layout->setRowStretch(0, 1);
   layout->setRowStretch(2, 1);
-  setImageWidget(outerWidget.release(), TRANSFER_OWNERSHIP);
+  setImageWidget(outerWidget.release(), Ownership::TRANSFER);
 
   filterList->setBatchProcessingPossible(false);
 }  // MainWindow::showNewOpenProjectPanel
@@ -657,7 +657,7 @@ void MainWindow::resetThumbSequence(const std::shared_ptr<const PageOrderProvide
 
 void MainWindow::setOptionsWidget(FilterOptionsWidget* widget, const Ownership ownership) {
   if (isBatchProcessingInProgress()) {
-    if (ownership == TRANSFER_OWNERSHIP) {
+    if (ownership == Ownership::TRANSFER) {
       delete widget;
     }
     return;
@@ -669,7 +669,7 @@ void MainWindow::setOptionsWidget(FilterOptionsWidget* widget, const Ownership o
   // Delete the old widget we were owning, if any.
   m_optionsWidgetCleanup.clear();
 
-  if (ownership == TRANSFER_OWNERSHIP) {
+  if (ownership == Ownership::TRANSFER) {
     m_optionsWidgetCleanup.add(widget);
   }
 
@@ -709,7 +709,7 @@ void MainWindow::applyImageWidget(QWidget* widget,
                                   bool overlay)
 {
   if (isBatchProcessingInProgress() && (widget != m_batchProcessingWidget.get())) {
-    if (ownership == TRANSFER_OWNERSHIP) {
+    if (ownership == Ownership::TRANSFER) {
       delete widget;
     }
     return;
@@ -719,7 +719,7 @@ void MainWindow::applyImageWidget(QWidget* widget,
     removeImageWidget();
   }
 
-  if (ownership == TRANSFER_OWNERSHIP) {
+  if (ownership == Ownership::TRANSFER) {
     m_imageWidgetCleanup.add(widget);
   }
 
@@ -1566,7 +1566,7 @@ void MainWindow::updateMainArea() {
     m_statusBarPanel->clear();
   } else if (isBatchProcessingInProgress()) {
     filterList->setBatchProcessingPossible(false);
-    setImageWidget(m_batchProcessingWidget.get(), KEEP_OWNERSHIP);
+    setImageWidget(m_batchProcessingWidget.get(), Ownership::KEEP);
   } else {
     setDockWidgetsVisible(true);
     const PageInfo page(m_thumbSequence->selectionLeader());
@@ -1605,7 +1605,7 @@ void MainWindow::loadPageInteractive(const PageInfo& page) {
            " \"Margins\"."));
 
     removeFilterOptionsWidget();
-    setImageWidget(new ErrorWidget(errText), TRANSFER_OWNERSHIP);
+    setImageWidget(new ErrorWidget(errText), Ownership::TRANSFER);
     return;
   }
 
@@ -1618,7 +1618,7 @@ void MainWindow::loadPageInteractive(const PageInfo& page) {
       m_processingIndicationWidget->processingRestartedEffect();
     }
     bool currentWidgetIsImage = (Utils::castOrFindChild<ImageViewBase*>(m_imageFrameLayout->widget(0)) != nullptr);
-    setImageWidget(m_processingIndicationWidget.get(), KEEP_OWNERSHIP, nullptr, currentWidgetIsImage);
+    setImageWidget(m_processingIndicationWidget.get(), Ownership::KEEP, nullptr, currentWidgetIsImage);
     m_stages->filterAt(m_curFilter)->preUpdateUI(this, page);
   }
 
@@ -1739,7 +1739,7 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
     explicit ProxyModel(const ProjectPages& pages) {
       setDynamicSortFilter(true);
 
-      const PageSequence sequence(pages.toPageSequence(IMAGE_VIEW));
+      const PageSequence sequence(pages.toPageSequence(PageView::IMAGE_VIEW));
       for (const PageInfo& page : sequence) {
         m_inProjectFiles.push_back(QFileInfo(page.imageId().filePath()));
       }

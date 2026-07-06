@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_ABSTRACTFILTER_H_
-#define SCANTAILOR_CORE_ABSTRACTFILTER_H_
+#pragma once
 
 #include <vector>
 
@@ -35,7 +34,7 @@ class AbstractFilter : public std::enable_shared_from_this<AbstractFilter> {
 
   virtual void selectPageOrder([[maybe_unused]] int option) {}
 
-  virtual std::vector<PageOrderOption> pageOrderOptions() const { return std::vector<PageOrderOption>(); }
+  virtual std::vector<PageOrderOption> pageOrderOptions() const { return {}; }
 
   virtual void performRelinking(const AbstractRelinker& relinker) = 0;
 
@@ -47,6 +46,3 @@ class AbstractFilter : public std::enable_shared_from_this<AbstractFilter> {
 
   virtual void loadDefaultSettings(const PageInfo& pageInfo) = 0;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_ABSTRACTFILTER_H_

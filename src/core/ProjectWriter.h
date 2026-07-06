@@ -54,18 +54,19 @@ class ProjectWriter : private NonCopyable {
   void enumPages(OutFunc out) const;
 
  private:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   struct Directory {
     QString path;
     int numericId;
 
-    Directory(const QString& pPath, int pNumericId) : path(pPath), numericId(pNumericId) {}
+    Directory(QString pPath, int pNumericId) : path(std::move(pPath)), numericId(pNumericId) {}
   };
 
   struct File {
     QString path;
     int numericId;
 
-    File(const QString& pPath, int pNumericId) : path(pPath), numericId(pNumericId) {}
+    File(QString pPath, int pNumericId) : path(std::move(pPath)), numericId(pNumericId) {}
   };
 
   struct Image {
@@ -82,9 +83,9 @@ class ProjectWriter : private NonCopyable {
     PageId id;
     int numericId;
 
-    Page(const PageId& pID, int pNumericId) : id(pID), numericId(pNumericId) {}
+    Page(PageId pID, int pNumericId) : id(std::move(pID)), numericId(pNumericId) {}
   };
-
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
   class Sequenced;
 
   using MetadataByImage = std::unordered_map<ImageId, ImageMetadata>;

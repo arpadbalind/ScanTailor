@@ -247,7 +247,7 @@ void ProjectReader::processPages(const QDomElement& pagesEl) {
     m_pageMap.insert(PageMap::value_type(id, pageId));
 
     if (el.attribute("selected") == "selected") {
-      m_selectedPage.set(pageId, PAGE_VIEW);
+      m_selectedPage.set(pageId, PageView::PAGE_VIEW);
     }
   }
 }  // ProjectReader::processPages

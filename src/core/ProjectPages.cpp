@@ -85,7 +85,7 @@ void ProjectPages::initSubPagesInOrder(const Qt::LayoutDirection layoutDirection
 PageSequence ProjectPages::toPageSequence(const PageView view) const {
   PageSequence pages;
 
-  if (view == PAGE_VIEW) {
+  if (view == PageView::PAGE_VIEW) {
     QMutexLocker locker(&m_mutex);
 
     const auto numImages = static_cast<int>(m_images.size());
@@ -99,7 +99,7 @@ PageSequence ProjectPages::toPageSequence(const PageView view) const {
       }
     }
   } else {
-    assert(view == IMAGE_VIEW);
+    assert(view == PageView::IMAGE_VIEW);
 
     QMutexLocker locker(&m_mutex);
 
@@ -444,7 +444,7 @@ std::vector<PageInfo> ProjectPages::insertImageImpl(const ImageInfo& newImage,
   PageInfo pageInfoTempl(PageId(newImage.id(), PageId::SubPage::SINGLE_PAGE), imageDesc.metadata, imageDesc.numLogicalPages,
                          imageDesc.leftHalfRemoved, imageDesc.rightHalfRemoved);
 
-  if ((view == IMAGE_VIEW)
+  if ((view == PageView::IMAGE_VIEW)
       || ((imageDesc.numLogicalPages == 1) && (imageDesc.leftHalfRemoved == imageDesc.rightHalfRemoved))) {
     logicalPages.push_back(pageInfoTempl);
   } else {

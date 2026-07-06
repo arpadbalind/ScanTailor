@@ -498,7 +498,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
 
   OptionsWidget* const optWidget = m_filter->optionsWidget();
   optWidget->postUpdateUI();
-  ui->setOptionsWidget(optWidget, ui->KEEP_OWNERSHIP);
+  ui->setOptionsWidget(optWidget, ui->Ownership::KEEP);
 
   auto tabImageRectMap = std::make_unique<std::unordered_map<ImageViewTab, QRectF, std::hash<int>>>();
 
@@ -586,6 +586,6 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
 
   QObject::connect(tabWidget.get(), SIGNAL(tabChanged(ImageViewTab)), optWidget, SLOT(tabChanged(ImageViewTab)));
 
-  ui->setImageWidget(tabWidget.release(), ui->TRANSFER_OWNERSHIP, m_dbg.get());
+  ui->setImageWidget(tabWidget.release(), ui->Ownership::TRANSFER, m_dbg.get());
 }  // Task::UiUpdater::updateUI
 }  // namespace output

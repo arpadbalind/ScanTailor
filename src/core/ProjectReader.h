@@ -49,13 +49,15 @@ class ProjectReader {
   PageId pageId(int numericId) const;
 
  private:
+  // NOLINTBEGIN(misc-non-private-member-variables-in-classes)
   struct FileRecord {
     QString filePath;
     bool compatMultiPage{ false };
 
     FileRecord() = default;
-    FileRecord(const QString& pFilePath, bool pCompatMultiPage) : filePath(pFilePath), compatMultiPage(pCompatMultiPage) {}
+    FileRecord(QString pFilePath, bool pCompatMultiPage) : filePath(std::move(pFilePath)), compatMultiPage(pCompatMultiPage) {}
   };
+  // NOLINTEND(misc-non-private-member-variables-in-classes)
 
   using DirMap = std::unordered_map<int, QString>;
   using FileMap = std::unordered_map<int, FileRecord>;

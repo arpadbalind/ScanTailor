@@ -24,7 +24,7 @@
 ProjectWriter::ProjectWriter(const std::shared_ptr<ProjectPages>& pageSequence,
                              const SelectedPage& selectedPage,
                              const OutputFileNameGenerator& outFileNameGen)
-    : m_pageSequence(pageSequence->toPageSequence(PAGE_VIEW)),
+    : m_pageSequence(pageSequence->toPageSequence(PageView::PAGE_VIEW)),
       m_outFileNameGen(outFileNameGen),
       m_selectedPage(selectedPage),
       m_layoutDirection(pageSequence->layoutDirection()) {
@@ -155,8 +155,8 @@ void ProjectWriter::writeImageMetadata(QDomDocument& doc, QDomElement& imageEl, 
 QDomElement ProjectWriter::processPages(QDomDocument& doc) const {
   QDomElement pagesEl(doc.createElement("pages"));
 
-  const PageId selOpt1(m_selectedPage.get(IMAGE_VIEW));
-  const PageId selOpt2(m_selectedPage.get(PAGE_VIEW));
+  const PageId selOpt1(m_selectedPage.get(PageView::IMAGE_VIEW));
+  const PageId selOpt2(m_selectedPage.get(PageView::PAGE_VIEW));
 
   PageId pageLeft;
   PageId pageRight;

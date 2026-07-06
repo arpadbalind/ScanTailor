@@ -61,7 +61,7 @@ class FileNameDisambiguator : private NonCopyable {
                     const QString& name,
                     const std::function<QString(const QString&)>& filePathPacker) const;
 
-  int getLabel(const QString& filePath) const;
+  [[nodiscard]] int getLabel(const QString& filePath) const;
 
   int registerFile(const QString& filePath);
 

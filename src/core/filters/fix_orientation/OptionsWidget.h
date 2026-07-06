@@ -16,7 +16,7 @@
 namespace fix_orientation {
 class Settings;
 
-class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
+class OptionsWidget : public FilterOptionsWidget {
   Q_OBJECT
  public:
   OptionsWidget(std::shared_ptr<Settings> settings, const PageSelectionAccessor& pageSelectionAccessor);
@@ -55,10 +55,15 @@ class OptionsWidget : public FilterOptionsWidget, private Ui::OptionsWidget {
   void setupIcons();
 
   std::shared_ptr<Settings> m_settings;
+
   PageSelectionAccessor m_pageSelectionAccessor;
+
   PageId m_pageId;
+
   OrthogonalRotation m_rotation;
 
   ConnectionManager m_connectionManager;
+
+  std::unique_ptr<Ui::OptionsWidget> m_ui;
 };
 }  // namespace fix_orientation

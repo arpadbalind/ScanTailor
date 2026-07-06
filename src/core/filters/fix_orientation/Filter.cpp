@@ -3,27 +3,30 @@
 
 #include "Filter.h"
 
-#include <filters/page_split/CacheDrivenTask.h>
-#include <filters/page_split/Task.h>
-
 #include <QCoreApplication>
+
+#include <memory>
 #include <utility>
 
 #include "CacheDrivenTask.h"
+#include "filters/page_split/CacheDrivenTask.h"
+#include "filters/page_split/Task.h"
 #include "FilterUiInterface.h"
 #include "ImageSettings.h"
 #include "OptionsWidget.h"
+#include "PageView.h"
 #include "ProjectReader.h"
 #include "ProjectWriter.h"
 #include "Settings.h"
 #include "Task.h"
 #include "FixOrientationUtils.h"
-#include "XmlMarshaller.h"
 
 namespace fix_orientation {
 Filter::Filter(const PageSelectionAccessor& pageSelectionAccessor)
     : m_settings(std::make_shared<Settings>()), m_imageSettings(std::make_shared<ImageSettings>()) {
+  // NOLINTBEGIN(cppcoreguidelines-owning-memory)
   m_optionsWidget.reset(new OptionsWidget(m_settings, pageSelectionAccessor));
+  // NOLINTEND(cppcoreguidelines-owning-memory)
 }
 
 Filter::~Filter() = default;
@@ -33,7 +36,7 @@ QString Filter::getName() const {
 }
 
 PageView Filter::getView() const {
-  return IMAGE_VIEW;
+  return PageView::IMAGE_VIEW;
 }
 
 void Filter::performRelinking(const AbstractRelinker& relinker) {
@@ -45,7 +48,7 @@ void Filter::preUpdateUI(FilterUiInterface* ui, const PageInfo& pageInfo) {
   if (m_optionsWidget.get()) {
     const OrthogonalRotation rotation(m_settings->getRotationFor(pageInfo.id().imageId()));
     m_optionsWidget->preUpdateUI(pageInfo.id(), rotation);
-    ui->setOptionsWidget(m_optionsWidget.get(), ui->KEEP_OWNERSHIP);
+    ui->setOptionsWidget(m_optionsWidget.get(), FilterUiInterface::Ownership::KEEP);
   }
 }
 
@@ -61,7 +64,7 @@ QDomElement Filter::saveSettings(const ProjectWriter& writer, QDomDocument& doc)
 void Filter::loadSettings(const ProjectReader& reader, const QDomElement& filtersEl) {
   m_settings->clear();
 
-  QDomElement filterEl(filtersEl.namedItem("fix-orientation").toElement());
+  const QDomElement filterEl(filtersEl.namedItem("fix-orientation").toElement());
 
   const QString imageTagName("image");
   QDomNode node(filterEl.firstChild());
@@ -72,7 +75,7 @@ void Filter::loadSettings(const ProjectReader& reader, const QDomElement& filter
     if (node.nodeName() != imageTagName) {
       continue;
     }
-    QDomElement el(node.toElement());
+    const QDomElement el(node.toElement());
 
     bool ok = true;
     const int id = el.attribute("id").toInt(&ok);
@@ -109,8 +112,6 @@ void Filter::writeParams(QDomDocument& doc, QDomElement& filterEl, const ImageId
   if (rotation.toDegrees() == 0) {
     return;
   }
-
-  XmlMarshaller marshaller(doc);
 
   QDomElement imageEl(doc.createElement("image"));
   imageEl.setAttribute("id", numericId);

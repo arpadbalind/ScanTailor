@@ -3,12 +3,11 @@
 
 #include "OptionsWidget.h"
 
-#include <core/IconProvider.h>
-
 #include <cassert>
 #include <utility>
 
 #include "ApplyDialog.h"
+#include "core/IconProvider.h"
 #include "Filter.h"
 #include "ProjectPages.h"
 #include "Settings.h"
@@ -17,8 +16,9 @@ namespace fix_orientation {
 OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelectionAccessor& pageSelectionAccessor)
     : m_settings(std::move(settings)),
       m_pageSelectionAccessor(pageSelectionAccessor),
-      m_connectionManager(std::bind(&OptionsWidget::setupUiConnections, this)) {
-  setupUi(this);
+      m_connectionManager(std::bind(&OptionsWidget::setupUiConnections, this)),
+      m_ui(std::make_unique<Ui::OptionsWidget>()) {
+  m_ui->setupUi(this);
   setupIcons();
 
   setupUiConnections();
@@ -118,23 +118,27 @@ void OptionsWidget::setRotationPixmap() {
     default:
       assert(!"Unreachable");
   }
-  rotationIndicator->setPixmap(icon.pixmap(32, 32));
+  m_ui->rotationIndicator->setPixmap(icon.pixmap(32, 32));
 }
-
-#define CONNECT(...) m_connectionManager.addConnection(connect(__VA_ARGS__))
 
 void OptionsWidget::setupUiConnections() {
-  CONNECT(rotateLeftBtn, SIGNAL(clicked()), this, SLOT(rotateLeft()));
-  CONNECT(rotateRightBtn, SIGNAL(clicked()), this, SLOT(rotateRight()));
-  CONNECT(resetBtn, SIGNAL(clicked()), this, SLOT(resetRotation()));
-  CONNECT(applyToBtn, SIGNAL(clicked()), this, SLOT(showApplyToDialog()));
+  m_connectionManager.addConnection(
+      connect(m_ui->rotateLeftBtn, &QPushButton::clicked, this, &OptionsWidget::rotateLeft)
+      );
+  m_connectionManager.addConnection(
+      connect(m_ui->rotateRightBtn, &QPushButton::clicked, this, &OptionsWidget::rotateRight)
+      );
+  m_connectionManager.addConnection(
+      connect(m_ui->resetBtn, &QPushButton::clicked, this, &OptionsWidget::resetRotation)
+      );
+  m_connectionManager.addConnection(
+      connect(m_ui->applyToBtn, &QPushButton::clicked, this, &OptionsWidget::showApplyToDialog)
+      );
 }
-
-#undef CONNECT
 
 void OptionsWidget::setupIcons() {
   auto& iconProvider = IconProvider::getInstance();
-  rotateLeftBtn->setIcon(iconProvider.getIcon("object-rotate-left"));
-  rotateRightBtn->setIcon(iconProvider.getIcon("object-rotate-right"));
+  m_ui->rotateLeftBtn->setIcon(iconProvider.getIcon("object-rotate-left"));
+  m_ui->rotateRightBtn->setIcon(iconProvider.getIcon("object-rotate-right"));
 }
 }  // namespace fix_orientation

@@ -27,11 +27,11 @@ class ImageSettings : private NonCopyable {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    const imageproc::BinaryThreshold& getBwThreshold() const;
+    [[nodiscard]] const imageproc::BinaryThreshold& getBwThreshold() const;
 
     void setBwThreshold(const imageproc::BinaryThreshold& bwThreshold);
 
-    bool isBlackOnWhite() const;
+    [[nodiscard]] bool isBlackOnWhite() const;
 
     void setBlackOnWhite(bool blackOnWhite);
 

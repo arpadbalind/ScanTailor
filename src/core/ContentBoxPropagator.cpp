@@ -38,7 +38,7 @@ ContentBoxPropagator::ContentBoxPropagator(std::shared_ptr<page_layout::Filter> 
 ContentBoxPropagator::~ContentBoxPropagator() = default;
 
 void ContentBoxPropagator::propagate(const ProjectPages& pages) {
-  const PageSequence sequence(pages.toPageSequence(PAGE_VIEW));
+  const PageSequence sequence(pages.toPageSequence(PageView::PAGE_VIEW));
 
   for (const PageInfo& pageInfo : sequence) {
     Collector collector;

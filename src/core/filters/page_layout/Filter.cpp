@@ -45,7 +45,7 @@ QString Filter::getName() const {
 }
 
 PageView Filter::getView() const {
-  return PAGE_VIEW;
+  return PageView::PAGE_VIEW;
 }
 
 void Filter::selected() {
@@ -73,7 +73,7 @@ void Filter::preUpdateUI(FilterUiInterface* ui, const PageInfo& pageInfo) {
   const Margins marginsMm(m_settings->getHardMarginsMM(pageInfo.id()));
   const Alignment alignment(m_settings->getPageAlignment(pageInfo.id()));
   m_optionsWidget->preUpdateUI(pageInfo, marginsMm, alignment);
-  ui->setOptionsWidget(m_optionsWidget.get(), ui->KEEP_OWNERSHIP);
+  ui->setOptionsWidget(m_optionsWidget.get(), ui->Ownership::KEEP);
 }
 
 QDomElement Filter::saveSettings(const ProjectWriter& writer, QDomDocument& doc) const {
@@ -167,7 +167,7 @@ void Filter::invalidateContentBox(const PageId& pageId) {
 }
 
 bool Filter::checkReadyForOutput(const ProjectPages& pages, const PageId* ignore) {
-  const PageSequence snapshot(pages.toPageSequence(PAGE_VIEW));
+  const PageSequence snapshot(pages.toPageSequence(PageView::PAGE_VIEW));
   return m_settings->checkEverythingDefined(snapshot, ignore);
 }
 

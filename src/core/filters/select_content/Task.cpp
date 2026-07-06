@@ -181,11 +181,11 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
 
   OptionsWidget* const optWidget = m_filter->optionsWidget();
   optWidget->postUpdateUI(m_uiData);
-  ui->setOptionsWidget(optWidget, ui->KEEP_OWNERSHIP);
+  ui->setOptionsWidget(optWidget, ui->Ownership::KEEP);
 
   auto* view = new ImageView(m_image, m_downscaledImage, m_contentMask, m_xform, m_uiData.contentRect(),
                              m_uiData.pageRect(), m_uiData.pageDetectionMode() != MODE_DISABLED);
-  ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP, m_dbg.get());
+  ui->setImageWidget(view, ui->Ownership::TRANSFER, m_dbg.get());
 
   QObject::connect(view, SIGNAL(manualContentRectSet(const QRectF&)), optWidget,
                    SLOT(manualContentRectSet(const QRectF&)));

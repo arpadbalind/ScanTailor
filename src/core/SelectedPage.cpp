@@ -8,13 +8,13 @@ SelectedPage::SelectedPage(const PageId& pageId, PageView view) {
 }
 
 void SelectedPage::set(const PageId& pageId, PageView view) {
-  if ((view == PAGE_VIEW) || (pageId.imageId() != m_pageId.imageId())) {
+  if ((view == PageView::PAGE_VIEW) || (pageId.imageId() != m_pageId.imageId())) {
     m_pageId = pageId;
   }
 }
 
 PageId SelectedPage::get(PageView view) const {
-  if (view == PAGE_VIEW) {
+  if (view == PageView::PAGE_VIEW) {
     return m_pageId;
   } else {
     return PageId(m_pageId.imageId(), PageId::SubPage::SINGLE_PAGE);

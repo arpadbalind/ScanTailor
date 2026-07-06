@@ -18,8 +18,6 @@ FilterData::FilterData(const FilterData& other, const ImageTransformation& xform
       m_xform(xform),
       m_imageParams(other.m_imageParams) {}
 
-FilterData::FilterData(const FilterData& other) = default;
-
 imageproc::BinaryThreshold FilterData::bwThreshold() const {
   return m_imageParams.getBwThreshold();
 }

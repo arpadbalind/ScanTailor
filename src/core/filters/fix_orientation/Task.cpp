@@ -108,10 +108,10 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
 
   OptionsWidget* const optWidget = m_filter->optionsWidget();
   optWidget->postUpdateUI(m_xform.preRotation());
-  ui->setOptionsWidget(optWidget, ui->KEEP_OWNERSHIP);
+  ui->setOptionsWidget(optWidget, ui->Ownership::KEEP);
 
   auto* view = new ImageView(m_image, m_downscaledImage, m_xform);
-  ui->setImageWidget(view, ui->TRANSFER_OWNERSHIP);
+  ui->setImageWidget(view, ui->Ownership::TRANSFER);
   QObject::connect(optWidget, SIGNAL(rotated(OrthogonalRotation)), view, SLOT(setPreRotation(OrthogonalRotation)));
 }
 }  // namespace fix_orientation

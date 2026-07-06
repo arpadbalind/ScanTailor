@@ -46,7 +46,7 @@ QString Filter::getName() const {
 }
 
 PageView Filter::getView() const {
-  return PAGE_VIEW;
+  return PageView::PAGE_VIEW;
 }
 
 int Filter::selectedPageOrder() const {
@@ -68,7 +68,7 @@ void Filter::performRelinking(const AbstractRelinker& relinker) {
 
 void Filter::preUpdateUI(FilterUiInterface* ui, const PageInfo& pageInfo) {
   m_optionsWidget->preUpdateUI(pageInfo);
-  ui->setOptionsWidget(m_optionsWidget.get(), ui->KEEP_OWNERSHIP);
+  ui->setOptionsWidget(m_optionsWidget.get(), ui->Ownership::KEEP);
 }
 
 QDomElement Filter::saveSettings(const ProjectWriter& writer, QDomDocument& doc) const {

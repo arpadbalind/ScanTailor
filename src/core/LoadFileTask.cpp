@@ -138,6 +138,6 @@ void LoadFileTask::ErrorResult::updateUI(FilterUiInterface* ui) {
                  .arg(m_filePath.toHtmlEscaped());
     fmt = Qt::RichText;
   }
-  ui->setImageWidget(new ErrWidget(ui->relinkingDialogRequester(), errMsg, fmt), ui->TRANSFER_OWNERSHIP);
-  ui->setOptionsWidget(new FilterOptionsWidget, ui->TRANSFER_OWNERSHIP);
+  ui->setImageWidget(new ErrWidget(ui->relinkingDialogRequester(), errMsg, fmt), ui->Ownership::TRANSFER);
+  ui->setOptionsWidget(new FilterOptionsWidget, ui->Ownership::TRANSFER);
 }  // LoadFileTask::ErrorResult::updateUI
