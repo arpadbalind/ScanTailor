@@ -8,13 +8,13 @@
 namespace page_split {
 QString layoutTypeToString(const LayoutType layoutType) {
   switch (layoutType) {
-    case AUTO_LAYOUT_TYPE:
+    case LayoutType::AUTO_LAYOUT_TYPE:
       return "auto-detect";
-    case SINGLE_PAGE_UNCUT:
+    case LayoutType::SINGLE_PAGE_UNCUT:
       return "single-uncut";
-    case PAGE_PLUS_OFFCUT:
+    case LayoutType::PAGE_PLUS_OFFCUT:
       return "single-cut";
-    case TWO_PAGES:
+    case LayoutType::TWO_PAGES:
       return "two-pages";
   }
   assert(!"unreachable");
@@ -23,13 +23,13 @@ QString layoutTypeToString(const LayoutType layoutType) {
 
 LayoutType layoutTypeFromString(const QString& layoutType) {
   if (layoutType == "single-uncut") {
-    return SINGLE_PAGE_UNCUT;
+    return LayoutType::SINGLE_PAGE_UNCUT;
   } else if (layoutType == "single-cut") {
-    return PAGE_PLUS_OFFCUT;
+    return LayoutType::PAGE_PLUS_OFFCUT;
   } else if (layoutType == "two-pages") {
-    return TWO_PAGES;
+    return LayoutType::TWO_PAGES;
   } else {
-    return AUTO_LAYOUT_TYPE;
+    return LayoutType::AUTO_LAYOUT_TYPE;
   }
 }
 }  // namespace page_split

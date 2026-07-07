@@ -1,12 +1,13 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_PAGE_SPLIT_PAGELAYOUT_H_
-#define SCANTAILOR_PAGE_SPLIT_PAGELAYOUT_H_
+#pragma once
 
 #include <QLineF>
 #include <QPolygonF>
 #include <QString>
+
+#include <cstdint>
 
 #include "LayoutType.h"
 #include "PageId.h"
@@ -33,12 +34,16 @@ namespace page_split {
  */
 class PageLayout {
  public:
-  enum Type { SINGLE_PAGE_UNCUT, SINGLE_PAGE_CUT, TWO_PAGES };
+  enum class Type : std::uint8_t {
+    SINGLE_PAGE_UNCUT,
+    SINGLE_PAGE_CUT,
+    TWO_PAGES
+  };
 
   /**
    * \brief Constructs a null layout.
    */
-  PageLayout();
+  PageLayout() = default;
 
   /**
    * \brief Constructs a SINGLE_PAGE_UNCUT layout.
@@ -175,12 +180,12 @@ class PageLayout {
   QLineF m_cutter1;
   QLineF m_cutter2;
 
-  Type m_type;
+  Type m_type{ Type::SINGLE_PAGE_UNCUT };
 };
 
 
 inline int PageLayout::numSubPages() const {
-  return m_type == TWO_PAGES ? 2 : 1;
+  return m_type == Type::TWO_PAGES ? 2 : 1;
 }
 
 inline PageLayout::Type PageLayout::type() const {
@@ -191,4 +196,3 @@ inline const QPolygonF& PageLayout::uncutOutline() const {
   return m_uncutOutline;
 }
 }  // namespace page_split
-#endif  // ifndef SCANTAILOR_PAGE_SPLIT_PAGELAYOUT_H_

@@ -113,7 +113,7 @@ bool OutputImageParams::matches(const OutputImageParams& other) const {
 
   if (m_dewarpingOptions != other.m_dewarpingOptions) {
     return false;
-  } else if (m_dewarpingOptions.dewarpingMode() != OFF) {
+  } else if (m_dewarpingOptions.dewarpingMode() != DewarpingMode::OFF) {
     if (!m_distortionModel.matches(other.m_distortionModel)) {
       return false;
     }
@@ -143,12 +143,12 @@ bool OutputImageParams::colorParamsMatch(const ColorParams& cp1,
   }
 
   switch (cp1.colorMode()) {
-    case MIXED:
+    case ColorMode::MIXED:
       if (so1 != so2) {
         return false;
       }
       // fall through
-    case BLACK_AND_WHITE:
+    case ColorMode::BLACK_AND_WHITE:
       if (cp1.blackWhiteOptions() != cp2.blackWhiteOptions()) {
         return false;
       }
@@ -156,7 +156,7 @@ bool OutputImageParams::colorParamsMatch(const ColorParams& cp1,
         return false;
       }
       // fall through
-    case COLOR_GRAYSCALE:
+    case ColorMode::COLOR_GRAYSCALE:
       if (cp1.colorCommonOptions() != cp2.colorCommonOptions()) {
         return false;
       }

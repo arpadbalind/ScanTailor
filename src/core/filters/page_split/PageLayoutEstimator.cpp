@@ -73,7 +73,7 @@ std::unique_ptr<PageLayout> autoDetectSinglePageLayout(const LayoutType layoutTy
   do {
     // This whole branch (loop) leads to SINGLE_PAGE_UNCUT,
     // which conflicts with PAGE_PLUS_OFFCUT.
-    if (layoutType == PAGE_PLUS_OFFCUT) {
+    if (layoutType == LayoutType::PAGE_PLUS_OFFCUT) {
       break;
     }
     // If we have a single line close to an edge,
@@ -153,17 +153,17 @@ int numPages(const LayoutType layoutType, const ImageTransformation& preXform) {
   int numPages = 0;
 
   switch (layoutType) {
-    case AUTO_LAYOUT_TYPE: {
+    case LayoutType::AUTO_LAYOUT_TYPE: {
       const QSize imageSize(preXform.origRect().size().toSize());
       numPages = ProjectPages::adviseNumberOfLogicalPages(ImageMetadata(imageSize, preXform.origDpi()),
                                                           preXform.preRotation());
       break;
     }
-    case SINGLE_PAGE_UNCUT:
-    case PAGE_PLUS_OFFCUT:
+    case LayoutType::SINGLE_PAGE_UNCUT:
+    case LayoutType::PAGE_PLUS_OFFCUT:
       numPages = 1;
       break;
-    case TWO_PAGES:
+    case LayoutType::TWO_PAGES:
       numPages = 2;
       break;
   }
@@ -176,7 +176,7 @@ PageLayout PageLayoutEstimator::estimatePageLayout(const LayoutType layoutType,
                                                    const ImageTransformation& preXform,
                                                    const BinaryThreshold bwThreshold,
                                                    DebugImages* const dbg) {
-  if (layoutType == SINGLE_PAGE_UNCUT) {
+  if (layoutType == LayoutType::SINGLE_PAGE_UNCUT) {
     return PageLayout(preXform.resultingRect());
   }
 
@@ -577,12 +577,12 @@ PageLayout PageLayoutEstimator::processContentSpansSinglePage(const LayoutType l
                                                               const int height,
                                                               const bool leftOffcut,
                                                               const bool rightOffcut) {
-  assert(layoutType == AUTO_LAYOUT_TYPE || layoutType == PAGE_PLUS_OFFCUT);
+  assert(layoutType == LayoutType::AUTO_LAYOUT_TYPE || layoutType == LayoutType::PAGE_PLUS_OFFCUT);
 
   const QRectF virtualImageRect(0, 0, width, height);
 
   // Just to be able to break from it.
-  while (leftOffcut && !rightOffcut && layoutType == AUTO_LAYOUT_TYPE) {
+  while (leftOffcut && !rightOffcut && layoutType == LayoutType::AUTO_LAYOUT_TYPE) {
     double x;
     if (spans.empty()) {
       x = 0.0;
@@ -605,7 +605,7 @@ PageLayout PageLayoutEstimator::processContentSpansSinglePage(const LayoutType l
   }
 
   // Just to be able to break from it.
-  while (rightOffcut && !leftOffcut && layoutType == AUTO_LAYOUT_TYPE) {
+  while (rightOffcut && !leftOffcut && layoutType == LayoutType::AUTO_LAYOUT_TYPE) {
     double x;
     if (spans.empty()) {
       x = width;
@@ -627,7 +627,7 @@ PageLayout PageLayoutEstimator::processContentSpansSinglePage(const LayoutType l
     return PageLayout(virtualImageRect, leftLine, vertLine(x));
   }
 
-  if (layoutType == PAGE_PLUS_OFFCUT) {
+  if (layoutType == LayoutType::PAGE_PLUS_OFFCUT) {
     const QLineF line1(virtualImageRect.topLeft(), virtualImageRect.bottomLeft());
     const QLineF line2(virtualImageRect.topRight(), virtualImageRect.bottomRight());
     return PageLayout(virtualImageRect, line1, line2);
@@ -641,7 +641,7 @@ PageLayout PageLayoutEstimator::processContentSpansTwoPages(const LayoutType lay
                                                             const std::deque<Span>& spans,
                                                             const int width,
                                                             const int height) {
-  assert(layoutType == AUTO_LAYOUT_TYPE || layoutType == TWO_PAGES);
+  assert(layoutType == LayoutType::AUTO_LAYOUT_TYPE || layoutType == LayoutType::TWO_PAGES);
 
   const QRectF virtualImageRect(0, 0, width, height);
 

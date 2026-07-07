@@ -9,15 +9,13 @@
 #include "RelinkablePath.h"
 
 namespace page_split {
-Settings::Settings() : m_defaultLayoutType(AUTO_LAYOUT_TYPE) {}
-
 Settings::~Settings() = default;
 
 void Settings::clear() {
   QMutexLocker locker(&m_mutex);
 
   m_perPageRecords.clear();
-  m_defaultLayoutType = AUTO_LAYOUT_TYPE;
+  m_defaultLayoutType = LayoutType::AUTO_LAYOUT_TYPE;
 }
 
 void Settings::performRelinking(const AbstractRelinker& relinker) {
@@ -176,8 +174,8 @@ Settings::Record Settings::conditionalUpdate(const ImageId& imageId, const Updat
 /*======================= Settings::BaseRecord ======================*/
 
 Settings::BaseRecord::BaseRecord()
-    : m_params(PageLayout(), Dependencies(), MODE_AUTO),
-      m_layoutType(AUTO_LAYOUT_TYPE),
+    : m_params(PageLayout(), Dependencies(), AutoManualMode::MODE_AUTO),
+      m_layoutType(LayoutType::AUTO_LAYOUT_TYPE),
       m_paramsValid(false),
       m_layoutTypeValid(false) {}
 
@@ -197,18 +195,18 @@ bool Settings::BaseRecord::hasLayoutTypeConflict(const LayoutType layoutType) co
     return false;
   }
 
-  if (layoutType == AUTO_LAYOUT_TYPE) {
+  if (layoutType == LayoutType::AUTO_LAYOUT_TYPE) {
     // This one is compatible with everything.
     return false;
   }
 
   switch (m_params.pageLayout().type()) {
-    case PageLayout::SINGLE_PAGE_UNCUT:
-      return layoutType != SINGLE_PAGE_UNCUT;
-    case PageLayout::SINGLE_PAGE_CUT:
-      return layoutType != PAGE_PLUS_OFFCUT;
-    case PageLayout::TWO_PAGES:
-      return layoutType != TWO_PAGES;
+    case PageLayout::Type::SINGLE_PAGE_UNCUT:
+      return layoutType != LayoutType::SINGLE_PAGE_UNCUT;
+    case PageLayout::Type::SINGLE_PAGE_CUT:
+      return layoutType != LayoutType::PAGE_PLUS_OFFCUT;
+    case PageLayout::Type::TWO_PAGES:
+      return layoutType != LayoutType::TWO_PAGES;
   }
 
   assert(!"Unreachable");
@@ -277,8 +275,8 @@ bool Settings::Record::hasLayoutTypeConflict() const {
 /*======================= Settings::UpdateAction ======================*/
 
 Settings::UpdateAction::UpdateAction()
-    : m_params(PageLayout(), Dependencies(), MODE_AUTO),
-      m_layoutType(AUTO_LAYOUT_TYPE),
+    : m_params(PageLayout(), Dependencies(), AutoManualMode::MODE_AUTO),
+      m_layoutType(LayoutType::AUTO_LAYOUT_TYPE),
       m_paramsAction(DONT_TOUCH),
       m_layoutTypeAction(DONT_TOUCH) {}
 

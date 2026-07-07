@@ -35,16 +35,16 @@ OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelec
   despeckleSlider->setMinimum(qRound(1.0 * 10));
   despeckleSlider->setMaximum(qRound(3.0 * 10));
 
-  colorModeSelector->addItem(tr("Black and White"), BLACK_AND_WHITE);
-  colorModeSelector->addItem(tr("Color / Grayscale"), COLOR_GRAYSCALE);
-  colorModeSelector->addItem(tr("Mixed"), MIXED);
+  colorModeSelector->addItem(tr("Black and White"), QVariant::fromValue(ColorMode::BLACK_AND_WHITE));
+  colorModeSelector->addItem(tr("Color / Grayscale"), QVariant::fromValue(ColorMode::COLOR_GRAYSCALE));
+  colorModeSelector->addItem(tr("Mixed"), QVariant::fromValue(ColorMode::MIXED));
 
-  thresholdMethodBox->addItem(tr("Otsu"), OTSU);
-  thresholdMethodBox->addItem(tr("Sauvola"), SAUVOLA);
-  thresholdMethodBox->addItem(tr("Wolf"), WOLF);
+  thresholdMethodBox->addItem(tr("Otsu"), QVariant::fromValue(BinarizationMethod::OTSU));
+  thresholdMethodBox->addItem(tr("Sauvola"), QVariant::fromValue(BinarizationMethod::SAUVOLA));
+  thresholdMethodBox->addItem(tr("Wolf"), QVariant::fromValue(BinarizationMethod::WOLF));
 
-  fillingColorBox->addItem(tr("Background"), FILL_BACKGROUND);
-  fillingColorBox->addItem(tr("White"), FILL_WHITE);
+  fillingColorBox->addItem(tr("Background"), QVariant::fromValue(FillingColor::BACKGROUND));
+  fillingColorBox->addItem(tr("White"), QVariant::fromValue(FillingColor::WHITE));
 
   QPointer<BinarizationOptionsWidget> otsuBinarizationOptionsWidget = new OtsuBinarizationOptionsWidget(m_settings);
   QPointer<BinarizationOptionsWidget> sauvolaBinarizationOptionsWidget
@@ -59,9 +59,9 @@ OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelec
   addBinarizationOptionsWidget(wolfBinarizationOptionsWidget);
   updateBinarizationOptionsDisplay(binarizationOptions->currentIndex());
 
-  pictureShapeSelector->addItem(tr("Off"), OFF_SHAPE);
-  pictureShapeSelector->addItem(tr("Free"), FREE_SHAPE);
-  pictureShapeSelector->addItem(tr("Rectangular"), RECTANGULAR_SHAPE);
+  pictureShapeSelector->addItem(tr("Off"), QVariant::fromValue(PictureShape::OFF_SHAPE));
+  pictureShapeSelector->addItem(tr("Free"), QVariant::fromValue(PictureShape::FREE_SHAPE));
+  pictureShapeSelector->addItem(tr("Rectangular"), QVariant::fromValue(PictureShape::RECTANGULAR_SHAPE));
 
   updateDpiDisplay();
   updateColorsDisplay();
@@ -112,7 +112,7 @@ void OptionsWidget::tabChanged(const ImageViewTab tab) {
 void OptionsWidget::distortionModelChanged(const dewarping::DistortionModel& model) {
   m_settings->setDistortionModel(m_pageId, model);
 
-  m_dewarpingOptions.setDewarpingMode(MANUAL);
+  m_dewarpingOptions.setDewarpingMode(DewarpingMode::MANUAL);
   m_settings->setDewarpingOptions(m_pageId, m_dewarpingOptions);
   updateDewarpingDisplay();
 }
@@ -150,8 +150,8 @@ void OptionsWidget::pictureShapeChanged(const int idx) {
   m_pictureShapeOptions.setPictureShape(shapeMode);
   m_settings->setPictureShapeOptions(m_pageId, m_pictureShapeOptions);
 
-  pictureShapeSensitivityOptions->setVisible(shapeMode == RECTANGULAR_SHAPE);
-  higherSearchSensitivityCB->setVisible(shapeMode != OFF_SHAPE);
+  pictureShapeSensitivityOptions->setVisible(shapeMode == PictureShape::RECTANGULAR_SHAPE);
+  higherSearchSensitivityCB->setVisible(shapeMode != PictureShape::OFF_SHAPE);
 
   emit reloadRequested();
 }
@@ -190,7 +190,7 @@ void OptionsWidget::equalizeIlluminationToggled(const bool checked) {
   BlackWhiteOptions blackWhiteOptions(m_colorParams.blackWhiteOptions());
   blackWhiteOptions.setNormalizeIllumination(checked);
 
-  if (m_colorParams.colorMode() == MIXED) {
+  if (m_colorParams.colorMode() == ColorMode::MIXED) {
     if (!checked) {
       ColorCommonOptions colorCommonOptions(m_colorParams.colorCommonOptions());
       colorCommonOptions.setNormalizeIllumination(false);
@@ -414,7 +414,7 @@ void OptionsWidget::dewarpingChanged(const std::set<PageId>& pages, const Dewarp
       // we reload not just on TAB_FILL_ZONES but on all tabs except TAB_DEWARPING.
       // PS: the static original <-> dewarped mappings are constructed
       // in Task::UiUpdater::updateUI().  Look for "new DewarpingPointMapper" there.
-      if ((opt.dewarpingMode() == AUTO) || (m_lastTab != TAB_DEWARPING) || (opt.dewarpingMode() == MARGINAL)) {
+      if ((opt.dewarpingMode() == DewarpingMode::AUTO) || (m_lastTab != TAB_DEWARPING) || (opt.dewarpingMode() == DewarpingMode::MARGINAL)) {
         // Switch to the Output tab after reloading.
         m_lastTab = TAB_OUTPUT;
         // These depend on the value of m_lastTab.
@@ -509,17 +509,17 @@ void OptionsWidget::reloadIfNecessary() {
     return;
   }
 
-  if ((savedDewarpingOptions.dewarpingMode() == OFF) && (params.dewarpingOptions().dewarpingMode() == OFF)) {
+  if ((savedDewarpingOptions.dewarpingMode() == DewarpingMode::OFF) && (params.dewarpingOptions().dewarpingMode() == DewarpingMode::OFF)) {
   } else if (savedDepthPerception.value() != params.depthPerception().value()) {
     emit reloadRequested();
     return;
-  } else if ((savedDewarpingOptions.dewarpingMode() == AUTO) && (params.dewarpingOptions().dewarpingMode() == AUTO)) {
-  } else if ((savedDewarpingOptions.dewarpingMode() == MARGINAL)
-             && (params.dewarpingOptions().dewarpingMode() == MARGINAL)) {
+  } else if ((savedDewarpingOptions.dewarpingMode() == DewarpingMode::AUTO) && (params.dewarpingOptions().dewarpingMode() == DewarpingMode::AUTO)) {
+  } else if ((savedDewarpingOptions.dewarpingMode() == DewarpingMode::MARGINAL)
+             && (params.dewarpingOptions().dewarpingMode() == DewarpingMode::MARGINAL)) {
   } else if (!savedDistortionModel.matches(params.distortionModel())) {
     emit reloadRequested();
     return;
-  } else if ((savedDewarpingOptions.dewarpingMode() == OFF) != (params.dewarpingOptions().dewarpingMode() == OFF)) {
+  } else if ((savedDewarpingOptions.dewarpingMode() == DewarpingMode::OFF) != (params.dewarpingOptions().dewarpingMode() == DewarpingMode::OFF)) {
     emit reloadRequested();
     return;
   }
@@ -537,21 +537,21 @@ void OptionsWidget::updateColorsDisplay() {
   colorModeSelector->blockSignals(true);
 
   const ColorMode colorMode = m_colorParams.colorMode();
-  const int colorModeIdx = colorModeSelector->findData(colorMode);
+  const int colorModeIdx = colorModeSelector->findData(QVariant::fromValue(colorMode));
   colorModeSelector->setCurrentIndex(colorModeIdx);
 
   bool thresholdOptionsVisible = false;
   bool pictureShapeVisible = false;
   bool splittingOptionsVisible = false;
   switch (colorMode) {
-    case MIXED:
+    case ColorMode::MIXED:
       pictureShapeVisible = true;
       splittingOptionsVisible = true;
       // fall through
-    case BLACK_AND_WHITE:
+    case ColorMode::BLACK_AND_WHITE:
       thresholdOptionsVisible = true;
       // fall through
-    case COLOR_GRAYSCALE:
+    case ColorMode::COLOR_GRAYSCALE:
       break;
   }
 
@@ -559,7 +559,7 @@ void OptionsWidget::updateColorsDisplay() {
   ColorCommonOptions colorCommonOptions(m_colorParams.colorCommonOptions());
   BlackWhiteOptions blackWhiteOptions(m_colorParams.blackWhiteOptions());
 
-  if (!blackWhiteOptions.normalizeIllumination() && colorMode == MIXED) {
+  if (!blackWhiteOptions.normalizeIllumination() && colorMode == ColorMode::MIXED) {
     colorCommonOptions.setNormalizeIllumination(false);
   }
   m_colorParams.setColorCommonOptions(colorCommonOptions);
@@ -570,10 +570,10 @@ void OptionsWidget::updateColorsDisplay() {
   fillOffcutCB->setChecked(colorCommonOptions.fillOffcut());
   fillOffcutCB->setVisible(true);
   equalizeIlluminationCB->setChecked(blackWhiteOptions.normalizeIllumination());
-  equalizeIlluminationCB->setVisible(colorMode != COLOR_GRAYSCALE);
+  equalizeIlluminationCB->setVisible(colorMode != ColorMode::COLOR_GRAYSCALE);
   equalizeIlluminationColorCB->setChecked(colorCommonOptions.normalizeIllumination());
-  equalizeIlluminationColorCB->setVisible(colorMode != BLACK_AND_WHITE);
-  equalizeIlluminationColorCB->setEnabled(colorMode == COLOR_GRAYSCALE || blackWhiteOptions.normalizeIllumination());
+  equalizeIlluminationColorCB->setVisible(colorMode != ColorMode::BLACK_AND_WHITE);
+  equalizeIlluminationColorCB->setEnabled(colorMode == ColorMode::COLOR_GRAYSCALE || blackWhiteOptions.normalizeIllumination());
   savitzkyGolaySmoothingCB->setChecked(blackWhiteOptions.isSavitzkyGolaySmoothingEnabled());
   savitzkyGolaySmoothingCB->setVisible(thresholdOptionsVisible);
   morphologicalSmoothingCB->setChecked(blackWhiteOptions.isMorphologicalSmoothingEnabled());
@@ -587,10 +587,10 @@ void OptionsWidget::updateColorsDisplay() {
   splittingOptions->setVisible(splittingOptionsVisible);
   splittingCB->setChecked(m_splittingOptions.isSplitOutput());
   switch (m_splittingOptions.getSplittingMode()) {
-    case BLACK_AND_WHITE_FOREGROUND:
+    case SplittingMode::BLACK_AND_WHITE_FOREGROUND:
       bwForegroundRB->setChecked(true);
       break;
-    case COLOR_FOREGROUND:
+    case SplittingMode::COLOR_FOREGROUND:
       colorForegroundRB->setChecked(true);
       break;
   }
@@ -598,12 +598,12 @@ void OptionsWidget::updateColorsDisplay() {
   colorForegroundRB->setEnabled(m_splittingOptions.isSplitOutput());
   bwForegroundRB->setEnabled(m_splittingOptions.isSplitOutput());
   originalBackgroundCB->setEnabled(m_splittingOptions.isSplitOutput()
-                                   && (m_splittingOptions.getSplittingMode() == BLACK_AND_WHITE_FOREGROUND));
+                                   && (m_splittingOptions.getSplittingMode() == SplittingMode::BLACK_AND_WHITE_FOREGROUND));
 
   thresholdMethodBox->setCurrentIndex((int) blackWhiteOptions.getBinarizationMethod());
   binarizationOptions->setCurrentIndex((int) blackWhiteOptions.getBinarizationMethod());
 
-  fillingOptions->setVisible(colorMode != BLACK_AND_WHITE);
+  fillingOptions->setVisible(colorMode != ColorMode::BLACK_AND_WHITE);
   fillingColorBox->setCurrentIndex((int) colorCommonOptions.getFillingColor());
 
   colorSegmentationCB->setVisible(thresholdOptionsVisible);
@@ -628,12 +628,12 @@ void OptionsWidget::updateColorsDisplay() {
   posterizeForceBwCB->setChecked(colorCommonOptions.getPosterizationOptions().isForceBlackAndWhite());
 
   if (pictureShapeVisible) {
-    const int pictureShapeIdx = pictureShapeSelector->findData(m_pictureShapeOptions.getPictureShape());
+    const int pictureShapeIdx = pictureShapeSelector->findData(QVariant::fromValue(m_pictureShapeOptions.getPictureShape()));
     pictureShapeSelector->setCurrentIndex(pictureShapeIdx);
     pictureShapeSensitivitySB->setValue(m_pictureShapeOptions.getSensitivity());
-    pictureShapeSensitivityOptions->setVisible(m_pictureShapeOptions.getPictureShape() == RECTANGULAR_SHAPE);
+    pictureShapeSensitivityOptions->setVisible(m_pictureShapeOptions.getPictureShape() == PictureShape::RECTANGULAR_SHAPE);
     higherSearchSensitivityCB->setChecked(m_pictureShapeOptions.isHigherSearchSensitivity());
-    higherSearchSensitivityCB->setVisible(m_pictureShapeOptions.getPictureShape() != OFF_SHAPE);
+    higherSearchSensitivityCB->setVisible(m_pictureShapeOptions.getPictureShape() != PictureShape::OFF_SHAPE);
   }
 
   if (thresholdOptionsVisible) {
@@ -659,21 +659,21 @@ void OptionsWidget::updateDewarpingDisplay() {
   depthPerceptionPanel->setVisible(m_lastTab == TAB_DEWARPING);
 
   switch (m_dewarpingOptions.dewarpingMode()) {
-    case OFF:
+    case DewarpingMode::OFF:
       dewarpingStatusLabel->setText(tr("Off"));
       break;
-    case AUTO:
+    case DewarpingMode::AUTO:
       dewarpingStatusLabel->setText(tr("Auto"));
       break;
-    case MANUAL:
+    case DewarpingMode::MANUAL:
       dewarpingStatusLabel->setText(tr("Manual"));
       break;
-    case MARGINAL:
+    case DewarpingMode::MARGINAL:
       dewarpingStatusLabel->setText(tr("Marginal"));
       break;
   }
 
-  if ((m_dewarpingOptions.dewarpingMode() == MANUAL) || (m_dewarpingOptions.dewarpingMode() == MARGINAL)) {
+  if ((m_dewarpingOptions.dewarpingMode() == DewarpingMode::MANUAL) || (m_dewarpingOptions.dewarpingMode() == DewarpingMode::MARGINAL)) {
     QString dewarpingStatus = dewarpingStatusLabel->text();
     if (m_dewarpingOptions.needPostDeskew()) {
       const double deskewAngle = -std::round(m_dewarpingOptions.getPostDeskewAngle() * 100) / 100;
@@ -712,7 +712,7 @@ void OptionsWidget::bwForegroundToggled(bool checked) {
 
   originalBackgroundCB->setEnabled(checked);
 
-  m_splittingOptions.setSplittingMode(BLACK_AND_WHITE_FOREGROUND);
+  m_splittingOptions.setSplittingMode(SplittingMode::BLACK_AND_WHITE_FOREGROUND);
   m_settings->setSplittingOptions(m_pageId, m_splittingOptions);
   emit reloadRequested();
 }
@@ -724,7 +724,7 @@ void OptionsWidget::colorForegroundToggled(bool checked) {
 
   originalBackgroundCB->setEnabled(!checked);
 
-  m_splittingOptions.setSplittingMode(COLOR_FOREGROUND);
+  m_splittingOptions.setSplittingMode(SplittingMode::COLOR_FOREGROUND);
   m_settings->setSplittingOptions(m_pageId, m_splittingOptions);
   emit reloadRequested();
 }
@@ -756,7 +756,7 @@ void OptionsWidget::colorSegmentationToggled(bool checked) {
   m_settings->setColorParams(m_pageId, m_colorParams);
 
   segmenterOptionsWidget->setEnabled(checked);
-  if ((m_colorParams.colorMode() == BLACK_AND_WHITE) || (m_colorParams.colorMode() == MIXED)) {
+  if ((m_colorParams.colorMode() == ColorMode::BLACK_AND_WHITE) || (m_colorParams.colorMode() == ColorMode::MIXED)) {
     posterizeCB->setEnabled(checked);
     posterizeOptionsWidget->setEnabled(checked && posterizeCB->isChecked());
   }

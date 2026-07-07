@@ -12,13 +12,13 @@ Params::Params(const PageLayout& layout, const Dependencies& deps, const AutoMan
 Params::Params(const QDomElement& el)
     : m_layout(el.namedItem("pages").toElement()),
       m_deps(el.namedItem("dependencies").toElement()),
-      m_splitLineMode(el.attribute("mode") == "manual" ? MODE_MANUAL : MODE_AUTO) {}
+      m_splitLineMode(el.attribute("mode") == "manual" ? AutoManualMode::MODE_MANUAL : AutoManualMode::MODE_AUTO) {}
 
 Params::~Params() = default;
 
 QDomElement Params::toXml(QDomDocument& doc, const QString& name) const {
   QDomElement el(doc.createElement(name));
-  el.setAttribute("mode", m_splitLineMode == MODE_AUTO ? "auto" : "manual");
+  el.setAttribute("mode", m_splitLineMode == AutoManualMode::MODE_AUTO ? "auto" : "manual");
   el.appendChild(m_layout.toXml(doc, "pages"));
   el.appendChild(m_deps.toXml(doc, "dependencies"));
   return el;

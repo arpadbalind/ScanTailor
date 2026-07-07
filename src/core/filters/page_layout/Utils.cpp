@@ -27,7 +27,7 @@ QRectF Utils::adaptContentRect(const ImageTransformation& xform, const QRectF& c
 }
 
 QSizeF Utils::calcRectSizeMM(const ImageTransformation& xform, const QRectF& rect) {
-  const QTransform virtToMm(xform.transformBack() * UnitsConverter(xform.origDpi()).transform(PIXELS, MILLIMETRES));
+  const QTransform virtToMm(xform.transformBack() * UnitsConverter(xform.origDpi()).transform(Units::PIXELS, Units::MILLIMETRES));
 
   const QLineF horLine(rect.topLeft(), rect.topRight());
   const QLineF verLine(rect.topLeft(), rect.bottomLeft());
@@ -138,24 +138,24 @@ Margins Utils::calcSoftMarginsMM(const QSizeF& hardSizeMm,
   }
 
   if (deltaWidth > .0) {
-    if (correctedAlignment.horizontal() == Alignment::HAUTO) {
+    if (correctedAlignment.horizontal() == Alignment::Horizontal::HAUTO) {
       if (3 * aggLeftBorder < aggRightBorder) {
-        correctedAlignment.setHorizontal(Alignment::LEFT);
+        correctedAlignment.setHorizontal(Alignment::Horizontal::LEFT);
       } else if (3 * aggRightBorder < aggLeftBorder) {
-        correctedAlignment.setHorizontal(Alignment::RIGHT);
+        correctedAlignment.setHorizontal(Alignment::Horizontal::RIGHT);
       } else {
-        correctedAlignment.setHorizontal(Alignment::HCENTER);
+        correctedAlignment.setHorizontal(Alignment::Horizontal::HCENTER);
       }
     }
 
     switch (correctedAlignment.horizontal()) {
-      case Alignment::LEFT:
+      case Alignment::Horizontal::LEFT:
         right = deltaWidth;
         break;
-      case Alignment::HCENTER:
+      case Alignment::Horizontal::HCENTER:
         left = right = 0.5 * deltaWidth;
         break;
-      case Alignment::RIGHT:
+      case Alignment::Horizontal::RIGHT:
         left = deltaWidth;
         break;
       default:
@@ -166,24 +166,24 @@ Margins Utils::calcSoftMarginsMM(const QSizeF& hardSizeMm,
   }
 
   if (deltaHeight > .0) {
-    if (correctedAlignment.vertical() == Alignment::VAUTO) {
+    if (correctedAlignment.vertical() == Alignment::Vertical::VAUTO) {
       if (3 * aggTopBorder < aggBottomBorder) {
-        correctedAlignment.setVertical(Alignment::TOP);
+        correctedAlignment.setVertical(Alignment::Vertical::TOP);
       } else if (3 * aggBottomBorder < aggTopBorder) {
-        correctedAlignment.setVertical(Alignment::BOTTOM);
+        correctedAlignment.setVertical(Alignment::Vertical::BOTTOM);
       } else {
-        correctedAlignment.setVertical(Alignment::VCENTER);
+        correctedAlignment.setVertical(Alignment::Vertical::VCENTER);
       }
     }
 
     switch (correctedAlignment.vertical()) {
-      case Alignment::TOP:
+      case Alignment::Vertical::TOP:
         bottom = deltaHeight;
         break;
-      case Alignment::VCENTER:
+      case Alignment::Vertical::VCENTER:
         top = bottom = 0.5 * deltaHeight;
         break;
-      case Alignment::BOTTOM:
+      case Alignment::Vertical::BOTTOM:
         top = deltaHeight;
         break;
       default:
@@ -199,7 +199,7 @@ QPolygonF Utils::calcPageRectPhys(const ImageTransformation& xform,
                                   const QPolygonF& contentRectPhys,
                                   const Params& params,
                                   const QSizeF& aggregateHardSizeMm) {
-  const QTransform pixelsToMmTransform(UnitsConverter(xform.origDpi()).transform(PIXELS, MILLIMETRES));
+  const QTransform pixelsToMmTransform(UnitsConverter(xform.origDpi()).transform(Units::PIXELS, Units::MILLIMETRES));
 
   QPolygonF polyMm(pixelsToMmTransform.map(contentRectPhys));
   extendPolyRectWithMargins(polyMm, params.hardMarginsMM());
@@ -243,8 +243,8 @@ Params Utils::buildDefaultParams(const Dpi& dpi) {
   double topMargin = margins.top();
   double rightMargin = margins.right();
   double bottomMargin = margins.bottom();
-  unitsConverter.convert(leftMargin, topMargin, defaultParams.getUnits(), MILLIMETRES);
-  unitsConverter.convert(rightMargin, bottomMargin, defaultParams.getUnits(), MILLIMETRES);
+  unitsConverter.convert(leftMargin, topMargin, defaultParams.getUnits(), Units::MILLIMETRES);
+  unitsConverter.convert(rightMargin, bottomMargin, defaultParams.getUnits(), Units::MILLIMETRES);
 
   return Params(Margins(leftMargin, topMargin, rightMargin, bottomMargin), QRectF(), QRectF(), QSizeF(),
                 pageLayoutParams.getAlignment(), pageLayoutParams.isAutoMargins());

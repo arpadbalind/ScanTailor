@@ -3,10 +3,11 @@
 
 #pragma once
 
-#include <foundation/NonCopyable.h>
+#include <QString>
 
-#include <QtCore/QString>
 #include <memory>
+
+#include "foundation/NonCopyable.h"
 
 class DefaultParams;
 
@@ -17,9 +18,9 @@ class DefaultParamsProvider : private NonCopyable {
  public:
   static DefaultParamsProvider& getInstance();
 
-  const QString& getProfileName() const;
+  [[nodiscard]] const QString& getProfileName() const;
 
-  const DefaultParams& getParams() const;
+  [[nodiscard]] const DefaultParams& getParams() const;
 
   void setParams(std::unique_ptr<DefaultParams> params, const QString& name);
 

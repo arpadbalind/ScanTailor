@@ -3,21 +3,21 @@
 
 #include "Units.h"
 
-#include <QtCore/QObject>
+#include <QObject>
 
 QString unitsToString(Units units) {
   QString unitsStr;
   switch (units) {
-    case PIXELS:
+    case Units::PIXELS:
       unitsStr = "px";
       break;
-    case MILLIMETRES:
+    case Units::MILLIMETRES:
       unitsStr = "mm";
       break;
-    case CENTIMETRES:
+    case Units::CENTIMETRES:
       unitsStr = "cm";
       break;
-    case INCHES:
+    case Units::INCHES:
       unitsStr = "in";
       break;
   }
@@ -26,29 +26,29 @@ QString unitsToString(Units units) {
 
 Units unitsFromString(const QString& string) {
   if (string == "px") {
-    return PIXELS;
+    return Units::PIXELS;
   } else if (string == "cm") {
-    return CENTIMETRES;
+    return Units::CENTIMETRES;
   } else if (string == "in") {
-    return INCHES;
+    return Units::INCHES;
   } else {
-    return MILLIMETRES;
+    return Units::MILLIMETRES;
   }
 }
 
 QString unitsToLocalizedString(Units units) {
   QString unitsStr;
   switch (units) {
-    case PIXELS:
+    case Units::PIXELS:
       unitsStr = QObject::tr("px");
       break;
-    case MILLIMETRES:
+    case Units::MILLIMETRES:
       unitsStr = QObject::tr("mm");
       break;
-    case CENTIMETRES:
+    case Units::CENTIMETRES:
       unitsStr = QObject::tr("cm");
       break;
-    case INCHES:
+    case Units::INCHES:
       unitsStr = QObject::tr("in");
       break;
   }

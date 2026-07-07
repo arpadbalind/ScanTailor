@@ -7,7 +7,7 @@
 
 namespace output {
 PictureShapeOptions::PictureShapeOptions()
-    : m_pictureShape(FREE_SHAPE), m_sensitivity(100), m_higherSearchSensitivity(false) {}
+    : m_pictureShape(PictureShape::FREE_SHAPE), m_sensitivity(100), m_higherSearchSensitivity(false) {}
 
 PictureShapeOptions::PictureShapeOptions(const QDomElement& el)
     : m_pictureShape(parsePictureShape(el.attribute("pictureShape"))),
@@ -33,24 +33,24 @@ bool PictureShapeOptions::operator!=(const PictureShapeOptions& other) const {
 
 PictureShape PictureShapeOptions::parsePictureShape(const QString& str) {
   if (str == "rectangular") {
-    return RECTANGULAR_SHAPE;
+    return PictureShape::RECTANGULAR_SHAPE;
   } else if (str == "off") {
-    return OFF_SHAPE;
+    return PictureShape::OFF_SHAPE;
   } else {
-    return FREE_SHAPE;
+    return PictureShape::FREE_SHAPE;
   }
 }
 
 QString PictureShapeOptions::formatPictureShape(PictureShape type) {
   QString str = "";
   switch (type) {
-    case OFF_SHAPE:
+    case PictureShape::OFF_SHAPE:
       str = "off";
       break;
-    case FREE_SHAPE:
+    case PictureShape::FREE_SHAPE:
       str = "free";
       break;
-    case RECTANGULAR_SHAPE:
+    case PictureShape::RECTANGULAR_SHAPE:
       str = "rectangular";
       break;
   }

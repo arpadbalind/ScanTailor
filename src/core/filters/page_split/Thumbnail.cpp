@@ -35,15 +35,15 @@ void Thumbnail::prePaintOverImage(QPainter& painter,
 
   painter.setPen(Qt::NoPen);
   switch (m_layout.type()) {
-    case PageLayout::SINGLE_PAGE_UNCUT:
+    case PageLayout::Type::SINGLE_PAGE_UNCUT:
       painter.setBrush(QColor(0, 0, 255, 50));
       painter.drawRect(canvasRect);
       return;  // No split line will be drawn.
-    case PageLayout::SINGLE_PAGE_CUT:
+    case PageLayout::Type::SINGLE_PAGE_CUT:
       painter.setBrush(QColor(0, 0, 255, 50));
       painter.drawPolygon(m_layout.singlePageOutline());
       break;
-    case PageLayout::TWO_PAGES: {
+    case PageLayout::Type::TWO_PAGES: {
       const QPolygonF leftPoly(m_layout.leftPageOutline());
       const QPolygonF rightPoly(m_layout.rightPageOutline());
       painter.setBrush(m_leftHalfRemoved ? QColor(0, 0, 0, 80) : QColor(0, 0, 255, 50));
@@ -75,11 +75,11 @@ void Thumbnail::prePaintOverImage(QPainter& painter,
   painter.setPen(pen);
 
   switch (m_layout.type()) {
-    case PageLayout::SINGLE_PAGE_CUT:
+    case PageLayout::Type::SINGLE_PAGE_CUT:
       painter.drawLine(m_layout.inscribedCutterLine(0));
       painter.drawLine(m_layout.inscribedCutterLine(1));
       break;
-    case PageLayout::TWO_PAGES:
+    case PageLayout::Type::TWO_PAGES:
       painter.drawLine(m_layout.inscribedCutterLine(0));
       break;
     default:;

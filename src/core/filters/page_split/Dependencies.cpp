@@ -8,8 +8,6 @@
 #include "XmlUnmarshaller.h"
 
 namespace page_split {
-Dependencies::Dependencies() : m_layoutType(AUTO_LAYOUT_TYPE) {}
-
 Dependencies::Dependencies(const QDomElement& el)
     : m_imageSize(XmlUnmarshaller::size(el.namedItem("size").toElement())),
       m_rotation(el.namedItem("rotation").toElement()),
@@ -30,11 +28,11 @@ bool Dependencies::compatibleWith(const Params& params) const {
   if (m_layoutType == deps.m_layoutType) {
     return true;
   }
-  if (m_layoutType == SINGLE_PAGE_UNCUT) {
+  if (m_layoutType == LayoutType::SINGLE_PAGE_UNCUT) {
     // The split line doesn't matter here.
     return true;
   }
-  if ((m_layoutType == TWO_PAGES) && (params.splitLineMode() == MODE_MANUAL)) {
+  if ((m_layoutType == LayoutType::TWO_PAGES) && (params.splitLineMode() == AutoManualMode::MODE_MANUAL)) {
     // Two pages and a specified split line means we have all the data.
     // Note that if layout type was PAGE_PLUS_OFFCUT, we would
     // not know if that page is to the left or to the right of the

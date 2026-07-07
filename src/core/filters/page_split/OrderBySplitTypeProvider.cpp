@@ -32,19 +32,19 @@ bool OrderBySplitTypeProvider::precedes(const PageId& lhsPage,
   const Params* lhsParams = lhsRecord.params();
   const Params* rhsParams = rhsRecord.params();
 
-  int lhsLayoutType = lhsRecord.combinedLayoutType();
+  int lhsLayoutType = static_cast<int>(lhsRecord.combinedLayoutType());
   if (lhsParams) {
-    lhsLayoutType = lhsParams->pageLayout().toLayoutType();
+    lhsLayoutType = static_cast<int>(lhsParams->pageLayout().toLayoutType());
   }
-  if (lhsLayoutType == AUTO_LAYOUT_TYPE) {
+  if (lhsLayoutType == static_cast<int>(LayoutType::AUTO_LAYOUT_TYPE)) {
     lhsLayoutType = 100;  // To force it below pages with known layout.
   }
 
-  int rhsLayoutType = rhsRecord.combinedLayoutType();
+  int rhsLayoutType = static_cast<int>(rhsRecord.combinedLayoutType());
   if (rhsParams) {
-    rhsLayoutType = rhsParams->pageLayout().toLayoutType();
+    rhsLayoutType = static_cast<int>(rhsParams->pageLayout().toLayoutType());
   }
-  if (rhsLayoutType == AUTO_LAYOUT_TYPE) {
+  if (rhsLayoutType == static_cast<int>(LayoutType::AUTO_LAYOUT_TYPE)) {
     rhsLayoutType = 100;  // To force it below pages with known layout.
   }
 

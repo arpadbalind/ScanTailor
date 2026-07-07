@@ -104,7 +104,7 @@ class Settings : private NonCopyable {
   };
 
 
-  Settings();
+  Settings() = default;
 
   virtual ~Settings();
 
@@ -164,6 +164,6 @@ class Settings : private NonCopyable {
 
   mutable QMutex m_mutex;
   PerPageRecords m_perPageRecords;
-  LayoutType m_defaultLayoutType;
+  LayoutType m_defaultLayoutType{ LayoutType::AUTO_LAYOUT_TYPE };
 };
 }  // namespace page_split

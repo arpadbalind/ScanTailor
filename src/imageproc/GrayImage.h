@@ -58,7 +58,7 @@ class GrayImage {
    * An additional guaranee provided by the underlying QImage
    * is that this value is a multiple of 4.
    */
-  [[nodiscard]] size_t stride() const { return m_image.bytesPerLine(); }
+  [[nodiscard]] size_t stride() const { return static_cast<size_t>(m_image.bytesPerLine()); }
 
   [[nodiscard]] QSize size() const { return m_image.size(); }
 

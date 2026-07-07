@@ -24,7 +24,7 @@ DefaultParams::DefaultParams(const DefaultParams::FixOrientationParams& fixOrien
       m_selectContentParams(selectContentParams),
       m_pageLayoutParams(pageLayoutParams),
       m_outputParams(outputParams),
-      m_units(MILLIMETRES) {}
+      m_units(Units::MILLIMETRES) {}
 
 DefaultParams::DefaultParams(const QDomElement& el)
     : m_fixOrientationParams(el.namedItem("fix-orientation-params").toElement()),
@@ -47,7 +47,7 @@ QDomElement DefaultParams::toXml(QDomDocument& doc, const QString& name) const {
   return el;
 }
 
-DefaultParams::DefaultParams() : m_units(MILLIMETRES) {}
+DefaultParams::DefaultParams() : m_units(Units::MILLIMETRES) {}
 
 DefaultParams::FixOrientationParams::FixOrientationParams(const OrthogonalRotation& imageRotation)
     : m_imageRotation(imageRotation) {}
@@ -64,22 +64,22 @@ QDomElement DefaultParams::FixOrientationParams::toXml(QDomDocument& doc, const 
 DefaultParams::DeskewParams::DeskewParams(double deskewAngleDeg, AutoManualMode mode)
     : m_deskewAngleDeg(deskewAngleDeg), m_mode(mode) {}
 
-DefaultParams::DeskewParams::DeskewParams() : m_deskewAngleDeg(0.0), m_mode(MODE_AUTO) {}
+DefaultParams::DeskewParams::DeskewParams() : m_deskewAngleDeg(0.0), m_mode(AutoManualMode::MODE_AUTO) {}
 
 DefaultParams::DeskewParams::DeskewParams(const QDomElement& el)
     : m_deskewAngleDeg(el.attribute("deskewAngleDeg").toDouble()),
-      m_mode((el.attribute("mode") == "manual") ? MODE_MANUAL : MODE_AUTO) {}
+      m_mode((el.attribute("mode") == "manual") ? AutoManualMode::MODE_MANUAL : AutoManualMode::MODE_AUTO) {}
 
 QDomElement DefaultParams::DeskewParams::toXml(QDomDocument& doc, const QString& name) const {
   QDomElement el(doc.createElement(name));
   el.setAttribute("deskewAngleDeg", Utils::doubleToString(m_deskewAngleDeg));
-  el.setAttribute("mode", (m_mode == MODE_AUTO) ? "auto" : "manual");
+  el.setAttribute("mode", (m_mode == AutoManualMode::MODE_AUTO) ? "auto" : "manual");
   return el;
 }
 
 DefaultParams::PageSplitParams::PageSplitParams(page_split::LayoutType layoutType) : m_layoutType(layoutType) {}
 
-DefaultParams::PageSplitParams::PageSplitParams() : m_layoutType(AUTO_LAYOUT_TYPE) {}
+DefaultParams::PageSplitParams::PageSplitParams() : m_layoutType(LayoutType::AUTO_LAYOUT_TYPE) {}
 
 DefaultParams::PageSplitParams::PageSplitParams(const QDomElement& el)
     : m_layoutType(layoutTypeFromString(el.attribute("layoutType"))) {}
@@ -102,7 +102,7 @@ DefaultParams::SelectContentParams::SelectContentParams(const QSizeF& pageRectSi
 DefaultParams::SelectContentParams::SelectContentParams()
     : m_pageRectSize(QSizeF(210, 297)),
       m_contentDetectEnabled(true),
-      m_pageDetectMode(MODE_DISABLED),
+      m_pageDetectMode(AutoManualMode::MODE_DISABLED),
       m_fineTuneCorners(false) {}
 
 DefaultParams::SelectContentParams::SelectContentParams(const QDomElement& el)

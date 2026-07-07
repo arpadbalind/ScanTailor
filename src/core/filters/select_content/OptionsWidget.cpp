@@ -55,8 +55,8 @@ void OptionsWidget::postUpdateUI(const UiData& uiData) {
 
 void OptionsWidget::manualContentRectSet(const QRectF& contentRect) {
   m_uiData.setContentRect(contentRect);
-  m_uiData.setContentDetectionMode(MODE_MANUAL);
-  updateContentModeIndication(MODE_MANUAL);
+  m_uiData.setContentDetectionMode(AutoManualMode::MODE_MANUAL);
+  updateContentModeIndication(AutoManualMode::MODE_MANUAL);
 
   commitCurrentParams();
 
@@ -65,8 +65,8 @@ void OptionsWidget::manualContentRectSet(const QRectF& contentRect) {
 
 void OptionsWidget::manualPageRectSet(const QRectF& pageRect) {
   m_uiData.setPageRect(pageRect);
-  m_uiData.setPageDetectionMode(MODE_MANUAL);
-  updatePageModeIndication(MODE_MANUAL);
+  m_uiData.setPageDetectionMode(AutoManualMode::MODE_MANUAL);
+  updatePageModeIndication(AutoManualMode::MODE_MANUAL);
   updatePageDetectOptionsDisplay();
   updatePageRectSize(pageRect.size());
 
@@ -80,7 +80,7 @@ void OptionsWidget::updatePageRectSize(const QSizeF& size) {
 
   double width = size.width();
   double height = size.height();
-  UnitsProvider::getInstance().convertFrom(width, height, PIXELS, m_dpi);
+  UnitsProvider::getInstance().convertFrom(width, height, Units::PIXELS, m_dpi);
 
   widthSpinBox->setValue(width);
   heightSpinBox->setValue(height);
@@ -90,19 +90,19 @@ void OptionsWidget::contentDetectToggled(const AutoManualMode mode) {
   m_uiData.setContentDetectionMode(mode);
   commitCurrentParams();
 
-  if (mode != MODE_MANUAL) {
+  if (mode != AutoManualMode::MODE_MANUAL) {
     emit reloadRequested();
   }
 }
 
 void OptionsWidget::pageDetectToggled(const AutoManualMode mode) {
-  const bool needUpdateState = ((mode == MODE_MANUAL) && (m_uiData.pageDetectionMode() == MODE_DISABLED));
+  const bool needUpdateState = ((mode == AutoManualMode::MODE_MANUAL) && (m_uiData.pageDetectionMode() == AutoManualMode::MODE_DISABLED));
 
   m_uiData.setPageDetectionMode(mode);
   updatePageDetectOptionsDisplay();
   commitCurrentParams();
 
-  if (mode != MODE_MANUAL) {
+  if (mode != AutoManualMode::MODE_MANUAL) {
     emit reloadRequested();
   } else if (needUpdateState) {
     emit pageRectStateChanged(true);
@@ -113,20 +113,20 @@ void OptionsWidget::pageDetectToggled(const AutoManualMode mode) {
 void OptionsWidget::fineTuningChanged(bool checked) {
   m_uiData.setFineTuneCornersEnabled(checked);
   commitCurrentParams();
-  if (m_uiData.pageDetectionMode() == MODE_AUTO) {
+  if (m_uiData.pageDetectionMode() == AutoManualMode::MODE_AUTO) {
     emit reloadRequested();
   }
 }
 
 void OptionsWidget::updateContentModeIndication(const AutoManualMode mode) {
   switch (mode) {
-    case MODE_AUTO:
+    case AutoManualMode::MODE_AUTO:
       contentDetectAutoBtn->setChecked(true);
       break;
-    case MODE_MANUAL:
+    case AutoManualMode::MODE_MANUAL:
       contentDetectManualBtn->setChecked(true);
       break;
-    case MODE_DISABLED:
+    case AutoManualMode::MODE_DISABLED:
       contentDetectDisableBtn->setChecked(true);
       break;
   }
@@ -134,13 +134,13 @@ void OptionsWidget::updateContentModeIndication(const AutoManualMode mode) {
 
 void OptionsWidget::updatePageModeIndication(const AutoManualMode mode) {
   switch (mode) {
-    case MODE_AUTO:
+    case AutoManualMode::MODE_AUTO:
       pageDetectAutoBtn->setChecked(true);
       break;
-    case MODE_MANUAL:
+    case AutoManualMode::MODE_MANUAL:
       pageDetectManualBtn->setChecked(true);
       break;
-    case MODE_DISABLED:
+    case AutoManualMode::MODE_DISABLED:
       pageDetectDisableBtn->setChecked(true);
       break;
   }
@@ -148,15 +148,15 @@ void OptionsWidget::updatePageModeIndication(const AutoManualMode mode) {
 
 void OptionsWidget::updatePageDetectOptionsDisplay() {
   fineTuneBtn->setChecked(m_uiData.isFineTuningCornersEnabled());
-  pageDetectOptions->setVisible(m_uiData.pageDetectionMode() != MODE_DISABLED);
-  fineTuneBtn->setVisible(m_uiData.pageDetectionMode() == MODE_AUTO);
-  dimensionsWidget->setVisible(m_uiData.pageDetectionMode() == MODE_MANUAL);
+  pageDetectOptions->setVisible(m_uiData.pageDetectionMode() != AutoManualMode::MODE_DISABLED);
+  fineTuneBtn->setVisible(m_uiData.pageDetectionMode() == AutoManualMode::MODE_AUTO);
+  dimensionsWidget->setVisible(m_uiData.pageDetectionMode() == AutoManualMode::MODE_MANUAL);
 }
 
 void OptionsWidget::dimensionsChangedLocally(double) {
   double widthSpinBoxValue = widthSpinBox->value();
   double heightSpinBoxValue = heightSpinBox->value();
-  UnitsProvider::getInstance().convertTo(widthSpinBoxValue, heightSpinBoxValue, PIXELS, m_dpi);
+  UnitsProvider::getInstance().convertTo(widthSpinBoxValue, heightSpinBoxValue, Units::PIXELS, m_dpi);
 
   QRectF newPageRect = m_uiData.pageRect();
   newPageRect.setSize(QSizeF(widthSpinBoxValue, heightSpinBoxValue));
@@ -175,16 +175,16 @@ void OptionsWidget::commitCurrentParams() {
 void OptionsWidget::updateDependenciesIfNecessary() {
   // On switching to manual mode the page dependencies isn't updated
   // as Task::process isn't called, so we need to update it manually.
-  if (!(m_uiData.contentDetectionMode() == MODE_MANUAL || m_uiData.pageDetectionMode() == MODE_MANUAL)) {
+  if (!(m_uiData.contentDetectionMode() == AutoManualMode::MODE_MANUAL || m_uiData.pageDetectionMode() == AutoManualMode::MODE_MANUAL)) {
     return;
   }
 
   Dependencies deps = m_uiData.dependencies();
-  if (m_uiData.contentDetectionMode() == MODE_MANUAL) {
-    deps.setContentDetectionMode(MODE_MANUAL);
+  if (m_uiData.contentDetectionMode() == AutoManualMode::MODE_MANUAL) {
+    deps.setContentDetectionMode(AutoManualMode::MODE_MANUAL);
   }
-  if (m_uiData.pageDetectionMode() == MODE_MANUAL) {
-    deps.setPageDetectionMode(MODE_MANUAL);
+  if (m_uiData.pageDetectionMode() == AutoManualMode::MODE_MANUAL) {
+    deps.setPageDetectionMode(AutoManualMode::MODE_MANUAL);
   }
   m_uiData.setDependencies(deps);
 }
@@ -214,7 +214,7 @@ void OptionsWidget::applySelection(const std::set<PageId>& pages, const bool app
     Params newParams(params);
     std::unique_ptr<Params> oldParams = m_settings->getPageParams(pageId);
     if (oldParams) {
-      if (newParams.pageDetectionMode() == MODE_MANUAL) {
+      if (newParams.pageDetectionMode() == AutoManualMode::MODE_MANUAL) {
         if (!applyPageBox) {
           newParams.setPageRect(oldParams->pageRect());
         } else {
@@ -228,7 +228,7 @@ void OptionsWidget::applySelection(const std::set<PageId>& pages, const bool app
           }
         }
       }
-      if (newParams.contentDetectionMode() == MODE_MANUAL) {
+      if (newParams.contentDetectionMode() == AutoManualMode::MODE_MANUAL) {
         if (!applyContentBox) {
           newParams.setContentRect(oldParams->contentRect());
         } else if (!newParams.contentRect().isEmpty()) {
@@ -262,8 +262,8 @@ void OptionsWidget::onUnitsChanged(Units units) {
   int decimals;
   double step;
   switch (units) {
-    case PIXELS:
-    case MILLIMETRES:
+    case Units::PIXELS:
+    case Units::MILLIMETRES:
       decimals = 1;
       step = 1.0;
       break;
@@ -286,12 +286,12 @@ void OptionsWidget::onUnitsChanged(Units units) {
 void OptionsWidget::setupUiConnections() {
   CONNECT(widthSpinBox, SIGNAL(valueChanged(double)), this, SLOT(dimensionsChangedLocally(double)));
   CONNECT(heightSpinBox, SIGNAL(valueChanged(double)), this, SLOT(dimensionsChangedLocally(double)));
-  CONNECT(contentDetectAutoBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(MODE_AUTO); });
-  CONNECT(contentDetectManualBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(MODE_MANUAL); });
-  CONNECT(contentDetectDisableBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(MODE_DISABLED); });
-  CONNECT(pageDetectAutoBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(MODE_AUTO); });
-  CONNECT(pageDetectManualBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(MODE_MANUAL); });
-  CONNECT(pageDetectDisableBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(MODE_DISABLED); });
+  CONNECT(contentDetectAutoBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(AutoManualMode::MODE_AUTO); });
+  CONNECT(contentDetectManualBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(AutoManualMode::MODE_MANUAL); });
+  CONNECT(contentDetectDisableBtn, &QPushButton::pressed, this, [this]() { this->contentDetectToggled(AutoManualMode::MODE_DISABLED); });
+  CONNECT(pageDetectAutoBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(AutoManualMode::MODE_AUTO); });
+  CONNECT(pageDetectManualBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(AutoManualMode::MODE_MANUAL); });
+  CONNECT(pageDetectDisableBtn, &QPushButton::pressed, this, [this]() { this->pageDetectToggled(AutoManualMode::MODE_DISABLED); });
   CONNECT(fineTuneBtn, SIGNAL(toggled(bool)), this, SLOT(fineTuningChanged(bool)));
   CONNECT(applyToBtn, SIGNAL(clicked()), this, SLOT(showApplyToDialog()));
 }
@@ -302,7 +302,7 @@ void OptionsWidget::setupUiConnections() {
 /*========================= OptionsWidget::UiData ======================*/
 
 OptionsWidget::UiData::UiData()
-    : m_contentDetectionMode(MODE_AUTO), m_pageDetectionMode(MODE_DISABLED), m_fineTuneCornersEnabled(false) {}
+    : m_contentDetectionMode(AutoManualMode::MODE_AUTO), m_pageDetectionMode(AutoManualMode::MODE_DISABLED), m_fineTuneCornersEnabled(false) {}
 
 OptionsWidget::UiData::~UiData() = default;
 }  // namespace select_content

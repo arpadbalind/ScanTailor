@@ -8,13 +8,13 @@
 namespace output {
 QString despeckleLevelToString(const DespeckleLevel level) {
   switch (level) {
-    case DESPECKLE_OFF:
+    case DespeckleLevel::OFF:
       return "off";
-    case DESPECKLE_CAUTIOUS:
+    case DespeckleLevel::CAUTIOUS:
       return "cautious";
-    case DESPECKLE_NORMAL:
+    case DespeckleLevel::NORMAL:
       return "normal";
-    case DESPECKLE_AGGRESSIVE:
+    case DespeckleLevel::AGGRESSIVE:
       return "aggressive";
   }
   return QString();
@@ -22,13 +22,13 @@ QString despeckleLevelToString(const DespeckleLevel level) {
 
 DespeckleLevel despeckleLevelFromString(const QString& str) {
   if (str == "off") {
-    return DESPECKLE_OFF;
+    return DespeckleLevel::OFF;
   } else if (str == "cautious") {
-    return DESPECKLE_CAUTIOUS;
+    return DespeckleLevel::CAUTIOUS;
   } else if (str == "aggressive") {
-    return DESPECKLE_AGGRESSIVE;
+    return DespeckleLevel::AGGRESSIVE;
   } else {
-    return DESPECKLE_NORMAL;
+    return DespeckleLevel::NORMAL;
   }
 }
 }  // namespace output

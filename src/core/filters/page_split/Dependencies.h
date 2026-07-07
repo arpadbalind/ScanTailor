@@ -24,7 +24,7 @@ class Params;
 class Dependencies {
   // Member-wise copying is OK.
  public:
-  Dependencies();
+  Dependencies() = default;
 
   explicit Dependencies(const QDomElement& el);
 
@@ -43,7 +43,7 @@ class Dependencies {
  private:
   QSize m_imageSize;
   OrthogonalRotation m_rotation;
-  LayoutType m_layoutType;
+  LayoutType m_layoutType{ LayoutType::AUTO_LAYOUT_TYPE };
 };
 
 

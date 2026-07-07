@@ -106,15 +106,15 @@ void ImageView::onPaint(QPainter& painter, [[maybe_unused]] const InteractionSta
   const QRectF virtRect(virtualDisplayRect());
 
   switch (m_virtLayout.type()) {
-    case PageLayout::SINGLE_PAGE_UNCUT:
+    case PageLayout::Type::SINGLE_PAGE_UNCUT:
       painter.setBrush(QColor(0, 0, 255, 50));
       painter.drawRect(virtRect);
       return;  // No Split Line will be drawn.
-    case PageLayout::SINGLE_PAGE_CUT:
+    case PageLayout::Type::SINGLE_PAGE_CUT:
       painter.setBrush(QColor(0, 0, 255, 50));
       painter.drawPolygon(m_virtLayout.singlePageOutline());
       break;
-    case PageLayout::TWO_PAGES:
+    case PageLayout::Type::TWO_PAGES:
       painter.setBrush(m_leftPageRemoved ? QColor(0, 0, 0, 80) : QColor(0, 0, 255, 50));
       painter.drawPolygon(m_virtLayout.leftPageOutline());
       painter.setBrush(m_rightPageRemoved ? QColor(0, 0, 0, 80) : QColor(255, 0, 0, 50));

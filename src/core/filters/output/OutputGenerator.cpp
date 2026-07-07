@@ -1213,8 +1213,8 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processImpl(ZoneSet& pi
   m_outsideBackgroundColor = BackgroundColorCalculator::calcDominantBackgroundColor(
       m_colorOriginal ? m_inputOrigImage : static_cast<const QImage&>(m_inputGrayImage), m_outCropAreaInOriginalCs);
 
-  if ((m_dewarpingOptions.dewarpingMode() == AUTO) || (m_dewarpingOptions.dewarpingMode() == MARGINAL)
-      || ((m_dewarpingOptions.dewarpingMode() == MANUAL) && distortionModel.isValid())) {
+  if ((m_dewarpingOptions.dewarpingMode() == DewarpingMode::AUTO) || (m_dewarpingOptions.dewarpingMode() == DewarpingMode::MARGINAL)
+      || ((m_dewarpingOptions.dewarpingMode() == DewarpingMode::MANUAL) && distortionModel.isValid())) {
     return processWithDewarping(pictureZones, fillZones, distortionModel, depthPerception, autoPictureMask,
                                 specklesImage);
   } else {
@@ -1440,7 +1440,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithoutDewarping
 
   if (m_renderParams.needBinarization() && !m_renderParams.originalBackground()) {
     m_outsideBackgroundColor = Qt::white;
-  } else if (m_colorParams.colorCommonOptions().getFillingColor() == FILL_WHITE) {
+  } else if (m_colorParams.colorCommonOptions().getFillingColor() == FillingColor::WHITE) {
     m_outsideBackgroundColor = m_blackOnWhite ? Qt::white : Qt::black;
   }
   fillMarginsInPlace(maybeNormalized, m_contentAreaInWorkingCs, m_outsideBackgroundColor);
@@ -1559,9 +1559,9 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
     m_status.throwIfCancelled();
   }
 
-  if (m_dewarpingOptions.dewarpingMode() == AUTO) {
+  if (m_dewarpingOptions.dewarpingMode() == DewarpingMode::AUTO) {
     distortionModel = buildAutoDistortionModel(warpedGrayOutput, workingToOrig);
-  } else if (m_dewarpingOptions.dewarpingMode() == MARGINAL) {
+  } else if (m_dewarpingOptions.dewarpingMode() == DewarpingMode::MARGINAL) {
     distortionModel = buildMarginalDistortionModel();
   }
   warpedGrayOutput = GrayImage();  // Save memory.
@@ -1773,7 +1773,7 @@ std::unique_ptr<OutputImage> OutputGenerator::Processor::processWithDewarping(Zo
 
   if (m_renderParams.needBinarization() && !m_renderParams.originalBackground()) {
     m_outsideBackgroundColor = Qt::white;
-  } else if (m_colorParams.colorCommonOptions().getFillingColor() == FILL_WHITE) {
+  } else if (m_colorParams.colorCommonOptions().getFillingColor() == FillingColor::WHITE) {
     m_outsideBackgroundColor = m_blackOnWhite ? Qt::white : Qt::black;
   }
   fillMarginsInPlace(dewarped, dewarpingContentAreaMask, m_outsideBackgroundColor);
@@ -2209,21 +2209,21 @@ BinaryImage OutputGenerator::Processor::binarize(const QImage& image) const {
 
   BinaryImage binarized;
   switch (binarizationMethod) {
-    case OTSU: {
+    case BinarizationMethod::OTSU: {
       GrayscaleHistogram hist(image);
       const BinaryThreshold bwThresh(BinaryThreshold::otsuThreshold(hist));
 
       binarized = BinaryImage(image, adjustThreshold(bwThresh));
       break;
     }
-    case SAUVOLA: {
+    case BinarizationMethod::SAUVOLA: {
       QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());
       double sauvolaCoef = blackWhiteOptions.getSauvolaCoef();
 
       binarized = binarizeSauvola(image, windowsSize, sauvolaCoef);
       break;
     }
-    case WOLF: {
+    case BinarizationMethod::WOLF: {
       QSize windowsSize = QSize(blackWhiteOptions.getWindowSize(), blackWhiteOptions.getWindowSize());
       auto lowerBound = (unsigned char) blackWhiteOptions.getWolfLowerBound();
       auto upperBound = (unsigned char) blackWhiteOptions.getWolfUpperBound();
@@ -2323,7 +2323,7 @@ void OutputGenerator::Processor::maybeDespeckleInPlace(BinaryImage& image,
 
 double OutputGenerator::Processor::findSkew(const QImage& image) const {
   if (m_dewarpingOptions.needPostDeskew()
-      && ((m_dewarpingOptions.dewarpingMode() == MARGINAL) || (m_dewarpingOptions.dewarpingMode() == MANUAL))) {
+      && ((m_dewarpingOptions.dewarpingMode() == DewarpingMode::MARGINAL) || (m_dewarpingOptions.dewarpingMode() == DewarpingMode::MANUAL))) {
     const BinaryImage bwImage(image, BinaryThreshold::otsuThreshold(GrayscaleHistogram(image)));
     const Skew skew = SkewFinder().findSkew(bwImage);
     if ((skew.angle() != .0) && (skew.confidence() >= Skew::GOOD_CONFIDENCE)) {
@@ -2372,8 +2372,8 @@ QImage OutputGenerator::Processor::posterizeImage(const QImage& image, const QCo
 }
 
 void OutputGenerator::Processor::processPictureZones(BinaryImage& mask, ZoneSet& pictureZones, const GrayImage& image) {
-  if ((m_pictureShapeOptions.getPictureShape() != RECTANGULAR_SHAPE) || !m_outputProcessingParams.isAutoZonesFound()) {
-    if (m_pictureShapeOptions.getPictureShape() != OFF_SHAPE) {
+  if ((m_pictureShapeOptions.getPictureShape() != PictureShape::RECTANGULAR_SHAPE) || !m_outputProcessingParams.isAutoZonesFound()) {
+    if (m_pictureShapeOptions.getPictureShape() != PictureShape::OFF_SHAPE) {
       mask = estimateBinarizationMask(image, m_workingBoundingRect, m_workingBoundingRect);
     }
 
@@ -2382,7 +2382,7 @@ void OutputGenerator::Processor::processPictureZones(BinaryImage& mask, ZoneSet&
     m_outputProcessingParams.setAutoZonesFound(false);
     m_settings->setOutputProcessingParams(m_pageId, m_outputProcessingParams);
   }
-  if ((m_pictureShapeOptions.getPictureShape() == RECTANGULAR_SHAPE) && !m_outputProcessingParams.isAutoZonesFound()) {
+  if ((m_pictureShapeOptions.getPictureShape() == PictureShape::RECTANGULAR_SHAPE) && !m_outputProcessingParams.isAutoZonesFound()) {
     std::vector<QRect> areas = findRectAreas(mask, BWColor::WHITE, m_pictureShapeOptions.getSensitivity());
 
     const QTransform fromWorkingCs = [this]() {

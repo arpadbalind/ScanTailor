@@ -1,17 +1,20 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_COLORCOMMONOPTIONS_H_
-#define SCANTAILOR_OUTPUT_COLORCOMMONOPTIONS_H_
+#pragma once
+#include <cstdint>
 
-#include <AutoManualMode.h>
+#include "AutoManualMode.h"
 
 class QString;
 class QDomDocument;
 class QDomElement;
 
 namespace output {
-enum FillingColor { FILL_BACKGROUND, FILL_WHITE };
+enum class FillingColor : std::uint8_t {
+  BACKGROUND,
+  WHITE
+};
 
 class ColorCommonOptions {
  public:
@@ -27,19 +30,19 @@ class ColorCommonOptions {
 
     bool operator!=(const PosterizationOptions& other) const;
 
-    bool isEnabled() const;
+    [[nodiscard]] bool isEnabled() const;
 
     void setEnabled(bool enabled);
 
-    int getLevel() const;
+    [[nodiscard]] int getLevel() const;
 
     void setLevel(int level);
 
-    bool isNormalizationEnabled() const;
+    [[nodiscard]] bool isNormalizationEnabled() const;
 
     void setNormalizationEnabled(bool normalizationEnabled);
 
-    bool isForceBlackAndWhite() const;
+    [[nodiscard]] bool isForceBlackAndWhite() const;
 
     void setForceBlackAndWhite(bool forceBlackAndWhite);
 
@@ -56,19 +59,19 @@ class ColorCommonOptions {
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  bool fillOffcut() const;
+  [[nodiscard]] bool fillOffcut() const;
 
   void setFillOffcut(bool fillOffcut);
 
-  bool fillMargins() const;
+  [[nodiscard]] bool fillMargins() const;
 
   void setFillMargins(bool val);
 
-  bool normalizeIllumination() const;
+  [[nodiscard]] bool normalizeIllumination() const;
 
   void setNormalizeIllumination(bool val);
 
-  FillingColor getFillingColor() const;
+  [[nodiscard]] FillingColor getFillingColor() const;
 
   void setFillingColor(FillingColor fillingColor);
 
@@ -76,7 +79,7 @@ class ColorCommonOptions {
 
   bool operator!=(const ColorCommonOptions& other) const;
 
-  const PosterizationOptions& getPosterizationOptions() const;
+  [[nodiscard]] const PosterizationOptions& getPosterizationOptions() const;
 
   void setPosterizationOptions(const PosterizationOptions& posterizationOptions);
 
@@ -167,4 +170,4 @@ inline void ColorCommonOptions::PosterizationOptions::setForceBlackAndWhite(bool
   PosterizationOptions::m_forceBlackAndWhite = forceBlackAndWhite;
 }
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_COLORCOMMONOPTIONS_H_
+Q_DECLARE_METATYPE(output::FillingColor);

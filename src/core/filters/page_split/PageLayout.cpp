@@ -16,19 +16,17 @@
 using namespace imageproc;
 
 namespace page_split {
-PageLayout::PageLayout() : m_type(SINGLE_PAGE_UNCUT) {}
-
 PageLayout::PageLayout(const QRectF& fullRect)
     : m_uncutOutline(fullRect),
       m_cutter1(fullRect.topLeft(), fullRect.bottomLeft()),
       m_cutter2(fullRect.topRight(), fullRect.bottomRight()),
-      m_type(SINGLE_PAGE_UNCUT) {}
+      m_type(Type::SINGLE_PAGE_UNCUT) {}
 
 PageLayout::PageLayout(const QRectF& fullRect, const QLineF& cutter1, const QLineF& cutter2)
-    : m_uncutOutline(fullRect), m_cutter1(cutter1), m_cutter2(cutter2), m_type(SINGLE_PAGE_CUT) {}
+    : m_uncutOutline(fullRect), m_cutter1(cutter1), m_cutter2(cutter2), m_type(Type::SINGLE_PAGE_CUT) {}
 
 PageLayout::PageLayout(const QRectF fullRect, const QLineF& splitLine)
-    : m_uncutOutline(fullRect), m_cutter1(splitLine), m_type(TWO_PAGES) {}
+    : m_uncutOutline(fullRect), m_cutter1(splitLine), m_type(Type::TWO_PAGES) {}
 
 PageLayout::PageLayout(const QPolygonF& outline, const QLineF& cutter1, const QLineF& cutter2, Type type)
     : m_uncutOutline(outline), m_cutter1(cutter1), m_cutter2(cutter2), m_type(type) {}
@@ -41,7 +39,7 @@ PageLayout::PageLayout(const QDomElement& layoutEl)
 
 void PageLayout::setType(Type type) {
   m_type = type;
-  if (type == TWO_PAGES) {
+  if (type == Type::TWO_PAGES) {
     m_cutter2 = m_cutter1;
   }
 }
@@ -66,25 +64,25 @@ void PageLayout::setCutterLine(int idx, const QLineF& cutter) {
 
 LayoutType PageLayout::toLayoutType() const {
   switch (m_type) {
-    case SINGLE_PAGE_UNCUT:
-      return page_split::SINGLE_PAGE_UNCUT;
-    case SINGLE_PAGE_CUT:
-      return page_split::PAGE_PLUS_OFFCUT;
-    case TWO_PAGES:
-      return page_split::TWO_PAGES;
+    case Type::SINGLE_PAGE_UNCUT:
+      return page_split::LayoutType::SINGLE_PAGE_UNCUT;
+    case Type::SINGLE_PAGE_CUT:
+      return page_split::LayoutType::PAGE_PLUS_OFFCUT;
+    case Type::TWO_PAGES:
+      return page_split::LayoutType::TWO_PAGES;
   }
 
   assert(!"Unreachable");
-  return page_split::SINGLE_PAGE_UNCUT;
+  return page_split::LayoutType::SINGLE_PAGE_UNCUT;
 }
 
 int PageLayout::numCutters() const {
   switch (m_type) {
-    case SINGLE_PAGE_UNCUT:
+    case Type::SINGLE_PAGE_UNCUT:
       return 0;
-    case SINGLE_PAGE_CUT:
+    case Type::SINGLE_PAGE_CUT:
       return 2;
-    case TWO_PAGES:
+    case Type::TWO_PAGES:
       return 1;
   }
 
@@ -152,11 +150,11 @@ QPolygonF PageLayout::singlePageOutline() const {
   }
 
   switch (m_type) {
-    case SINGLE_PAGE_UNCUT:
+    case Type::SINGLE_PAGE_UNCUT:
       return m_uncutOutline;
-    case SINGLE_PAGE_CUT:
+    case Type::SINGLE_PAGE_CUT:
       break;
-    case TWO_PAGES:
+    case Type::TWO_PAGES:
       return QPolygonF();
   }
 
@@ -181,10 +179,10 @@ QPolygonF PageLayout::leftPageOutline() const {
   }
 
   switch (m_type) {
-    case SINGLE_PAGE_UNCUT:
-    case SINGLE_PAGE_CUT:
+    case Type::SINGLE_PAGE_UNCUT:
+    case Type::SINGLE_PAGE_CUT:
       return QPolygonF();
-    case TWO_PAGES:
+    case Type::TWO_PAGES:
       break;
   }
 
@@ -209,10 +207,10 @@ QPolygonF PageLayout::rightPageOutline() const {
   }
 
   switch (m_type) {
-    case SINGLE_PAGE_UNCUT:
-    case SINGLE_PAGE_CUT:
+    case Type::SINGLE_PAGE_UNCUT:
+    case Type::SINGLE_PAGE_CUT:
       return QPolygonF();
-    case TWO_PAGES:
+    case Type::TWO_PAGES:
       break;
   }
 
@@ -268,24 +266,24 @@ QDomElement PageLayout::toXml(QDomDocument& doc, const QString& name) const {
 
 PageLayout::Type PageLayout::typeFromString(const QString& str) {
   if (str == "two-pages") {
-    return TWO_PAGES;
+    return Type::TWO_PAGES;
   } else if (str == "single-cut") {
-    return SINGLE_PAGE_CUT;
+    return Type::SINGLE_PAGE_CUT;
   } else {  // "single-uncut"
-    return SINGLE_PAGE_UNCUT;
+    return Type::SINGLE_PAGE_UNCUT;
   }
 }
 
 QString PageLayout::typeToString(const Type type) {
   const char* str = nullptr;
   switch (type) {
-    case SINGLE_PAGE_UNCUT:
+    case Type::SINGLE_PAGE_UNCUT:
       str = "single-uncut";
       break;
-    case SINGLE_PAGE_CUT:
+    case Type::SINGLE_PAGE_CUT:
       str = "single-cut";
       break;
-    case TWO_PAGES:
+    case Type::TWO_PAGES:
       str = "two-pages";
       break;
   }

@@ -1,8 +1,9 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_COLORPARAMS_H_
-#define SCANTAILOR_OUTPUT_COLORPARAMS_H_
+#pragma once
+
+#include <cstdint>
 
 #include "BlackWhiteOptions.h"
 #include "ColorCommonOptions.h"
@@ -12,25 +13,29 @@ class QDomDocument;
 class QDomElement;
 
 namespace output {
-enum ColorMode { BLACK_AND_WHITE, COLOR_GRAYSCALE, MIXED };
+enum class ColorMode : std::uint8_t {
+  BLACK_AND_WHITE,
+  COLOR_GRAYSCALE,
+  MIXED
+};
 
 class ColorParams {
  public:
-  ColorParams();
+  ColorParams() = default;
 
   explicit ColorParams(const QDomElement& el);
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  ColorMode colorMode() const;
+  [[nodiscard]] ColorMode colorMode() const;
 
   void setColorMode(ColorMode mode);
 
-  const ColorCommonOptions& colorCommonOptions() const;
+  [[nodiscard]] const ColorCommonOptions& colorCommonOptions() const;
 
   void setColorCommonOptions(const ColorCommonOptions& opt);
 
-  const BlackWhiteOptions& blackWhiteOptions() const;
+  [[nodiscard]] const BlackWhiteOptions& blackWhiteOptions() const;
 
   void setBlackWhiteOptions(const BlackWhiteOptions& opt);
 
@@ -39,7 +44,7 @@ class ColorParams {
 
   static QString formatColorMode(ColorMode mode);
 
-  ColorMode m_colorMode;
+  ColorMode m_colorMode = ColorMode::BLACK_AND_WHITE;
   ColorCommonOptions m_colorCommonOptions;
   BlackWhiteOptions m_bwOptions;
 };
@@ -69,4 +74,4 @@ inline void ColorParams::setBlackWhiteOptions(const BlackWhiteOptions& opt) {
   m_bwOptions = opt;
 }
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_COLORPARAMS_H_
+Q_DECLARE_METATYPE(output::ColorMode);

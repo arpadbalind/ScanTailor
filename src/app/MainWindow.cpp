@@ -151,41 +151,41 @@ MainWindow::MainWindow()
     m_unitsMenuActionGroup->addAction(action);
   }
   switch (unitsFromString(settings.getUnits())) {
-    case PIXELS:
+    case Units::PIXELS:
       actionPixels->setChecked(true);
       break;
-    case MILLIMETRES:
+    case Units::MILLIMETRES:
       actionMilimeters->setChecked(true);
       break;
-    case CENTIMETRES:
+    case Units::CENTIMETRES:
       actionCentimetres->setChecked(true);
       break;
-    case INCHES:
+    case Units::INCHES:
       actionInches->setChecked(true);
       break;
   }
   connect(actionPixels, &QAction::toggled, [this, &settings](bool checked) {
     if (checked) {
-      UnitsProvider::getInstance().setUnits(PIXELS);
-      settings.setUnits(unitsToString(PIXELS));
+      UnitsProvider::getInstance().setUnits(Units::PIXELS);
+      settings.setUnits(unitsToString(Units::PIXELS));
     }
   });
   connect(actionMilimeters, &QAction::toggled, [this, &settings](bool checked) {
     if (checked) {
-      UnitsProvider::getInstance().setUnits(MILLIMETRES);
-      settings.setUnits(unitsToString(MILLIMETRES));
+      UnitsProvider::getInstance().setUnits(Units::MILLIMETRES);
+      settings.setUnits(unitsToString(Units::MILLIMETRES));
     }
   });
   connect(actionCentimetres, &QAction::toggled, [this, &settings](bool checked) {
     if (checked) {
-      UnitsProvider::getInstance().setUnits(CENTIMETRES);
-      settings.setUnits(unitsToString(CENTIMETRES));
+      UnitsProvider::getInstance().setUnits(Units::CENTIMETRES);
+      settings.setUnits(unitsToString(Units::CENTIMETRES));
     }
   });
   connect(actionInches, &QAction::toggled, [this, &settings](bool checked) {
     if (checked) {
-      UnitsProvider::getInstance().setUnits(INCHES);
-      settings.setUnits(unitsToString(INCHES));
+      UnitsProvider::getInstance().setUnits(Units::INCHES);
+      settings.setUnits(unitsToString(Units::INCHES));
     }
   });
 
@@ -1779,7 +1779,7 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
   }
 
   std::vector<QFileInfo> files;
-  files.reserve(fileNames.size());
+  files.reserve(static_cast<size_t>(fileNames.size()));
 
   std::ranges::transform(fileNames, std::back_inserter(files),
                          [](const auto& name) {
@@ -1794,13 +1794,14 @@ void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId
   std::vector<QString> loadedFiles;
   std::vector<QString> failedFiles;  // Those we failed to read metadata from.
   // dialog->selectedFiles() returns file list in reverse order.
-  for (int i = files.size() - 1; i >= 0; --i) {
-    const QFileInfo fileInfo(files[i]);
+
+  for (const auto& file : files | std::views::reverse)  {
+    const QFileInfo fileInfo(file);
     ImageFileInfo imageFileInfo(fileInfo, std::vector<ImageMetadata>());
 
     const ImageMetadataLoader::Status status =
         ImageMetadataLoader::load(
-            files.at(i).absoluteFilePath(),
+            file.absoluteFilePath(),
             [&](const ImageMetadata& metadata) {
               imageFileInfo.imageInfo().push_back(metadata);
             });

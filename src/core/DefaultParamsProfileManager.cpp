@@ -116,10 +116,10 @@ std::unique_ptr<DefaultParams> DefaultParamsProfileManager::createDefaultProfile
 
 std::unique_ptr<DefaultParams> DefaultParamsProfileManager::createSourceProfile() const {
   DefaultParams::DeskewParams deskewParams;
-  deskewParams.setMode(MODE_MANUAL);
+  deskewParams.setMode(AutoManualMode::MODE_MANUAL);
 
   DefaultParams::PageSplitParams pageSplitParams;
-  pageSplitParams.setLayoutType(SINGLE_PAGE_UNCUT);
+  pageSplitParams.setLayoutType(LayoutType::SINGLE_PAGE_UNCUT);
 
   DefaultParams::SelectContentParams selectContentParams;
   selectContentParams.setContentDetectEnabled(false);
@@ -134,7 +134,7 @@ std::unique_ptr<DefaultParams> DefaultParamsProfileManager::createSourceProfile(
   DefaultParams::OutputParams outputParams;
 
   ColorParams colorParams;
-  colorParams.setColorMode(COLOR_GRAYSCALE);
+  colorParams.setColorMode(ColorMode::COLOR_GRAYSCALE);
 
   ColorCommonOptions colorCommonOptions;
   colorCommonOptions.setFillMargins(false);

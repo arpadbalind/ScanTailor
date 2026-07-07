@@ -79,7 +79,7 @@ QVector<QLineF> PageLayoutAdapter::adaptCutters(const QVector<QLineF>& cuttersLi
 void PageLayoutAdapter::correctPageLayoutType(PageLayout* layout) {
   const QRectF outline = layout->uncutOutline().boundingRect().toRect();
 
-  if (layout->type() == PageLayout::SINGLE_PAGE_CUT) {
+  if (layout->type() == PageLayout::Type::SINGLE_PAGE_CUT) {
     QLineF cutterLine1 = layout->cutterLine(0).toLine();
     QLineF cutterLine2 = layout->cutterLine(1).toLine();
 
@@ -88,7 +88,7 @@ void PageLayoutAdapter::correctPageLayoutType(PageLayout* layout) {
          && ((cutterLine1.x1() == outline.left()) || (cutterLine1.x1() == outline.right())))
         && ((cutterLine2.x1() == cutterLine2.x2())
             && ((cutterLine2.x1() == outline.left()) || (cutterLine2.x1() == outline.right())))) {
-      layout->setType(PageLayout::SINGLE_PAGE_UNCUT);
+      layout->setType(PageLayout::Type::SINGLE_PAGE_UNCUT);
     }
 
     // if cutter lines match or intersect inside outline (not valid)
@@ -97,17 +97,17 @@ void PageLayoutAdapter::correctPageLayoutType(PageLayout* layout) {
     if (((intersectType != QLineF::NoIntersection)
          && (((intersection.y() > outline.top()) && (intersection.y() < outline.bottom()))))
         || ((intersectType == QLineF::NoIntersection) && (cutterLine1.pointAt(0) == cutterLine2.pointAt(0)))) {
-      layout->setType(PageLayout::SINGLE_PAGE_UNCUT);
+      layout->setType(PageLayout::Type::SINGLE_PAGE_UNCUT);
     }
   }
 
-  if (layout->type() == PageLayout::TWO_PAGES) {
+  if (layout->type() == PageLayout::Type::TWO_PAGES) {
     QLineF cutterLine1 = layout->cutterLine(0).toLine();
 
     // if the cutter line matches left or right bound
     if ((cutterLine1.x1() == cutterLine1.x2())
         && ((cutterLine1.x1() == outline.left()) || (cutterLine1.x1() == outline.right()))) {
-      layout->setType(PageLayout::SINGLE_PAGE_UNCUT);
+      layout->setType(PageLayout::Type::SINGLE_PAGE_UNCUT);
     }
   }
 }
@@ -119,12 +119,12 @@ PageLayout PageLayoutAdapter::adaptPageLayout(const PageLayout& pageLayout, cons
 
   PageLayout newPageLayout;
 
-  if (pageLayout.type() == PageLayout::SINGLE_PAGE_CUT) {
+  if (pageLayout.type() == PageLayout::Type::SINGLE_PAGE_CUT) {
     const QVector<QLineF> adaptedCutters
         = PageLayoutAdapter::adaptCutters({pageLayout.cutterLine(0), pageLayout.cutterLine(1)}, outline);
     newPageLayout = PageLayout(outline, adaptedCutters.at(0), adaptedCutters.at(1));
     correctPageLayoutType(&newPageLayout);
-  } else if (pageLayout.type() == PageLayout::TWO_PAGES) {
+  } else if (pageLayout.type() == PageLayout::Type::TWO_PAGES) {
     QLineF adaptedCutter = PageLayoutAdapter::adaptCutter(pageLayout.cutterLine(0), outline);
     newPageLayout = PageLayout(outline, adaptedCutter);
     correctPageLayoutType(&newPageLayout);

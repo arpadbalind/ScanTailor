@@ -11,7 +11,7 @@ namespace select_content {
 PhysSizeCalc::PhysSizeCalc() = default;
 
 PhysSizeCalc::PhysSizeCalc(const ImageTransformation& xform)
-    : m_virtToPhys(xform.transformBack() * UnitsConverter(xform.origDpi()).transform(PIXELS, MILLIMETRES)) {}
+    : m_virtToPhys(xform.transformBack() * UnitsConverter(xform.origDpi()).transform(Units::PIXELS, Units::MILLIMETRES)) {}
 
 QSizeF PhysSizeCalc::sizeMM(const QRectF& rectPx) const {
   const QPolygonF polyMm(m_virtToPhys.map(rectPx));

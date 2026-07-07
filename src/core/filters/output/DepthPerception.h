@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_DEPTHPERCEPTION_H_
-#define SCANTAILOR_OUTPUT_DEPTHPERCEPTION_H_
+#pragma once
 
 #include <QString>
 
@@ -18,11 +17,11 @@ class DepthPerception {
 
   explicit DepthPerception(const QString& fromString);
 
-  QString toString() const;
+  [[nodiscard]] QString toString() const;
 
   void setValue(double value);
 
-  double value() const;
+  [[nodiscard]] double value() const;
 
   static constexpr double minValue();
 
@@ -31,6 +30,9 @@ class DepthPerception {
   static constexpr double maxValue();
 
  private:
+  static constexpr double MINIMAL_DEPTH_VALUE{ 1.0 };
+  static constexpr double DEFAULT_DEPTH_VALUE{ 2.0 };
+  static constexpr double MAXIMAL_DEPTH_VALUE{ 3.0 };
   double m_value;
 };
 
@@ -39,15 +41,14 @@ inline double DepthPerception::value() const {
 }
 
 constexpr double DepthPerception::minValue() {
-  return 1.0;
+  return MINIMAL_DEPTH_VALUE;
 }
 
 constexpr double DepthPerception::defaultValue() {
-  return 2.0;
+  return DEFAULT_DEPTH_VALUE;
 }
 
 constexpr double DepthPerception::maxValue() {
-  return 3.0;
+  return MAXIMAL_DEPTH_VALUE;
 }
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_DEPTHPERCEPTION_H_

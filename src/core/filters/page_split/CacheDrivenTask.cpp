@@ -25,15 +25,15 @@ CacheDrivenTask::~CacheDrivenTask() = default;
 
 static ProjectPages::LayoutType toPageLayoutType(const PageLayout& layout) {
   switch (layout.type()) {
-    case PageLayout::SINGLE_PAGE_UNCUT:
-    case PageLayout::SINGLE_PAGE_CUT:
-      return ProjectPages::ONE_PAGE_LAYOUT;
-    case PageLayout::TWO_PAGES:
-      return ProjectPages::TWO_PAGE_LAYOUT;
+    case PageLayout::Type::SINGLE_PAGE_UNCUT:
+    case PageLayout::Type::SINGLE_PAGE_CUT:
+      return ProjectPages::LayoutType::ONE_PAGE_LAYOUT;
+    case PageLayout::Type::TWO_PAGES:
+      return ProjectPages::LayoutType::TWO_PAGE_LAYOUT;
   }
 
   assert(!"Unreachable");
-  return ProjectPages::ONE_PAGE_LAYOUT;
+  return ProjectPages::LayoutType::ONE_PAGE_LAYOUT;
 }
 
 void CacheDrivenTask::process(const PageInfo& pageInfo,

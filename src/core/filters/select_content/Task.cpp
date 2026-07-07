@@ -93,11 +93,11 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data) 
     QRectF contentRect(newParams.contentRect());
 
     if (needUpdatePageBox) {
-      if (newParams.pageDetectionMode() == MODE_AUTO) {
+      if (newParams.pageDetectionMode() == AutoManualMode::MODE_AUTO) {
         pageRect
             = PageFinder::findPageBox(status, data, newParams.isFineTuningEnabled(), m_settings->pageDetectionBox(),
                                       m_settings->pageDetectionTolerance(), m_dbg.get());
-      } else if (newParams.pageDetectionMode() == MODE_DISABLED) {
+      } else if (newParams.pageDetectionMode() == AutoManualMode::MODE_DISABLED) {
         pageRect = data.xform().resultingRect();
       }
 
@@ -114,9 +114,9 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data) 
     }
 
     if (needUpdateContentBox) {
-      if (newParams.contentDetectionMode() == MODE_AUTO) {
+      if (newParams.contentDetectionMode() == AutoManualMode::MODE_AUTO) {
         contentRect = ContentBoxFinder::findContentBox(status, data, pageRect, m_dbg.get());
-      } else if (newParams.contentDetectionMode() == MODE_DISABLED) {
+      } else if (newParams.contentDetectionMode() == AutoManualMode::MODE_DISABLED) {
         contentRect = pageRect;
       }
 
@@ -184,7 +184,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
   ui->setOptionsWidget(optWidget, ui->Ownership::KEEP);
 
   auto* view = new ImageView(m_image, m_downscaledImage, m_contentMask, m_xform, m_uiData.contentRect(),
-                             m_uiData.pageRect(), m_uiData.pageDetectionMode() != MODE_DISABLED);
+                             m_uiData.pageRect(), m_uiData.pageDetectionMode() != AutoManualMode::MODE_DISABLED);
   ui->setImageWidget(view, ui->Ownership::TRANSFER, m_dbg.get());
 
   QObject::connect(view, SIGNAL(manualContentRectSet(const QRectF&)), optWidget,

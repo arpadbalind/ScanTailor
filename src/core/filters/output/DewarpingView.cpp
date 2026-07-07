@@ -117,7 +117,7 @@ void DewarpingView::initNewSpline(XSpline& spline,
                                   const DewarpingOptions* dewarpingOptions) {
   const QLineF line(p1, p2);
   spline.appendControlPoint(line.p1(), 0);
-  if ((*dewarpingOptions).dewarpingMode() == AUTO) {
+  if ((*dewarpingOptions).dewarpingMode() == DewarpingMode::AUTO) {
     spline.appendControlPoint(line.pointAt(1.0 / 4.0), 1);
     spline.appendControlPoint(line.pointAt(2.0 / 4.0), 1);
     spline.appendControlPoint(line.pointAt(3.0 / 4.0), 1);
@@ -291,8 +291,8 @@ void DewarpingView::curveModified(int curveIdx) {
 }
 
 void DewarpingView::dragFinished() {
-  if ((m_dewarpingOptions.dewarpingMode() == AUTO) || (m_dewarpingOptions.dewarpingMode() == MARGINAL)) {
-    m_dewarpingOptions.setDewarpingMode(MANUAL);
+  if ((m_dewarpingOptions.dewarpingMode() == DewarpingMode::AUTO) || (m_dewarpingOptions.dewarpingMode() == DewarpingMode::MARGINAL)) {
+    m_dewarpingOptions.setDewarpingMode(DewarpingMode::MANUAL);
   }
   emit distortionModelChanged(m_distortionModel);
 }

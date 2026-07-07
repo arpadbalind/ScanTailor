@@ -5,9 +5,6 @@
 
 namespace output {
 
-SplittingOptions::SplittingOptions()
-    : m_isSplitOutput(false), m_splittingMode(BLACK_AND_WHITE_FOREGROUND), m_isOriginalBackgroundEnabled(false) {}
-
 SplittingOptions::SplittingOptions(const QDomElement& el)
     : m_isSplitOutput(el.attribute("splitOutput") == "1"),
       m_splittingMode(parseSplittingMode(el.attribute("splittingMode"))),
@@ -23,19 +20,19 @@ QDomElement SplittingOptions::toXml(QDomDocument& doc, const QString& name) cons
 
 SplittingMode SplittingOptions::parseSplittingMode(const QString& str) {
   if (str == "color") {
-    return COLOR_FOREGROUND;
+    return SplittingMode::COLOR_FOREGROUND;
   } else {
-    return BLACK_AND_WHITE_FOREGROUND;
+    return SplittingMode::BLACK_AND_WHITE_FOREGROUND;
   }
 }
 
 QString SplittingOptions::formatSplittingMode(const SplittingMode type) {
   QString str = "";
   switch (type) {
-    case BLACK_AND_WHITE_FOREGROUND:
+    case SplittingMode::BLACK_AND_WHITE_FOREGROUND:
       str = "bw";
       break;
-    case COLOR_FOREGROUND:
+    case SplittingMode::COLOR_FOREGROUND:
       str = "color";
       break;
   }

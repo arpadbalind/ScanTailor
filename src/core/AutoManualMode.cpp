@@ -6,13 +6,13 @@
 QString autoManualModeToString(AutoManualMode mode) {
   QString str;
   switch (mode) {
-    case MODE_AUTO:
+    case AutoManualMode::MODE_AUTO:
       str = "auto";
       break;
-    case MODE_MANUAL:
+    case AutoManualMode::MODE_MANUAL:
       str = "manual";
       break;
-    case MODE_DISABLED:
+    case AutoManualMode::MODE_DISABLED:
       str = "disabled";
       break;
   }
@@ -21,10 +21,10 @@ QString autoManualModeToString(AutoManualMode mode) {
 
 AutoManualMode stringToAutoManualMode(const QString& str) {
   if (str == "disabled") {
-    return MODE_DISABLED;
+    return AutoManualMode::MODE_DISABLED;
   } else if (str == "manual") {
-    return MODE_MANUAL;
+    return AutoManualMode::MODE_MANUAL;
   } else {
-    return MODE_AUTO;
+    return AutoManualMode::MODE_AUTO;
   }
 }

@@ -65,8 +65,8 @@ void OptionsWidget::appliedToAllPages(const std::set<PageId>& pages) {
 
 void OptionsWidget::manualDeskewAngleSetExternally(const double degrees) {
   m_uiData.setEffectiveDeskewAngle(degrees);
-  m_uiData.setMode(MODE_MANUAL);
-  updateModeIndication(MODE_MANUAL);
+  m_uiData.setMode(AutoManualMode::MODE_MANUAL);
+  updateModeIndication(AutoManualMode::MODE_MANUAL);
   setSpinBoxKnownState(degreesToSpinBox(degrees));
   commitCurrentParams();
 
@@ -98,8 +98,8 @@ void OptionsWidget::spinBoxValueChanged(const double value) {
 
   const double degrees = spinBoxToDegrees(value);
   m_uiData.setEffectiveDeskewAngle(degrees);
-  m_uiData.setMode(MODE_MANUAL);
-  updateModeIndication(MODE_MANUAL);
+  m_uiData.setMode(AutoManualMode::MODE_MANUAL);
+  updateModeIndication(AutoManualMode::MODE_MANUAL);
   commitCurrentParams();
 
   emit manualDeskewAngleSet(degrees);
@@ -108,11 +108,11 @@ void OptionsWidget::spinBoxValueChanged(const double value) {
 
 void OptionsWidget::modeChanged(const bool autoMode) {
   if (autoMode) {
-    m_uiData.setMode(MODE_AUTO);
+    m_uiData.setMode(AutoManualMode::MODE_AUTO);
     m_settings->clearPageParams(m_pageId);
     emit reloadRequested();
   } else {
-    m_uiData.setMode(MODE_MANUAL);
+    m_uiData.setMode(AutoManualMode::MODE_MANUAL);
     commitCurrentParams();
   }
 }
@@ -120,7 +120,7 @@ void OptionsWidget::modeChanged(const bool autoMode) {
 void OptionsWidget::updateModeIndication(const AutoManualMode mode) {
   auto block = m_connectionManager.getScopedBlock();
 
-  if (mode == MODE_AUTO) {
+  if (mode == AutoManualMode::MODE_AUTO) {
     autoBtn->setChecked(true);
   } else {
     manualBtn->setChecked(true);
@@ -177,7 +177,7 @@ void OptionsWidget::setupUiConnections() {
 
 /*========================== OptionsWidget::UiData =========================*/
 
-OptionsWidget::UiData::UiData() : m_effDeskewAngle(0.0), m_mode(MODE_AUTO) {}
+OptionsWidget::UiData::UiData() : m_effDeskewAngle(0.0), m_mode(AutoManualMode::MODE_AUTO) {}
 
 OptionsWidget::UiData::~UiData() = default;
 }  // namespace deskew

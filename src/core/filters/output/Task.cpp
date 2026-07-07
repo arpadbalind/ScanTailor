@@ -312,7 +312,7 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data, 
     // OutputGenerator will write a new distortion model
     // there, if dewarping mode is AUTO.
     DistortionModel distortionModel;
-    if (params.dewarpingOptions().dewarpingMode() == MANUAL) {
+    if (params.dewarpingOptions().dewarpingMode() == DewarpingMode::MANUAL) {
       distortionModel = params.distortionModel();
     }
 
@@ -325,8 +325,8 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data, 
 
       params = m_settings->getParams(m_pageId);
 
-      if (((params.dewarpingOptions().dewarpingMode() == AUTO)
-           || (params.dewarpingOptions().dewarpingMode() == MARGINAL))
+      if (((params.dewarpingOptions().dewarpingMode() == DewarpingMode::AUTO)
+           || (params.dewarpingOptions().dewarpingMode() == DewarpingMode::MARGINAL))
           && distortionModel.isValid()) {
         // A new distortion model was generated.
         // We need to save it to be able to modify it manually.
@@ -544,7 +544,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
   // anyway when another tab is selected.
   std::function<QPointF(const QPointF&)> origToOutput;
   std::function<QPointF(const QPointF&)> outputToOrig;
-  if ((m_params.dewarpingOptions().dewarpingMode() != OFF) && m_params.distortionModel().isValid()) {
+  if ((m_params.dewarpingOptions().dewarpingMode() != DewarpingMode::OFF) && m_params.distortionModel().isValid()) {
     const QTransform rotateXform
         = Utils::rotate(m_params.dewarpingOptions().getPostDeskewAngle(), m_xform.resultingRect().toRect());
     auto mapper = std::make_shared<DewarpingPointMapper>(m_params.distortionModel(), m_params.depthPerception().value(),
@@ -564,7 +564,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
   tabImageRectMap->insert(std::pair<ImageViewTab, QRectF>(TAB_FILL_ZONES, m_xform.resultingRect()));
 
   std::unique_ptr<QWidget> despeckleView;
-  if (m_params.colorParams().colorMode() == COLOR_GRAYSCALE) {
+  if (m_params.colorParams().colorMode() == ColorMode::COLOR_GRAYSCALE) {
     despeckleView = std::make_unique<ErrorWidget>(tr("Despeckling can't be done in Color / Grayscale mode."));
   } else {
     despeckleView = std::make_unique<output::DespeckleView>(m_despeckleState, m_despeckleVisualization, m_debug);

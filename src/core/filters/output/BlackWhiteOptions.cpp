@@ -21,7 +21,7 @@ BlackWhiteOptions::BlackWhiteOptions()
       m_wolfLowerBound(1),
       m_wolfUpperBound(254),
       m_wolfCoef(0.3),
-      m_binarizationMethod(OTSU) {}
+      m_binarizationMethod(BinarizationMethod::OTSU) {}
 
 BlackWhiteOptions::BlackWhiteOptions(const QDomElement& el)
     : m_thresholdAdjustment(el.attribute("thresholdAdj").toInt()),
@@ -69,24 +69,24 @@ bool BlackWhiteOptions::operator!=(const BlackWhiteOptions& other) const {
 
 BinarizationMethod BlackWhiteOptions::parseBinarizationMethod(const QString& str) {
   if (str == "wolf") {
-    return WOLF;
+    return BinarizationMethod::WOLF;
   } else if (str == "sauvola") {
-    return SAUVOLA;
+    return BinarizationMethod::SAUVOLA;
   } else {
-    return OTSU;
+    return BinarizationMethod::OTSU;
   }
 }
 
 QString BlackWhiteOptions::formatBinarizationMethod(BinarizationMethod type) {
   QString str = "";
   switch (type) {
-    case OTSU:
+    case BinarizationMethod::OTSU:
       str = "otsu";
       break;
-    case SAUVOLA:
+    case BinarizationMethod::SAUVOLA:
       str = "sauvola";
       break;
-    case WOLF:
+    case BinarizationMethod::WOLF:
       str = "wolf";
       break;
   }

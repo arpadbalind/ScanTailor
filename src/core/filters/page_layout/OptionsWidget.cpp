@@ -35,15 +35,15 @@ OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelec
   updateLinkDisplay(leftRightLink, m_leftRightLinked);
   updateAlignmentButtonsEnabled();
 
-  Utils::mapSetValue(m_alignmentByButton, alignTopLeftBtn, Alignment(Alignment::TOP, Alignment::LEFT));
-  Utils::mapSetValue(m_alignmentByButton, alignTopBtn, Alignment(Alignment::TOP, Alignment::HCENTER));
-  Utils::mapSetValue(m_alignmentByButton, alignTopRightBtn, Alignment(Alignment::TOP, Alignment::RIGHT));
-  Utils::mapSetValue(m_alignmentByButton, alignLeftBtn, Alignment(Alignment::VCENTER, Alignment::LEFT));
-  Utils::mapSetValue(m_alignmentByButton, alignCenterBtn, Alignment(Alignment::VCENTER, Alignment::HCENTER));
-  Utils::mapSetValue(m_alignmentByButton, alignRightBtn, Alignment(Alignment::VCENTER, Alignment::RIGHT));
-  Utils::mapSetValue(m_alignmentByButton, alignBottomLeftBtn, Alignment(Alignment::BOTTOM, Alignment::LEFT));
-  Utils::mapSetValue(m_alignmentByButton, alignBottomBtn, Alignment(Alignment::BOTTOM, Alignment::HCENTER));
-  Utils::mapSetValue(m_alignmentByButton, alignBottomRightBtn, Alignment(Alignment::BOTTOM, Alignment::RIGHT));
+  Utils::mapSetValue(m_alignmentByButton, alignTopLeftBtn, Alignment(Alignment::Vertical::TOP, Alignment::Horizontal::LEFT));
+  Utils::mapSetValue(m_alignmentByButton, alignTopBtn, Alignment(Alignment::Vertical::TOP, Alignment::Horizontal::HCENTER));
+  Utils::mapSetValue(m_alignmentByButton, alignTopRightBtn, Alignment(Alignment::Vertical::TOP, Alignment::Horizontal::RIGHT));
+  Utils::mapSetValue(m_alignmentByButton, alignLeftBtn, Alignment(Alignment::Vertical::VCENTER, Alignment::Horizontal::LEFT));
+  Utils::mapSetValue(m_alignmentByButton, alignCenterBtn, Alignment(Alignment::Vertical::VCENTER, Alignment::Horizontal::HCENTER));
+  Utils::mapSetValue(m_alignmentByButton, alignRightBtn, Alignment(Alignment::Vertical::VCENTER, Alignment::Horizontal::RIGHT));
+  Utils::mapSetValue(m_alignmentByButton, alignBottomLeftBtn, Alignment(Alignment::Vertical::BOTTOM, Alignment::Horizontal::LEFT));
+  Utils::mapSetValue(m_alignmentByButton, alignBottomBtn, Alignment(Alignment::Vertical::BOTTOM, Alignment::Horizontal::HCENTER));
+  Utils::mapSetValue(m_alignmentByButton, alignBottomRightBtn, Alignment(Alignment::Vertical::BOTTOM, Alignment::Horizontal::RIGHT));
 
   m_alignmentButtonGroup = new QButtonGroup(this);
   for (const auto& buttonAndAlignment : m_alignmentByButton) {
@@ -65,12 +65,12 @@ void OptionsWidget::preUpdateUI(const PageInfo& pageInfo, const Margins& margins
 
   for (const auto& [button, btnAlignment] : m_alignmentByButton) {
     if (alignment.isAutoVertical()) {
-      if ((btnAlignment.vertical() == Alignment::VCENTER) && (btnAlignment.horizontal() == alignment.horizontal())) {
+      if ((btnAlignment.vertical() == Alignment::Vertical::VCENTER) && (btnAlignment.horizontal() == alignment.horizontal())) {
         button->setChecked(true);
         break;
       }
     } else if (alignment.isAutoHorizontal()) {
-      if ((btnAlignment.horizontal() == Alignment::HCENTER) && (btnAlignment.vertical() == alignment.vertical())) {
+      if ((btnAlignment.horizontal() == Alignment::Horizontal::HCENTER) && (btnAlignment.vertical() == alignment.vertical())) {
         button->setChecked(true);
         break;
       }
@@ -82,16 +82,16 @@ void OptionsWidget::preUpdateUI(const PageInfo& pageInfo, const Margins& margins
 
   alignWithOthersCB->setChecked(!alignment.isNull());
 
-  if (alignment.horizontal() == Alignment::HAUTO) {
+  if (alignment.horizontal() == Alignment::Horizontal::HAUTO) {
     hAlignmentModeCB->setCurrentIndex(0);
-  } else if (alignment.horizontal() == Alignment::HORIGINAL) {
+  } else if (alignment.horizontal() == Alignment::Horizontal::HORIGINAL) {
     hAlignmentModeCB->setCurrentIndex(2);
   } else {
     hAlignmentModeCB->setCurrentIndex(1);
   }
-  if (alignment.vertical() == Alignment::VAUTO) {
+  if (alignment.vertical() == Alignment::Vertical::VAUTO) {
     vAlignmentModeCB->setCurrentIndex(0);
-  } else if (alignment.vertical() == Alignment::VORIGINAL) {
+  } else if (alignment.vertical() == Alignment::Vertical::VORIGINAL) {
     vAlignmentModeCB->setCurrentIndex(2);
   } else {
     vAlignmentModeCB->setCurrentIndex(1);
@@ -142,8 +142,8 @@ void OptionsWidget::onUnitsChanged(Units units) {
   int decimals;
   double step;
   switch (units) {
-    case PIXELS:
-    case MILLIMETRES:
+    case Units::PIXELS:
+    case Units::MILLIMETRES:
       decimals = 1;
       step = 1.0;
       break;
@@ -175,8 +175,8 @@ void OptionsWidget::horMarginsChanged(const double val) {
   double dummy;
   double leftMarginSpinBoxValue = leftMarginSpinBox->value();
   double rightMarginSpinBoxValue = rightMarginSpinBox->value();
-  UnitsProvider::getInstance().convertTo(leftMarginSpinBoxValue, dummy, MILLIMETRES, m_dpi);
-  UnitsProvider::getInstance().convertTo(rightMarginSpinBoxValue, dummy, MILLIMETRES, m_dpi);
+  UnitsProvider::getInstance().convertTo(leftMarginSpinBoxValue, dummy, Units::MILLIMETRES, m_dpi);
+  UnitsProvider::getInstance().convertTo(rightMarginSpinBoxValue, dummy, Units::MILLIMETRES, m_dpi);
 
   m_marginsMM.setLeft(leftMarginSpinBoxValue);
   m_marginsMM.setRight(rightMarginSpinBoxValue);
@@ -194,8 +194,8 @@ void OptionsWidget::vertMarginsChanged(const double val) {
   double dummy;
   double topMarginSpinBoxValue = topMarginSpinBox->value();
   double bottomMarginSpinBoxValue = bottomMarginSpinBox->value();
-  UnitsProvider::getInstance().convertTo(dummy, topMarginSpinBoxValue, MILLIMETRES, m_dpi);
-  UnitsProvider::getInstance().convertTo(dummy, bottomMarginSpinBoxValue, MILLIMETRES, m_dpi);
+  UnitsProvider::getInstance().convertTo(dummy, topMarginSpinBoxValue, Units::MILLIMETRES, m_dpi);
+  UnitsProvider::getInstance().convertTo(dummy, bottomMarginSpinBoxValue, Units::MILLIMETRES, m_dpi);
 
   m_marginsMM.setTop(topMarginSpinBoxValue);
   m_marginsMM.setBottom(bottomMarginSpinBoxValue);
@@ -234,14 +234,14 @@ void OptionsWidget::autoMarginsToggled(bool checked) {
 void OptionsWidget::horizontalAlignmentModeChanged(int idx) {
   switch (idx) {
     case 0:
-      m_alignment.setHorizontal(Alignment::HAUTO);
+      m_alignment.setHorizontal(Alignment::Horizontal::HAUTO);
       updateAutoModeButtons();
       break;
     case 1:
       m_alignment.setHorizontal(m_alignmentByButton.at(getCheckedAlignmentButton()).horizontal());
       break;
     case 2:
-      m_alignment.setHorizontal(Alignment::HORIGINAL);
+      m_alignment.setHorizontal(Alignment::Horizontal::HORIGINAL);
       updateAutoModeButtons();
       break;
     default:
@@ -255,14 +255,14 @@ void OptionsWidget::horizontalAlignmentModeChanged(int idx) {
 void OptionsWidget::verticalAlignmentModeChanged(int idx) {
   switch (idx) {
     case 0:
-      m_alignment.setVertical(Alignment::VAUTO);
+      m_alignment.setVertical(Alignment::Vertical::VAUTO);
       updateAutoModeButtons();
       break;
     case 1:
       m_alignment.setVertical(m_alignmentByButton.at(getCheckedAlignmentButton()).vertical());
       break;
     case 2:
-      m_alignment.setVertical(Alignment::VORIGINAL);
+      m_alignment.setVertical(Alignment::Vertical::VORIGINAL);
       updateAutoModeButtons();
       break;
     default:
@@ -352,8 +352,8 @@ void OptionsWidget::updateMarginsDisplay() {
   double bottomMarginValue = m_marginsMM.bottom();
   double leftMarginValue = m_marginsMM.left();
   double rightMarginValue = m_marginsMM.right();
-  UnitsProvider::getInstance().convertFrom(leftMarginValue, topMarginValue, MILLIMETRES, m_dpi);
-  UnitsProvider::getInstance().convertFrom(rightMarginValue, bottomMarginValue, MILLIMETRES, m_dpi);
+  UnitsProvider::getInstance().convertFrom(leftMarginValue, topMarginValue, Units::MILLIMETRES, m_dpi);
+  UnitsProvider::getInstance().convertFrom(rightMarginValue, bottomMarginValue, Units::MILLIMETRES, m_dpi);
 
   topMarginSpinBox->setValue(topMarginValue);
   bottomMarginSpinBox->setValue(bottomMarginValue);
@@ -439,10 +439,10 @@ void OptionsWidget::updateAutoModeButtons() {
 
   if (m_alignment.isAutoVertical() && !m_alignment.isAutoHorizontal()) {
     switch (m_alignmentByButton.at(getCheckedAlignmentButton()).horizontal()) {
-      case Alignment::LEFT:
+      case Alignment::Horizontal::LEFT:
         alignLeftBtn->setChecked(true);
         break;
-      case Alignment::RIGHT:
+      case Alignment::Horizontal::RIGHT:
         alignRightBtn->setChecked(true);
         break;
       default:
@@ -451,10 +451,10 @@ void OptionsWidget::updateAutoModeButtons() {
     }
   } else if (m_alignment.isAutoHorizontal() && !m_alignment.isAutoVertical()) {
     switch (m_alignmentByButton.at(getCheckedAlignmentButton()).vertical()) {
-      case Alignment::TOP:
+      case Alignment::Vertical::TOP:
         alignTopBtn->setChecked(true);
         break;
-      case Alignment::BOTTOM:
+      case Alignment::Vertical::BOTTOM:
         alignBottomBtn->setChecked(true);
         break;
       default:

@@ -14,17 +14,17 @@ void UnitsConverter::convert(double& horizontalValue, double& verticalValue, Uni
 
   auto dpm = Dpm(m_dpi);
   switch (fromUnits) {
-    case PIXELS:
+    case Units::PIXELS:
       switch (toUnits) {
-        case MILLIMETRES:
+        case Units::MILLIMETRES:
           horizontalValue = horizontalValue / dpm.horizontal() * 1000.;
           verticalValue = verticalValue / dpm.vertical() * 1000.;
           break;
-        case CENTIMETRES:
+        case Units::CENTIMETRES:
           horizontalValue = horizontalValue / dpm.horizontal() * 100.;
           verticalValue = verticalValue / dpm.vertical() * 100.;
           break;
-        case INCHES:
+        case Units::INCHES:
           horizontalValue /= m_dpi.horizontal();
           verticalValue /= m_dpi.vertical();
           break;
@@ -32,17 +32,17 @@ void UnitsConverter::convert(double& horizontalValue, double& verticalValue, Uni
           break;
       }
       break;
-    case MILLIMETRES:
+    case Units::MILLIMETRES:
       switch (toUnits) {
-        case PIXELS:
+        case Units::PIXELS:
           horizontalValue = horizontalValue / 1000. * dpm.horizontal();
           verticalValue = verticalValue / 1000. * dpm.vertical();
           break;
-        case CENTIMETRES:
+        case Units::CENTIMETRES:
           horizontalValue = horizontalValue / 10.;
           verticalValue = verticalValue / 10.;
           break;
-        case INCHES:
+        case Units::INCHES:
           horizontalValue = horizontalValue / 1000. * dpm.horizontal() / m_dpi.horizontal();
           verticalValue = verticalValue / 1000. * dpm.vertical() / m_dpi.vertical();
           break;
@@ -50,17 +50,17 @@ void UnitsConverter::convert(double& horizontalValue, double& verticalValue, Uni
           break;
       }
       break;
-    case CENTIMETRES:
+    case Units::CENTIMETRES:
       switch (toUnits) {
-        case PIXELS:
+        case Units::PIXELS:
           horizontalValue = horizontalValue / 100. * dpm.horizontal();
           verticalValue = verticalValue / 100. * dpm.vertical();
           break;
-        case MILLIMETRES:
+        case Units::MILLIMETRES:
           horizontalValue = horizontalValue * 10.;
           verticalValue = verticalValue * 10.;
           break;
-        case INCHES:
+        case Units::INCHES:
           horizontalValue = horizontalValue / 100. * dpm.horizontal() / m_dpi.horizontal();
           verticalValue = verticalValue / 100. * dpm.vertical() / m_dpi.vertical();
           break;
@@ -68,17 +68,17 @@ void UnitsConverter::convert(double& horizontalValue, double& verticalValue, Uni
           break;
       }
       break;
-    case INCHES:
+    case Units::INCHES:
       switch (toUnits) {
-        case PIXELS:
+        case Units::PIXELS:
           horizontalValue *= m_dpi.horizontal();
           verticalValue *= m_dpi.vertical();
           break;
-        case MILLIMETRES:
+        case Units::MILLIMETRES:
           horizontalValue = horizontalValue * m_dpi.horizontal() / dpm.horizontal() * 1000.;
           verticalValue = verticalValue * m_dpi.vertical() / dpm.vertical() * 1000.;
           break;
-        case CENTIMETRES:
+        case Units::CENTIMETRES:
           horizontalValue = horizontalValue * m_dpi.horizontal() / dpm.horizontal() * 100.;
           verticalValue = verticalValue * m_dpi.vertical() / dpm.vertical() * 100.;
           break;

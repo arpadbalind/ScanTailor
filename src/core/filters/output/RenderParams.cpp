@@ -11,14 +11,14 @@ RenderParams::RenderParams(const ColorParams& colorParams, const SplittingOption
   const ColorCommonOptions& colorCommonOptions = colorParams.colorCommonOptions();
   const ColorMode colorMode = colorParams.colorMode();
 
-  if ((colorMode == BLACK_AND_WHITE) || (colorMode == MIXED)) {
+  if ((colorMode == ColorMode::BLACK_AND_WHITE) || (colorMode == ColorMode::MIXED)) {
     m_mask |= NEED_BINARIZATION;
-    if (colorMode == MIXED) {
+    if (colorMode == ColorMode::MIXED) {
       m_mask |= MIXED_OUTPUT;
     }
     if (mixedOutput() && splittingOptions.isSplitOutput()) {
       m_mask |= SPLIT_OUTPUT;
-      if (splittingOptions.getSplittingMode() == COLOR_FOREGROUND) {
+      if (splittingOptions.getSplittingMode() == SplittingMode::COLOR_FOREGROUND) {
         m_mask ^= NEED_BINARIZATION;
       }
       if (needBinarization() && splittingOptions.isOriginalBackgroundEnabled()) {

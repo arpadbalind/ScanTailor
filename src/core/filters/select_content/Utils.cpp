@@ -20,9 +20,9 @@ Params Utils::buildDefaultParams(const Dpi& dpi) {
   const QSizeF& pageRectSize = selectContentParams.getPageRectSize();
   double pageRectWidth = pageRectSize.width();
   double pageRectHeight = pageRectSize.height();
-  unitsConverter.convert(pageRectWidth, pageRectHeight, defaultParams.getUnits(), PIXELS);
+  unitsConverter.convert(pageRectWidth, pageRectHeight, defaultParams.getUnits(), Units::PIXELS);
 
   return Params(QRectF(), QSizeF(), QRectF(QPointF(0, 0), QSizeF(pageRectWidth, pageRectHeight)), Dependencies(),
-                selectContentParams.isContentDetectEnabled() ? MODE_AUTO : MODE_DISABLED,
+                selectContentParams.isContentDetectEnabled() ? AutoManualMode::MODE_AUTO : AutoManualMode::MODE_DISABLED,
                 selectContentParams.getPageDetectMode(), selectContentParams.isFineTuneCorners());
 }

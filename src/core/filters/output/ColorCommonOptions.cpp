@@ -7,7 +7,7 @@
 
 namespace output {
 ColorCommonOptions::ColorCommonOptions()
-    : m_fillOffcut(true), m_fillMargins(true), m_normalizeIllumination(false), m_fillingColor(FILL_BACKGROUND) {}
+    : m_fillOffcut(true), m_fillMargins(true), m_normalizeIllumination(false), m_fillingColor(FillingColor::BACKGROUND) {}
 
 ColorCommonOptions::ColorCommonOptions(const QDomElement& el)
     : m_fillOffcut(el.attribute("fillOffcut") == "1"),
@@ -38,19 +38,19 @@ bool ColorCommonOptions::operator!=(const ColorCommonOptions& other) const {
 
 FillingColor ColorCommonOptions::parseFillingColor(const QString& str) {
   if (str == "white") {
-    return FILL_WHITE;
+    return FillingColor::WHITE;
   } else {
-    return FILL_BACKGROUND;
+    return FillingColor::BACKGROUND;
   }
 }
 
 QString ColorCommonOptions::formatFillingColor(FillingColor type) {
   QString str = "";
   switch (type) {
-    case FILL_WHITE:
+    case FillingColor::WHITE:
       str = "white";
       break;
-    case FILL_BACKGROUND:
+    case FillingColor::BACKGROUND:
       str = "background";
       break;
   }

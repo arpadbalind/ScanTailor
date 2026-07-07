@@ -1,9 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_DEFAULTPARAMS_H_
-#define SCANTAILOR_CORE_DEFAULTPARAMS_H_
-
+#pragma once
 
 #include <filters/output/ColorParams.h>
 #include <filters/output/DepthPerception.h>
@@ -33,7 +31,7 @@ class DefaultParams {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    const OrthogonalRotation& getImageRotation() const;
+    [[nodiscard]] const OrthogonalRotation& getImageRotation() const;
 
     void setImageRotation(const OrthogonalRotation& imageRotation);
 
@@ -51,11 +49,11 @@ class DefaultParams {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    double getDeskewAngleDeg() const;
+    [[nodiscard]] double getDeskewAngleDeg() const;
 
     void setDeskewAngleDeg(double deskewAngleDeg);
 
-    AutoManualMode getMode() const;
+    [[nodiscard]] AutoManualMode getMode() const;
 
     void setMode(AutoManualMode mode);
 
@@ -74,7 +72,7 @@ class DefaultParams {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    page_split::LayoutType getLayoutType() const;
+    [[nodiscard]] page_split::LayoutType getLayoutType() const;
 
     void setLayoutType(page_split::LayoutType layoutType);
 
@@ -95,19 +93,19 @@ class DefaultParams {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    const QSizeF& getPageRectSize() const;
+    [[nodiscard]] const QSizeF& getPageRectSize() const;
 
     void setPageRectSize(const QSizeF& pageRectSize);
 
-    bool isContentDetectEnabled() const;
+    [[nodiscard]] bool isContentDetectEnabled() const;
 
     void setContentDetectEnabled(bool contentDetectEnabled);
 
-    bool isFineTuneCorners() const;
+    [[nodiscard]] bool isFineTuneCorners() const;
 
     void setFineTuneCorners(bool fineTuneCorners);
 
-    AutoManualMode getPageDetectMode() const;
+    [[nodiscard]] AutoManualMode getPageDetectMode() const;
 
     void setPageDetectMode(AutoManualMode pageDetectMode);
 
@@ -128,15 +126,15 @@ class DefaultParams {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    const Margins& getHardMargins() const;
+    [[nodiscard]] const Margins& getHardMargins() const;
 
     void setHardMargins(const Margins& hardMargins);
 
-    const page_layout::Alignment& getAlignment() const;
+    [[nodiscard]] const page_layout::Alignment& getAlignment() const;
 
     void setAlignment(const page_layout::Alignment& alignment);
 
-    bool isAutoMargins() const;
+    [[nodiscard]] bool isAutoMargins() const;
 
     void setAutoMargins(bool autoMargins);
 
@@ -162,31 +160,31 @@ class DefaultParams {
 
     QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-    const Dpi& getDpi() const;
+    [[nodiscard]] const Dpi& getDpi() const;
 
     void setDpi(const Dpi& dpi);
 
-    const output::ColorParams& getColorParams() const;
+    [[nodiscard]] const output::ColorParams& getColorParams() const;
 
     void setColorParams(const output::ColorParams& colorParams);
 
-    const output::SplittingOptions& getSplittingOptions() const;
+    [[nodiscard]] const output::SplittingOptions& getSplittingOptions() const;
 
     void setSplittingOptions(const output::SplittingOptions& splittingOptions);
 
-    const output::PictureShapeOptions& getPictureShapeOptions() const;
+    [[nodiscard]] const output::PictureShapeOptions& getPictureShapeOptions() const;
 
     void setPictureShapeOptions(const output::PictureShapeOptions& pictureShapeOptions);
 
-    const output::DepthPerception& getDepthPerception() const;
+    [[nodiscard]] const output::DepthPerception& getDepthPerception() const;
 
     void setDepthPerception(const output::DepthPerception& depthPerception);
 
-    const output::DewarpingOptions& getDewarpingOptions() const;
+    [[nodiscard]] const output::DewarpingOptions& getDewarpingOptions() const;
 
     void setDewarpingOptions(const output::DewarpingOptions& dewarpingOptions);
 
-    double getDespeckleLevel() const;
+    [[nodiscard]] double getDespeckleLevel() const;
 
     void setDespeckleLevel(double despeckleLevel);
 
@@ -214,31 +212,31 @@ class DefaultParams {
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  const FixOrientationParams& getFixOrientationParams() const;
+  [[nodiscard]] const FixOrientationParams& getFixOrientationParams() const;
 
   void setFixOrientationParams(const FixOrientationParams& fixOrientationParams);
 
-  const DeskewParams& getDeskewParams() const;
+  [[nodiscard]] const DeskewParams& getDeskewParams() const;
 
   void setDeskewParams(const DeskewParams& deskewParams);
 
-  const PageSplitParams& getPageSplitParams() const;
+  [[nodiscard]] const PageSplitParams& getPageSplitParams() const;
 
   void setPageSplitParams(const PageSplitParams& pageSplitParams);
 
-  const SelectContentParams& getSelectContentParams() const;
+  [[nodiscard]] const SelectContentParams& getSelectContentParams() const;
 
   void setSelectContentParams(const SelectContentParams& selectContentParams);
 
-  const PageLayoutParams& getPageLayoutParams() const;
+  [[nodiscard]] const PageLayoutParams& getPageLayoutParams() const;
 
   void setPageLayoutParams(const PageLayoutParams& pageLayoutParams);
 
-  const OutputParams& getOutputParams() const;
+  [[nodiscard]] const OutputParams& getOutputParams() const;
 
   void setOutputParams(const OutputParams& outputParams);
 
-  Units getUnits() const;
+  [[nodiscard]] Units getUnits() const;
 
   void setUnits(Units units);
 
@@ -453,6 +451,3 @@ inline double DefaultParams::OutputParams::getDespeckleLevel() const {
 inline void DefaultParams::OutputParams::setDespeckleLevel(double despeckleLevel) {
   OutputParams::m_despeckleLevel = despeckleLevel;
 }
-
-
-#endif  // SCANTAILOR_CORE_DEFAULTPARAMS_H_

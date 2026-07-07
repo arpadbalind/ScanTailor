@@ -36,25 +36,25 @@ bool DewarpingOptions::operator!=(const DewarpingOptions& other) const {
 
 DewarpingMode DewarpingOptions::parseDewarpingMode(const QString& str) {
   if (str == "auto") {
-    return AUTO;
+    return DewarpingMode::AUTO;
   } else if (str == "manual") {
-    return MANUAL;
+    return DewarpingMode::MANUAL;
   } else if (str == "marginal") {
-    return MARGINAL;
+    return DewarpingMode::MARGINAL;
   } else {
-    return OFF;
+    return DewarpingMode::OFF;
   }
 }
 
 QString DewarpingOptions::formatDewarpingMode(DewarpingMode mode) {
   switch (mode) {
-    case OFF:
+    case DewarpingMode::OFF:
       return "off";
-    case AUTO:
+    case DewarpingMode::AUTO:
       return "auto";
-    case MANUAL:
+    case DewarpingMode::MANUAL:
       return "manual";
-    case MARGINAL:
+    case DewarpingMode::MARGINAL:
       return "marginal";
   }
 

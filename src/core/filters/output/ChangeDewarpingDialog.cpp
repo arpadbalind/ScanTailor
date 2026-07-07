@@ -28,25 +28,25 @@ ChangeDewarpingDialog::ChangeDewarpingDialog(QWidget* parent,
   }
 
   switch (dewarpingOptions.dewarpingMode()) {
-    case OFF:
+    case DewarpingMode::OFF:
       ui.offRB->setChecked(true);
       break;
-    case AUTO:
+    case DewarpingMode::AUTO:
       ui.autoRB->setChecked(true);
       break;
-    case MARGINAL:
+    case DewarpingMode::MARGINAL:
       ui.marginalRB->setChecked(true);
       break;
-    case MANUAL:
+    case DewarpingMode::MANUAL:
       ui.manualRB->setChecked(true);
       break;
   }
 
   ui.dewarpingPostDeskewCB->setChecked(dewarpingOptions.needPostDeskew());
-  connect(ui.offRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = OFF; });
-  connect(ui.autoRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = AUTO; });
-  connect(ui.manualRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = MANUAL; });
-  connect(ui.marginalRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = MARGINAL; });
+  connect(ui.offRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = DewarpingMode::OFF; });
+  connect(ui.autoRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = DewarpingMode::AUTO; });
+  connect(ui.manualRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = DewarpingMode::MANUAL; });
+  connect(ui.marginalRB, &QRadioButton::clicked, this, [this]() { m_dewarpingMode = DewarpingMode::MARGINAL; });
 
   connect(ui.buttonBox, SIGNAL(accepted()), this, SLOT(onSubmit()));
 }

@@ -4,8 +4,6 @@
 #include "ColorParams.h"
 
 namespace output {
-ColorParams::ColorParams() : m_colorMode(BLACK_AND_WHITE) {}
-
 ColorParams::ColorParams(const QDomElement& el)
     : m_colorMode(parseColorMode(el.attribute("colorMode"))),
       m_colorCommonOptions(el.namedItem("color-or-grayscale").toElement()),
@@ -21,21 +19,21 @@ QDomElement ColorParams::toXml(QDomDocument& doc, const QString& name) const {
 
 ColorMode ColorParams::parseColorMode(const QString& str) {
   if (str == "bw") {
-    return BLACK_AND_WHITE;
+    return ColorMode::BLACK_AND_WHITE;
   } else if (str == "colorOrGray") {
-    return COLOR_GRAYSCALE;
+    return ColorMode::COLOR_GRAYSCALE;
   } else if (str == "mixed") {
-    return MIXED;
+    return ColorMode::MIXED;
   } else {
-    return BLACK_AND_WHITE;
+    return ColorMode::BLACK_AND_WHITE;
   }
 }
 
 QString ColorParams::formatColorMode(const ColorMode mode) {
   switch (mode) {
-    case BLACK_AND_WHITE:   return QStringLiteral("bw");
-    case COLOR_GRAYSCALE:   return QStringLiteral("colorOrGray");
-    case MIXED:             return QStringLiteral("mixed");
+    case ColorMode::BLACK_AND_WHITE:   return QStringLiteral("bw");
+    case ColorMode::COLOR_GRAYSCALE:   return QStringLiteral("colorOrGray");
+    case ColorMode::MIXED:             return QStringLiteral("mixed");
   }
   return QString();
 }

@@ -54,15 +54,15 @@ class Task::UiUpdater : public FilterResult {
 
 static ProjectPages::LayoutType toPageLayoutType(const PageLayout& layout) {
   switch (layout.type()) {
-    case PageLayout::SINGLE_PAGE_UNCUT:
-    case PageLayout::SINGLE_PAGE_CUT:
-      return ProjectPages::ONE_PAGE_LAYOUT;
-    case PageLayout::TWO_PAGES:
-      return ProjectPages::TWO_PAGE_LAYOUT;
+    case PageLayout::Type::SINGLE_PAGE_UNCUT:
+    case PageLayout::Type::SINGLE_PAGE_CUT:
+      return ProjectPages::LayoutType::ONE_PAGE_LAYOUT;
+    case PageLayout::Type::TWO_PAGES:
+      return ProjectPages::LayoutType::TWO_PAGE_LAYOUT;
   }
 
   assert(!"Unreachable");
-  return ProjectPages::ONE_PAGE_LAYOUT;
+  return ProjectPages::LayoutType::ONE_PAGE_LAYOUT;
 }
 
 Task::Task(std::shared_ptr<Filter> filter,
@@ -95,11 +95,11 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data) 
     const Params* const params = record.params();
 
     LayoutType newLayoutType = record.combinedLayoutType();
-    AutoManualMode splitLineMode = MODE_AUTO;
+    AutoManualMode splitLineMode = AutoManualMode::MODE_AUTO;
     PageLayout newLayout;
 
     if (!params || !deps.compatibleWith(*params)) {
-      if (!params || (record.combinedLayoutType() == AUTO_LAYOUT_TYPE)) {
+      if (!params || (record.combinedLayoutType() == LayoutType::AUTO_LAYOUT_TYPE)) {
         newLayout = PageLayoutEstimator::estimatePageLayout(record.combinedLayoutType(), static_cast<const QImage&>(data.grayImage()), data.xform(),
                                                             data.bwThreshold(), m_dbg.get());
 
@@ -159,7 +159,7 @@ FilterResultPtr Task::process(const TaskStatus& status, const FilterData& data) 
   OptionsWidget::UiData uiData;
   uiData.setDependencies(deps);
   const PageLayout& layout = record.params()->pageLayout();
-  uiData.setLayoutTypeAutoDetected(record.combinedLayoutType() == AUTO_LAYOUT_TYPE);
+  uiData.setLayoutTypeAutoDetected(record.combinedLayoutType() == LayoutType::AUTO_LAYOUT_TYPE);
   uiData.setPageLayout(layout);
   uiData.setSplitLineMode(record.params()->splitLineMode());
 

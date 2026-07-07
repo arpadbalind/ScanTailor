@@ -6,8 +6,6 @@
 #include <QDomDocument>
 
 namespace page_layout {
-Alignment::Alignment() : m_vertical(VCENTER), m_horizontal(HCENTER), m_isNull(false) {}
-
 Alignment::Alignment(Vertical vertical, Horizontal horizontal)
     : m_vertical(vertical), m_horizontal(horizontal), m_isNull(false) {}
 
@@ -17,65 +15,65 @@ Alignment::Alignment(const QDomElement& el) {
   m_isNull = (el.attribute("null").toInt() != 0);
 
   if (vert == "top") {
-    m_vertical = TOP;
+    m_vertical = Vertical::TOP;
   } else if (vert == "bottom") {
-    m_vertical = BOTTOM;
+    m_vertical = Vertical::BOTTOM;
   } else if (vert == "auto") {
-    m_vertical = VAUTO;
+    m_vertical = Vertical::VAUTO;
   } else if (vert == "original") {
-    m_vertical = VORIGINAL;
+    m_vertical = Vertical::VORIGINAL;
   } else {
-    m_vertical = VCENTER;
+    m_vertical = Vertical::VCENTER;
   }
 
   if (hor == "left") {
-    m_horizontal = LEFT;
+    m_horizontal = Horizontal::LEFT;
   } else if (hor == "right") {
-    m_horizontal = RIGHT;
+    m_horizontal = Horizontal::RIGHT;
   } else if (hor == "auto") {
-    m_horizontal = HAUTO;
+    m_horizontal = Horizontal::HAUTO;
   } else if (hor == "original") {
-    m_horizontal = HORIGINAL;
+    m_horizontal = Horizontal::HORIGINAL;
   } else {
-    m_horizontal = HCENTER;
+    m_horizontal = Horizontal::HCENTER;
   }
 }
 
 QDomElement Alignment::toXml(QDomDocument& doc, const QString& name) const {
   const char* vert = nullptr;
   switch (m_vertical) {
-    case TOP:
+    case Vertical::TOP:
       vert = "top";
       break;
-    case VCENTER:
+    case Vertical::VCENTER:
       vert = "center";
       break;
-    case BOTTOM:
+    case Vertical::BOTTOM:
       vert = "bottom";
       break;
-    case VAUTO:
+    case Vertical::VAUTO:
       vert = "auto";
       break;
-    case VORIGINAL:
+    case Vertical::VORIGINAL:
       vert = "original";
       break;
   }
 
   const char* hor = nullptr;
   switch (m_horizontal) {
-    case LEFT:
+    case Horizontal::LEFT:
       hor = "left";
       break;
-    case HCENTER:
+    case Horizontal::HCENTER:
       hor = "center";
       break;
-    case RIGHT:
+    case Horizontal::RIGHT:
       hor = "right";
       break;
-    case HAUTO:
+    case Horizontal::HAUTO:
       hor = "auto";
       break;
-    case HORIGINAL:
+    case Horizontal::HORIGINAL:
       hor = "original";
       break;
   }

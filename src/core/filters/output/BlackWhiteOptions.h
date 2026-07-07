@@ -1,15 +1,22 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_BLACKWHITEOPTIONS_H_
-#define SCANTAILOR_OUTPUT_BLACKWHITEOPTIONS_H_
+#pragma once
+
+#include <QMetaType>
+
+#include <cstdint>
 
 class QString;
 class QDomDocument;
 class QDomElement;
 
 namespace output {
-enum BinarizationMethod { OTSU, SAUVOLA, WOLF };
+enum class BinarizationMethod : std::uint8_t {
+  OTSU,
+  SAUVOLA,
+  WOLF
+};
 
 class BlackWhiteOptions {
  public:
@@ -25,23 +32,23 @@ class BlackWhiteOptions {
 
     bool operator!=(const ColorSegmenterOptions& other) const;
 
-    bool isEnabled() const;
+    [[nodiscard]] bool isEnabled() const;
 
     void setEnabled(bool enabled);
 
-    int getNoiseReduction() const;
+    [[nodiscard]] int getNoiseReduction() const;
 
     void setNoiseReduction(int noiseReduction);
 
-    int getRedThresholdAdjustment() const;
+    [[nodiscard]] int getRedThresholdAdjustment() const;
 
     void setRedThresholdAdjustment(int redThresholdAdjustment);
 
-    int getGreenThresholdAdjustment() const;
+    [[nodiscard]] int getGreenThresholdAdjustment() const;
 
     void setGreenThresholdAdjustment(int greenThresholdAdjustment);
 
-    int getBlueThresholdAdjustment() const;
+    [[nodiscard]] int getBlueThresholdAdjustment() const;
 
     void setBlueThresholdAdjustment(int blueThresholdAdjustment);
 
@@ -64,47 +71,47 @@ class BlackWhiteOptions {
 
   bool operator!=(const BlackWhiteOptions& other) const;
 
-  int thresholdAdjustment() const;
+  [[nodiscard]] int thresholdAdjustment() const;
 
   void setThresholdAdjustment(int val);
 
-  bool normalizeIllumination() const;
+  [[nodiscard]] bool normalizeIllumination() const;
 
   void setNormalizeIllumination(bool val);
 
-  bool isSavitzkyGolaySmoothingEnabled() const;
+  [[nodiscard]] bool isSavitzkyGolaySmoothingEnabled() const;
 
   void setSavitzkyGolaySmoothingEnabled(bool savitzkyGolaySmoothingEnabled);
 
-  bool isMorphologicalSmoothingEnabled() const;
+  [[nodiscard]] bool isMorphologicalSmoothingEnabled() const;
 
   void setMorphologicalSmoothingEnabled(bool morphologicalSmoothingEnabled);
 
-  int getWindowSize() const;
+  [[nodiscard]] int getWindowSize() const;
 
   void setWindowSize(int windowSize);
 
-  double getSauvolaCoef() const;
+  [[nodiscard]] double getSauvolaCoef() const;
 
   void setSauvolaCoef(double sauvolaCoef);
 
-  int getWolfLowerBound() const;
+  [[nodiscard]] int getWolfLowerBound() const;
 
   void setWolfLowerBound(int wolfLowerBound);
 
-  int getWolfUpperBound() const;
+  [[nodiscard]] int getWolfUpperBound() const;
 
   void setWolfUpperBound(int wolfUpperBound);
 
-  double getWolfCoef() const;
+  [[nodiscard]] double getWolfCoef() const;
 
   void setWolfCoef(double wolfCoef);
 
-  BinarizationMethod getBinarizationMethod() const;
+  [[nodiscard]] BinarizationMethod getBinarizationMethod() const;
 
   void setBinarizationMethod(BinarizationMethod binarizationMethod);
 
-  const ColorSegmenterOptions& getColorSegmenterOptions() const;
+  [[nodiscard]] const ColorSegmenterOptions& getColorSegmenterOptions() const;
 
   void setColorSegmenterOptions(const ColorSegmenterOptions& colorSegmenterOptions);
 
@@ -257,4 +264,4 @@ inline void BlackWhiteOptions::ColorSegmenterOptions::setBlueThresholdAdjustment
   ColorSegmenterOptions::m_blueThresholdAdjustment = blueThresholdAdjustment;
 }
 }  // namespace output
-#endif  // ifndef SCANTAILOR_OUTPUT_BLACKWHITEOPTIONS_H_
+Q_DECLARE_METATYPE(output::BinarizationMethod);

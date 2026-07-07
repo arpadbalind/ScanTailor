@@ -92,7 +92,7 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
 
   if (params) {
     if ((!deps.matches(params->dependencies()) || (params->deskewAngle() != uiData.effectiveDeskewAngle()))
-        && (params->mode() == MODE_AUTO)) {
+        && (params->mode() == AutoManualMode::MODE_AUTO)) {
       params.reset();
     } else {
       uiData.setEffectiveDeskewAngle(params->deskewAngle());
@@ -135,7 +135,7 @@ FilterResultPtr Task::process(const TaskStatus& status, FilterData data) {
       } else {
         uiData.setEffectiveDeskewAngle(0);
       }
-      uiData.setMode(MODE_AUTO);
+      uiData.setMode(AutoManualMode::MODE_AUTO);
 
       Params newParams(uiData.effectiveDeskewAngle(), deps, uiData.mode());
       m_settings->setPageParams(m_pageId, newParams);

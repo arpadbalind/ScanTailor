@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_MARGINS_H_
-#define SCANTAILOR_CORE_MARGINS_H_
+#pragma once
 
 class QString;
 class QDomElement;
@@ -18,19 +17,19 @@ class Margins {
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  double top() const;
+  [[nodiscard]] double top() const;
 
   void setTop(double val);
 
-  double bottom() const;
+  [[nodiscard]] double bottom() const;
 
   void setBottom(double val);
 
-  double left() const;
+  [[nodiscard]] double left() const;
 
   void setLeft(double val);
 
-  double right() const;
+  [[nodiscard]] double right() const;
 
   void setRight(double val);
 
@@ -73,5 +72,3 @@ inline double Margins::right() const {
 inline void Margins::setRight(double val) {
   m_right = val;
 }
-
-#endif  // ifndef SCANTAILOR_CORE_MARGINS_H_

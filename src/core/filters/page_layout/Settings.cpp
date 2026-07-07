@@ -346,7 +346,7 @@ Settings::Impl::Impl()
       m_invalidRect(),
       m_invalidSize(),
       m_defaultHardMarginsMM(Margins(10.0, 5.0, 10.0, 5.0)),
-      m_defaultAlignment(Alignment::TOP, Alignment::HCENTER),
+      m_defaultAlignment(Alignment::Vertical::TOP, Alignment::Horizontal::HCENTER),
       m_autoMarginsDefault(false),
       m_showMiddleRect(true) {
   m_deviationProvider.setComputeValueByKey([this](const PageId& pageId) -> double {

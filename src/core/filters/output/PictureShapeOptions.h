@@ -1,15 +1,20 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_PICTURESHAPEOPTIONS_H_
-#define SCANTAILOR_OUTPUT_PICTURESHAPEOPTIONS_H_
+#pragma once
+#include <QMetaType>
+#include <cstdint>
 
 class QString;
 class QDomDocument;
 class QDomElement;
 
 namespace output {
-enum PictureShape { OFF_SHAPE, FREE_SHAPE, RECTANGULAR_SHAPE };
+enum class PictureShape : std::uint8_t {
+  OFF_SHAPE,
+  FREE_SHAPE,
+  RECTANGULAR_SHAPE
+};
 
 class PictureShapeOptions {
  public:
@@ -23,15 +28,15 @@ class PictureShapeOptions {
 
   bool operator!=(const PictureShapeOptions& other) const;
 
-  PictureShape getPictureShape() const;
+  [[nodiscard]] PictureShape getPictureShape() const;
 
   void setPictureShape(PictureShape pictureShape);
 
-  int getSensitivity() const;
+  [[nodiscard]] int getSensitivity() const;
 
   void setSensitivity(int sensitivity);
 
-  bool isHigherSearchSensitivity() const;
+  [[nodiscard]] bool isHigherSearchSensitivity() const;
 
   void setHigherSearchSensitivity(bool higherSearchSensitivity);
 
@@ -71,5 +76,4 @@ inline void PictureShapeOptions::setHigherSearchSensitivity(bool higherSearchSen
   PictureShapeOptions::m_higherSearchSensitivity = higherSearchSensitivity;
 }
 }  // namespace output
-
-#endif  // SCANTAILOR_OUTPUT_PICTURESHAPEOPTIONS_H_
+Q_DECLARE_METATYPE(output::PictureShape);

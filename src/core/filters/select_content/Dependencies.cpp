@@ -77,7 +77,7 @@ void Dependencies::setPageDetectionMode(AutoManualMode pageDetectionMode) {
 /* ================================= Dependencies::Params ================================= */
 
 Dependencies::Params::Params()
-    : m_contentDetectionMode(MODE_AUTO), m_pageDetectionMode(MODE_DISABLED), m_fineTuneCorners(false) {}
+    : m_contentDetectionMode(AutoManualMode::MODE_AUTO), m_pageDetectionMode(AutoManualMode::MODE_DISABLED), m_fineTuneCorners(false) {}
 
 Dependencies::Params::Params(const AutoManualMode contentDetectionMode,
                              const AutoManualMode pageDetectionMode,
@@ -100,27 +100,27 @@ QDomElement Dependencies::Params::toXml(QDomDocument& doc, const QString& name) 
 }
 
 bool Dependencies::Params::compatibleWith(const Dependencies::Params& other) const {
-  if ((m_contentDetectionMode != MODE_MANUAL) && (m_contentDetectionMode != other.m_contentDetectionMode)) {
+  if ((m_contentDetectionMode != AutoManualMode::MODE_MANUAL) && (m_contentDetectionMode != other.m_contentDetectionMode)) {
     return false;
   }
-  if ((m_pageDetectionMode != MODE_MANUAL) && (m_pageDetectionMode != other.m_pageDetectionMode)) {
+  if ((m_pageDetectionMode != AutoManualMode::MODE_MANUAL) && (m_pageDetectionMode != other.m_pageDetectionMode)) {
     return false;
   }
-  if ((m_pageDetectionMode == MODE_AUTO) && (m_fineTuneCorners != other.m_fineTuneCorners)) {
+  if ((m_pageDetectionMode == AutoManualMode::MODE_AUTO) && (m_fineTuneCorners != other.m_fineTuneCorners)) {
     return false;
   }
   return true;
 }
 
 bool Dependencies::Params::needUpdateContentBox(const Dependencies::Params& other) const {
-  return (m_contentDetectionMode != MODE_MANUAL) && (m_contentDetectionMode != other.m_contentDetectionMode);
+  return (m_contentDetectionMode != AutoManualMode::MODE_MANUAL) && (m_contentDetectionMode != other.m_contentDetectionMode);
 }
 
 bool Dependencies::Params::needUpdatePageBox(const Dependencies::Params& other) const {
-  if ((m_pageDetectionMode != MODE_MANUAL) && (m_pageDetectionMode != other.m_pageDetectionMode)) {
+  if ((m_pageDetectionMode != AutoManualMode::MODE_MANUAL) && (m_pageDetectionMode != other.m_pageDetectionMode)) {
     return true;
   }
-  if ((m_pageDetectionMode == MODE_AUTO) && (m_fineTuneCorners != other.m_fineTuneCorners)) {
+  if ((m_pageDetectionMode == AutoManualMode::MODE_AUTO) && (m_fineTuneCorners != other.m_fineTuneCorners)) {
     return true;
   }
   return false;

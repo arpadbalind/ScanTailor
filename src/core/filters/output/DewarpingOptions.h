@@ -1,18 +1,25 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_DEWARPINGOPTIONS_H_
-#define SCANTAILOR_OUTPUT_DEWARPINGOPTIONS_H_
+#pragma once
 
+#include <QMetaType>
 #include <QString>
 #include <QtXml/QDomElement>
 
+#include <cstdint>
+
 namespace output {
-enum DewarpingMode { OFF, AUTO, MANUAL, MARGINAL };
+enum class DewarpingMode : std::uint8_t {
+  OFF,
+  AUTO,
+  MANUAL,
+  MARGINAL
+};
 
 class DewarpingOptions {
  public:
-  explicit DewarpingOptions(DewarpingMode mode = OFF, bool needPostDeskew = true);
+  explicit DewarpingOptions(DewarpingMode mode = DewarpingMode::OFF, bool needPostDeskew = true);
 
   explicit DewarpingOptions(const QDomElement& el);
 
@@ -22,15 +29,15 @@ class DewarpingOptions {
 
   bool operator!=(const DewarpingOptions& other) const;
 
-  DewarpingMode dewarpingMode() const;
+  [[nodiscard]] DewarpingMode dewarpingMode() const;
 
   void setDewarpingMode(DewarpingMode mode);
 
-  bool needPostDeskew() const;
+  [[nodiscard]] bool needPostDeskew() const;
 
   void setPostDeskew(bool postDeskew);
 
-  double getPostDeskewAngle() const;
+  [[nodiscard]] double getPostDeskewAngle() const;
 
   void setPostDeskewAngle(double postDeskewAngle);
 
@@ -69,4 +76,4 @@ inline DewarpingMode DewarpingOptions::dewarpingMode() const {
   return m_mode;
 }
 }  // namespace output
-#endif
+Q_DECLARE_METATYPE(output::DewarpingMode);

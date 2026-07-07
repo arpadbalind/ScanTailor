@@ -1,17 +1,16 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_WOLFBINARIZATIONOPTIONSWIDGET_H_
-#define SCANTAILOR_OUTPUT_WOLFBINARIZATIONOPTIONSWIDGET_H_
-
-#include <core/ConnectionManager.h>
+#pragma once
 
 #include <QtCore>
+
 #include <list>
 #include <memory>
 
 #include "BinarizationOptionsWidget.h"
 #include "ColorParams.h"
+#include "core/ConnectionManager.h"
 #include "Settings.h"
 #include "ui_WolfBinarizationOptionsWidget.h"
 
@@ -51,6 +50,3 @@ class WolfBinarizationOptionsWidget : public BinarizationOptionsWidget, private 
   ConnectionManager m_connectionManager;
 };
 }  // namespace output
-
-
-#endif  // SCANTAILOR_OUTPUT_WOLFBINARIZATIONOPTIONSWIDGET_H_

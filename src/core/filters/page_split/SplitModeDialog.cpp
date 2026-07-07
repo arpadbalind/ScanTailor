@@ -39,7 +39,7 @@ SplitModeDialog::SplitModeDialog(QWidget* const parent,
   }
 
   layoutTypeLabel->setPixmap(iconFor(m_layoutType).pixmap(32, 32));
-  if (m_layoutType == AUTO_LAYOUT_TYPE) {
+  if (m_layoutType == LayoutType::AUTO_LAYOUT_TYPE) {
     modeAuto->setChecked(true);
     applyCutOption->setEnabled(false);
   } else {
@@ -55,7 +55,7 @@ SplitModeDialog::SplitModeDialog(QWidget* const parent,
 SplitModeDialog::~SplitModeDialog() = default;
 
 void SplitModeDialog::autoDetectionSelected() {
-  layoutTypeLabel->setPixmap(iconFor(AUTO_LAYOUT_TYPE).pixmap(32, 32));
+  layoutTypeLabel->setPixmap(iconFor(LayoutType::AUTO_LAYOUT_TYPE).pixmap(32, 32));
   applyCutOption->setEnabled(false);
   applyCutOption->setChecked(false);
 }
@@ -66,7 +66,7 @@ void SplitModeDialog::manualModeSelected() {
 }
 
 void SplitModeDialog::onSubmit() {
-  LayoutType layoutType = AUTO_LAYOUT_TYPE;
+  LayoutType layoutType = LayoutType::AUTO_LAYOUT_TYPE;
   if (modeManual->isChecked()) {
     layoutType = combinedLayoutType();
   }
@@ -110,36 +110,36 @@ void SplitModeDialog::onSubmit() {
 }  // SplitModeDialog::onSubmit
 
 LayoutType SplitModeDialog::combinedLayoutType() const {
-  if (m_layoutType != AUTO_LAYOUT_TYPE) {
+  if (m_layoutType != LayoutType::AUTO_LAYOUT_TYPE) {
     return m_layoutType;
   }
 
   switch (m_autoDetectedLayoutType) {
-    case PageLayout::SINGLE_PAGE_UNCUT:
-      return SINGLE_PAGE_UNCUT;
-    case PageLayout::SINGLE_PAGE_CUT:
-      return PAGE_PLUS_OFFCUT;
-    case PageLayout::TWO_PAGES:
-      return TWO_PAGES;
+    case PageLayout::Type::SINGLE_PAGE_UNCUT:
+      return LayoutType::SINGLE_PAGE_UNCUT;
+    case PageLayout::Type::SINGLE_PAGE_CUT:
+      return LayoutType::PAGE_PLUS_OFFCUT;
+    case PageLayout::Type::TWO_PAGES:
+      return LayoutType::TWO_PAGES;
   }
 
   assert(!"Unreachable");
-  return AUTO_LAYOUT_TYPE;
+  return LayoutType::AUTO_LAYOUT_TYPE;
 }
 
 QIcon SplitModeDialog::iconFor(const LayoutType layoutType) {
   QIcon icon;
   switch (layoutType) {
-    case AUTO_LAYOUT_TYPE:
+    case LayoutType::AUTO_LAYOUT_TYPE:
       icon = IconProvider::getInstance().getIcon("layout_type_auto");
       break;
-    case SINGLE_PAGE_UNCUT:
+    case LayoutType::SINGLE_PAGE_UNCUT:
       icon = IconProvider::getInstance().getIcon("single_page_uncut");
       break;
-    case PAGE_PLUS_OFFCUT:
+    case LayoutType::PAGE_PLUS_OFFCUT:
       icon = IconProvider::getInstance().getIcon("right_page_plus_offcut");
       break;
-    case TWO_PAGES:
+    case LayoutType::TWO_PAGES:
       icon = IconProvider::getInstance().getIcon("two_pages");
       break;
   }

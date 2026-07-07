@@ -82,11 +82,11 @@ void StatusBarPanel::mousePosChanged() {
   if (!m_mousePos.isNull() && !m_dpi.isNull()) {
     double x = m_mousePos.x();
     double y = m_mousePos.y();
-    UnitsProvider::getInstance().convertFrom(x, y, PIXELS, m_dpi);
+    UnitsProvider::getInstance().convertFrom(x, y, Units::PIXELS, m_dpi);
 
     switch (UnitsProvider::getInstance().getUnits()) {
-      case PIXELS:
-      case MILLIMETRES:
+      case Units::PIXELS:
+      case Units::MILLIMETRES:
         x = std::ceil(x);
         y = std::ceil(y);
         break;
@@ -109,23 +109,23 @@ void StatusBarPanel::physSizeChanged() {
   if (!m_physSize.isNull() && !m_dpi.isNull()) {
     double width = m_physSize.width();
     double height = m_physSize.height();
-    UnitsProvider::getInstance().convertFrom(width, height, PIXELS, m_dpi);
+    UnitsProvider::getInstance().convertFrom(width, height, Units::PIXELS, m_dpi);
 
     const Units units = UnitsProvider::getInstance().getUnits();
     switch (units) {
-      case PIXELS:
+      case Units::PIXELS:
         width = std::round(width);
         height = std::round(height);
         break;
-      case MILLIMETRES:
+      case Units::MILLIMETRES:
         width = std::round(width);
         height = std::round(height);
         break;
-      case CENTIMETRES:
+      case Units::CENTIMETRES:
         width = std::round(width * 10) / 10;
         height = std::round(height * 10) / 10;
         break;
-      case INCHES:
+      case Units::INCHES:
         width = std::round(width * 10) / 10;
         height = std::round(height * 10) / 10;
         break;

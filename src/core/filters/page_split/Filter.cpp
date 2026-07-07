@@ -107,7 +107,7 @@ void Filter::loadSettings(const ProjectReader& reader, const QDomElement& filter
 void Filter::pageOrientationUpdate(const ImageId& imageId, const OrthogonalRotation& orientation) {
   const Settings::Record record(m_settings->getPageRecord(imageId));
 
-  if (record.layoutType() && (*record.layoutType() != AUTO_LAYOUT_TYPE)) {
+  if (record.layoutType() && (*record.layoutType() != LayoutType::AUTO_LAYOUT_TYPE)) {
     // The layout type was set manually, so we don't care about orientation.
     return;
   }

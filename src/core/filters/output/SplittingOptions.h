@@ -1,27 +1,31 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_OUTPUT_SPLITTINGOPTIONS_H_
-#define SCANTAILOR_OUTPUT_SPLITTINGOPTIONS_H_
-
+#pragma once
+#include <QMetaType>
 #include <QtXml/QDomElement>
 
+#include <cstdint>
+
 namespace output {
-enum SplittingMode { BLACK_AND_WHITE_FOREGROUND, COLOR_FOREGROUND };
+enum class SplittingMode : std::uint8_t {
+  BLACK_AND_WHITE_FOREGROUND,
+  COLOR_FOREGROUND
+};
 
 class SplittingOptions {
  public:
-  SplittingOptions();
+  SplittingOptions() = default;
 
   explicit SplittingOptions(const QDomElement& el);
 
   QDomElement toXml(QDomDocument& doc, const QString& name) const;
 
-  bool isSplitOutput() const;
+  [[nodiscard]] bool isSplitOutput() const;
 
   void setSplitOutput(bool splitOutput);
 
-  SplittingMode getSplittingMode() const;
+  [[nodiscard]] SplittingMode getSplittingMode() const;
 
   void setSplittingMode(SplittingMode foregroundType);
 
@@ -29,7 +33,7 @@ class SplittingOptions {
 
   bool operator!=(const SplittingOptions& other) const;
 
-  bool isOriginalBackgroundEnabled() const;
+  [[nodiscard]] bool isOriginalBackgroundEnabled() const;
 
   void setOriginalBackgroundEnabled(bool enable);
 
@@ -38,9 +42,9 @@ class SplittingOptions {
 
   static QString formatSplittingMode(SplittingMode type);
 
-  bool m_isSplitOutput;
-  SplittingMode m_splittingMode;
-  bool m_isOriginalBackgroundEnabled;
+  bool m_isSplitOutput{ false };
+  SplittingMode m_splittingMode { SplittingMode::BLACK_AND_WHITE_FOREGROUND };
+  bool m_isOriginalBackgroundEnabled { false };
 };
 
 
@@ -68,6 +72,4 @@ inline void SplittingOptions::setOriginalBackgroundEnabled(bool enable) {
   SplittingOptions::m_isOriginalBackgroundEnabled = enable;
 }
 }  // namespace output
-
-
-#endif  // SCANTAILOR_OUTPUT_SPLITTINGOPTIONS_H_
+Q_DECLARE_METATYPE(output::SplittingMode);
