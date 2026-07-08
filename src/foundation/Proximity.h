@@ -22,9 +22,9 @@ class Proximity {
 
   static Proximity pointAndLineSegment(const QPointF& pt, const QLineF& segment, QPointF* pointOnSegment = nullptr);
 
-  double dist() const { return std::sqrt(m_sqDist); }
+  [[nodiscard]] double dist() const { return std::sqrt(m_sqDist); }
 
-  double sqDist() const { return m_sqDist; }
+  [[nodiscard]] double sqDist() const { return m_sqDist; }
 
   bool operator==(const Proximity& rhs) const { return m_sqDist == rhs.m_sqDist; }
 

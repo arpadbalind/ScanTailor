@@ -1,8 +1,7 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_CORE_IMAGEPRESENTATION_H_
-#define SCANTAILOR_CORE_IMAGEPRESENTATION_H_
+#pragma once
 
 #include <QPolygonF>
 #include <QRectF>
@@ -24,8 +23,8 @@ class ImagePresentation {
   ImagePresentation(const QTransform& xform, const QPolygonF& cropArea)
       : m_xform(xform), m_cropArea(cropArea), m_displayArea(cropArea.boundingRect()) {}
 
-  ImagePresentation(const QTransform& xform, const QPolygonF& cropArea, const QRectF& displayArea)
-      : m_xform(xform), m_cropArea(cropArea), m_displayArea(displayArea) {}
+  ImagePresentation(const QTransform& xform, QPolygonF cropArea, const QRectF& displayArea)
+      : m_xform(xform), m_cropArea(std::move(cropArea)), m_displayArea(displayArea) {}
 
   const QTransform& transform() const { return m_xform; }
 
@@ -44,6 +43,3 @@ class ImagePresentation {
   QPolygonF m_cropArea;
   QRectF m_displayArea;
 };
-
-
-#endif  // ifndef SCANTAILOR_CORE_IMAGEPRESENTATION_H_

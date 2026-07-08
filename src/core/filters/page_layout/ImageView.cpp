@@ -31,7 +31,7 @@ ImageView::ImageView(const std::shared_ptr<Settings>& settings,
                      const QRectF& adaptedContentRect,
                      const OptionsWidget& optWidget)
     : ImageViewBase(image,
-                    downscaledImage,
+                    ImagePixmapUnion(downscaledImage),
                     ImagePresentation(xform.transform(), xform.resultingPreCropArea()),
                     Margins(5, 5, 5, 5)),
       m_dragHandler(*this),
@@ -528,7 +528,7 @@ void ImageView::recalcBoxesAndFit(const Margins& marginsMm) {
   const QRectF outerRect(mmToVirt.map(polyMm).boundingRect());
   updateTransformAndFixFocalPoint(
       ImagePresentation(imageToVirtual(), m_xform.resultingPreCropArea().intersected(outerRect), outerRect),
-      CENTER_IF_FITS);
+      FocalPointMode::CENTER_IF_FITS);
 
   m_middleRect = middleRect;
   m_outerRect = outerRect;
@@ -552,7 +552,7 @@ void ImageView::updatePresentationTransform(const FitMode fitMode) {
     setZoomLevel(1.0);
     updateTransformAndFixFocalPoint(
         ImagePresentation(imageToVirtual(), m_xform.resultingPreCropArea().intersected(m_outerRect), m_outerRect),
-        CENTER_IF_FITS);
+        FocalPointMode::CENTER_IF_FITS);
   }
 }
 

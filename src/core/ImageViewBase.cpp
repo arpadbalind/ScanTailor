@@ -192,7 +192,7 @@ ImageViewBase::ImageViewBase(const QImage& image,
 
   updatePhysSize();
 
-  updateWidgetTransformAndFixFocalPoint(CENTER_IF_FITS);
+  updateWidgetTransformAndFixFocalPoint(FocalPointMode::CENTER_IF_FITS);
 
   interactionState().setDefaultStatusTip(tr("Use the mouse wheel or +/- to zoom.  When zoomed, dragging is possible."));
   ensureStatusTip(interactionState().statusTip());
@@ -215,12 +215,12 @@ void ImageViewBase::hqTransformSetEnabled(const bool enabled) {
     }
     if (!m_hqPixmap.isNull()) {
       m_hqPixmap = QPixmap();
-      update();
+      updateViewport();
     }
   } else if (enabled && !m_hqTransformEnabled) {
     // Turning on.
     m_hqTransformEnabled = true;
-    update();
+    updateViewport();
   }
 }
 
@@ -286,7 +286,7 @@ void ImageViewBase::setZoomLevel(double zoom) {
   if (m_zoom != zoom) {
     m_zoom = zoom;
     updateWidgetTransform();
-    update();
+    updateViewport();
   }
 }
 
@@ -296,7 +296,7 @@ void ImageViewBase::moveTowardsIdealPosition(const double pixelLength) {
     return;
   }
 
-  const QPointF idealWidgetFp(getIdealWidgetFocalPoint(CENTER_IF_FITS));
+  const QPointF idealWidgetFp(getIdealWidgetFocalPoint(FocalPointMode::CENTER_IF_FITS));
   if (idealWidgetFp == m_widgetFocalPoint) {
     return;
   }
@@ -311,7 +311,7 @@ void ImageViewBase::moveTowardsIdealPosition(const double pixelLength) {
   }
 
   updateWidgetTransform();
-  update();
+  updateViewport();
 }
 
 void ImageViewBase::updateTransform(const ImagePresentation& presentation) {
@@ -324,7 +324,7 @@ void ImageViewBase::updateTransform(const ImagePresentation& presentation) {
   m_virtualDisplayArea = presentation.displayArea();
 
   updateWidgetTransform();
-  update();
+  updateViewport();
   updatePhysSize();
 }
 
@@ -338,7 +338,7 @@ void ImageViewBase::updateTransformAndFixFocalPoint(const ImagePresentation& pre
   m_virtualDisplayArea = presentation.displayArea();
 
   updateWidgetTransformAndFixFocalPoint(mode);
-  update();
+  updateViewport();
   updatePhysSize();
 }
 
@@ -363,7 +363,7 @@ void ImageViewBase::updateTransformPreservingScale(const ImagePresentation& pres
   m_zoom *= widgetLineBefore.length() / widgetLineAfter.length();
   updateWidgetTransform();
 
-  update();
+  updateViewport();
   updatePhysSize();
 }
 
@@ -768,7 +768,7 @@ QPointF ImageViewBase::getIdealWidgetFocalPoint(const FocalPointMode mode) const
 
   QPointF widgetFocalPoint(m_widgetFocalPoint);
 
-  if ((mode == CENTER_IF_FITS) && (leftMargin + rightMargin >= 0.0)) {
+  if ((mode == FocalPointMode::CENTER_IF_FITS) && (leftMargin + rightMargin >= 0.0)) {
     // Image fits horizontally, so center it in that direction
     // by equalizing its left and right margins.
     const double newMargins = 0.5 * (leftMargin + rightMargin);
@@ -785,7 +785,7 @@ QPointF ImageViewBase::getIdealWidgetFocalPoint(const FocalPointMode mode) const
     widgetFocalPoint.rx() -= movement;
   }
 
-  if ((mode == CENTER_IF_FITS) && (topMargin + bottomMargin >= 0.0)) {
+  if ((mode == FocalPointMode::CENTER_IF_FITS) && (topMargin + bottomMargin >= 0.0)) {
     // Image fits vertically, so center it in that direction
     // by equalizing its top and bottom margins.
     const double newMargins = 0.5 * (topMargin + bottomMargin);
@@ -809,7 +809,7 @@ void ImageViewBase::setNewWidgetFP(const QPointF widgetFp, const bool update) {
     m_widgetFocalPoint = widgetFp;
     updateWidgetTransform();
     if (update) {
-      this->update();
+      this->updateViewport();
     }
   }
 }
@@ -822,7 +822,7 @@ void ImageViewBase::setNewWidgetFP(const QPointF widgetFp, const bool update) {
  * direction.
  *
  * \param proposedWidgetFp The proposed value for m_widgetFocalPoint.
- * \param update Whether to call this->update() in case the focal point
+ * \param update Whether to call this->updateViewport() in case the focal point
  *        has changed.
  */
 void ImageViewBase::adjustAndSetNewWidgetFP(const QPointF proposedWidgetFp, const bool update) {
@@ -835,7 +835,7 @@ void ImageViewBase::adjustAndSetNewWidgetFP(const QPointF proposedWidgetFp, cons
   const QPointF oldWidgetFp(m_widgetFocalPoint);
   setNewWidgetFP(proposedWidgetFp, update);
 
-  const QPointF idealWidgetFp(getIdealWidgetFocalPoint(CENTER_IF_FITS));
+  const QPointF idealWidgetFp(getIdealWidgetFocalPoint(FocalPointMode::CENTER_IF_FITS));
 
   const QPointF towardsIdeal(idealWidgetFp - oldWidgetFp);
   const QPointF towardsProposed(proposedWidgetFp - oldWidgetFp);
@@ -864,7 +864,7 @@ void ImageViewBase::adjustAndSetNewWidgetFP(const QPointF proposedWidgetFp, cons
     m_widgetFocalPoint = adjustedWidgetFp;
     updateWidgetTransform();
     if (update) {
-      this->update();
+      this->updateViewport();
     }
   }
 }  // ImageViewBase::adjustAndSetNewWidgetFP
@@ -949,7 +949,7 @@ void ImageViewBase::hqVersionBuilt(const QPoint& origin, const QImage& image) {
   m_hqPixmap = QPixmap::fromImage(image);
   m_hqPixmapPos = origin;
   m_hqTransformTask.reset();
-  update();
+  updateViewport();
 }
 
 void ImageViewBase::updateStatusTipAndCursor() {
@@ -968,7 +968,7 @@ void ImageViewBase::updateCursor() {
 void ImageViewBase::maybeQueueRedraw() {
   if (m_interactionState.redrawRequested()) {
     m_interactionState.setRedrawRequested(false);
-    update();
+    updateViewport();
   }
 }
 

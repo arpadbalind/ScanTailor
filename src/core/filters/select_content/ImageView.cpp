@@ -25,7 +25,7 @@ ImageView::ImageView(const QImage& image,
                      const QRectF& contentRect,
                      const QRectF& pageRect,
                      const bool pageRectEnabled)
-    : ImageViewBase(image, downscaledImage, ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
+    : ImageViewBase(image, ImagePixmapUnion(downscaledImage), ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
       m_dragHandler(*this),
       m_zoomHandler(*this),
       m_noContentMenu(new QMenu(this)),

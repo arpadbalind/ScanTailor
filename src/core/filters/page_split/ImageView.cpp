@@ -22,7 +22,7 @@ ImageView::ImageView(const QImage& image,
                      const ImageId& imageId,
                      bool leftHalfRemoved,
                      bool rightHalfRemoved)
-    : ImageViewBase(image, downscaledImage, ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
+    : ImageViewBase(image, ImagePixmapUnion(downscaledImage), ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
       m_pages(std::move(pages)),
       m_imageId(imageId),
       m_leftUnremoveButton([this]() { return leftPageCenter(); }),

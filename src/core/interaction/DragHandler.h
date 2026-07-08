@@ -20,7 +20,7 @@ class DragHandler : public InteractionHandler {
   DragHandler(ImageViewBase& imageView,
               const std::function<bool(const InteractionState&)>& explicitInteractionPermitter);
 
-  bool isActive() const;
+  [[nodiscard]] bool isActive() const;
 
  protected:
   void onMousePressEvent(QMouseEvent* event, InteractionState& interaction) override;

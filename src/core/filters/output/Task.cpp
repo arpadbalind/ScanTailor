@@ -510,7 +510,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
   std::vector<QPointF> preCropAreaStdVector(preCropArea.constBegin(), preCropArea.constEnd());
 
   auto dewarpingView = std::make_unique<DewarpingView>(
-      m_origImage, m_downscaledOrigImage, m_xform.transform(),
+      m_origImage, ImagePixmapUnion(m_downscaledOrigImage), m_xform.transform(),
       PolygonUtils::convexHull(preCropAreaStdVector), m_virtContentRect, m_pageId,
       m_params.dewarpingOptions(), m_params.distortionModel(), optWidget->depthPerception());
 
@@ -528,7 +528,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
   if (m_pictureMask.isNull()) {
     pictureZoneEditor = std::make_unique<ErrorWidget>(tr("Picture zones are only available in Mixed mode."));
   } else {
-    pictureZoneEditor = std::make_unique<output::PictureZoneEditor>(m_origImage, downscaledOrigPixmap, m_pictureMask,
+    pictureZoneEditor = std::make_unique<output::PictureZoneEditor>(m_origImage, ImagePixmapUnion(downscaledOrigPixmap), m_pictureMask,
                                                                     m_xform.transform(), m_xform.resultingPreCropArea(),
                                                                     m_pageId, m_settings);
     QObject::connect(pictureZoneEditor.get(), SIGNAL(invalidateThumbnail(const PageId&)), optWidget,
@@ -557,7 +557,7 @@ void Task::UiUpdater::updateUI(FilterUiInterface* ui) {
     outputToOrig = boost::bind((MapPointFunc) &QTransform::map, m_xform.transformBack(), _1);
   }
 
-  auto fillZoneEditor = std::make_unique<FillZoneEditor>(m_outputImage, downscaledOutputPixmap, origToOutput,
+  auto fillZoneEditor = std::make_unique<FillZoneEditor>(m_outputImage, ImagePixmapUnion(downscaledOutputPixmap), origToOutput,
                                                          outputToOrig, m_pageId, m_settings);
   QObject::connect(fillZoneEditor.get(), SIGNAL(invalidateThumbnail(const PageId&)), optWidget,
                    SIGNAL(invalidateThumbnail(const PageId&)));

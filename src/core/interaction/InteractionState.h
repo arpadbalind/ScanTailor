@@ -2,7 +2,7 @@
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
 #pragma once
-
+// NOLINTBEGIN(cppcoreguidelines-special-member-functions, misc-non-private-member-variables-in-classes, cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)
 #include <QCursor>
 #include <QString>
 #include <boost/intrusive/list.hpp>
@@ -18,6 +18,7 @@ class InteractionState : private NonCopyable {
     friend class InteractionState;
 
    private:
+    using BaseHook = boost::intrusive::list_base_hook<boost::intrusive::link_mode<boost::intrusive::auto_unlink>>;
     struct CopyHelper {
       Captor* captor;
 
@@ -27,9 +28,14 @@ class InteractionState : private NonCopyable {
    public:
     Captor() = default;
 
-    Captor(Captor& other) { swap_nodes(other); }
+    // NOLINTNEXTLINE(bugprone-copy-constructor-init)
+    Captor(Captor& other) {
+      swap_nodes(other);
+    }
 
-    explicit Captor(CopyHelper other) { swap_nodes(*other.captor); }
+    explicit Captor(CopyHelper other) {
+      swap_nodes(*other.captor);
+    }
 
     Captor& operator=(Captor& other);
 
@@ -39,23 +45,23 @@ class InteractionState : private NonCopyable {
 
     void release() { unlink(); }
 
-    const QCursor& proximityCursor() const { return m_proximityCursor; }
+    [[nodiscard]] const QCursor& proximityCursor() const { return m_proximityCursor; }
 
     void setProximityCursor(const QCursor& cursor) { m_proximityCursor = cursor; }
 
-    const QCursor& interactionCursor() const { return m_interactionCursor; }
+    [[nodiscard]] const QCursor& interactionCursor() const { return m_interactionCursor; }
 
     void setInteractionCursor(const QCursor& cursor) { m_interactionCursor = cursor; }
 
-    const QString& proximityStatusTip() const { return m_proximityStatusTip; }
+    [[nodiscard]] const QString& proximityStatusTip() const { return m_proximityStatusTip; }
 
     void setProximityStatusTip(const QString& tip) { m_proximityStatusTip = tip; }
 
-    const QString& interactionStatusTip() const { return m_interactionStatusTip; }
+    [[nodiscard]] const QString& interactionStatusTip() const { return m_interactionStatusTip; }
 
     void setInteractionStatusTip(const QString& tip) { m_interactionStatusTip = tip; }
 
-    const QString& interactionOrProximityStatusTip() const {
+    [[nodiscard]] const QString& interactionOrProximityStatusTip() const {
       return m_interactionStatusTip.isNull() ? m_proximityStatusTip : m_interactionStatusTip;
     }
 
@@ -71,9 +77,9 @@ class InteractionState : private NonCopyable {
 
   void capture(Captor& captor);
 
-  bool captured() const { return !m_captorList.empty(); }
+  [[nodiscard]] bool captured() const { return !m_captorList.empty(); }
 
-  bool capturedBy(const Captor& captor) const;
+  [[nodiscard]] bool capturedBy(const Captor& captor) const;
 
   void resetProximity();
 
@@ -82,19 +88,19 @@ class InteractionState : private NonCopyable {
                        int priority = 0,
                        Proximity proximityThreshold = Proximity());
 
-  bool proximityLeader(const Captor& captor) const;
+  [[nodiscard]] bool proximityLeader(const Captor& captor) const;
 
-  const Proximity& proximityThreshold() const { return m_proximityThreshold; }
+  [[nodiscard]] const Proximity& proximityThreshold() const { return m_proximityThreshold; }
 
-  QCursor cursor() const;
+  [[nodiscard]] QCursor cursor() const;
 
-  QString statusTip() const;
+  [[nodiscard]] QString statusTip() const;
 
-  const QString& defaultStatusTip() const { return m_defaultStatusTip; }
+  [[nodiscard]] const QString& defaultStatusTip() const { return m_defaultStatusTip; }
 
   void setDefaultStatusTip(const QString& statusTip) { m_defaultStatusTip = statusTip; }
 
-  bool redrawRequested() const { return m_redrawRequested; }
+  [[nodiscard]] bool redrawRequested() const { return m_redrawRequested; }
 
   void setRedrawRequested(bool requested) { m_redrawRequested = requested; }
 
@@ -104,7 +110,7 @@ class InteractionState : private NonCopyable {
   /**
    * Returns true if the provided proximity is better than the stored one.
    */
-  bool betterProximity(const Proximity& proximity, int priority) const;
+  [[nodiscard]] bool betterProximity(const Proximity& proximity, int priority) const;
 
   QString m_defaultStatusTip;
   CaptorList m_captorList;
@@ -114,3 +120,4 @@ class InteractionState : private NonCopyable {
   int m_bestProximityPriority;
   bool m_redrawRequested;
 };
+// NOLINTEND(cppcoreguidelines-special-member-functions, misc-non-private-member-variables-in-classes, cppcoreguidelines-c-copy-assignment-signature, misc-unconventional-assign-operator)

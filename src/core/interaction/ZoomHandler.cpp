@@ -14,7 +14,7 @@ ZoomHandler::ZoomHandler(ImageViewBase& imageView)
 
 ZoomHandler::ZoomHandler(ImageViewBase& imageView,
                          const std::function<bool(const InteractionState&)>& explicitInteractionPermitter)
-    : m_imageView(imageView), m_interactionPermitter(explicitInteractionPermitter), m_focus(CURSOR) {
+    : m_imageView(imageView), m_interactionPermitter(explicitInteractionPermitter) {
   m_magnifyShortcut = std::make_unique<QShortcut>(Qt::Key_Plus, &m_imageView);
   m_diminishShortcut = std::make_unique<QShortcut>(Qt::Key_Minus, &m_imageView);
   QObject::connect(m_magnifyShortcut.get(), &QShortcut::activated, &m_imageView,
@@ -53,10 +53,10 @@ void ZoomHandler::onWheelEvent(QWheelEvent* event, InteractionState& interaction
 
   QPointF focusPoint;
   switch (m_focus) {
-    case CENTER:
+    case Focus::CENTER:
       focusPoint = QRectF(m_imageView.rect()).center();
       break;
-    case CURSOR:
+    case Focus::CURSOR:
       focusPoint = event->position() + QPointF(0.5, 0.5);
       break;
   }
@@ -81,10 +81,10 @@ void ZoomHandler::zoom(double factor) {
 
   QPointF focusPoint;
   switch (m_focus) {
-    case CENTER:
+    case Focus::CENTER:
       focusPoint = QRectF(m_imageView.rect()).center();
       break;
-    case CURSOR:
+    case Focus::CURSOR:
       focusPoint = m_virtualMousePos;
       break;
   }

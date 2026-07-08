@@ -28,11 +28,11 @@ class ImageViewInfoProvider : private NonCopyable {
 
   void setMousePos(const QPointF& mousePos);
 
-  const Dpi& getDpi() const;
+  [[nodiscard]] const Dpi& getDpi() const;
 
-  const QPointF& getMousePos() const;
+  [[nodiscard]] const QPointF& getMousePos() const;
 
-  const QSizeF& getPhysSize() const;
+  [[nodiscard]] const QSizeF& getPhysSize() const;
 
  private:
   void physSizeChanged(const QSizeF& physSize) const;

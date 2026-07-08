@@ -16,6 +16,8 @@
 #include <QTransform>
 #include <QWidget>
 #include <Qt>
+
+#include <cstdint>
 #include <memory>
 
 #include "ImagePixmapUnion.h"
@@ -47,7 +49,10 @@ class ImagePresentation;
 class ImageViewBase : public QAbstractScrollArea {
   Q_OBJECT
  public:
-  enum FocalPointMode { CENTER_IF_FITS, DONT_CENTER };
+  enum class FocalPointMode : std::uint8_t {
+    CENTER_IF_FITS,
+    DONT_CENTER
+  };
 
   /**
    * \brief ImageViewBase constructor.
@@ -117,7 +122,7 @@ class ImageViewBase : public QAbstractScrollArea {
 
   QTransform widgetToImage() const { return m_widgetToVirtual * m_virtualToImage; }
 
-  void update() { viewport()->update(); }
+  void updateViewport() { viewport()->update(); }
 
   const QRectF& virtualDisplayRect() const { return m_virtualDisplayArea; }
 

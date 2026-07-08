@@ -8,7 +8,7 @@
 
 namespace output {
 ImageView::ImageView(const QImage& image, const QImage& downscaledImage)
-    : ImageViewBase(image, downscaledImage, ImagePresentation(QTransform(), QRectF(image.rect())), OutputMargins()),
+    : ImageViewBase(image, ImagePixmapUnion(downscaledImage), ImagePresentation(QTransform(), QRectF(image.rect())), OutputMargins()),
       m_dragHandler(*this),
       m_zoomHandler(*this) {
   rootInteractionHandler().makeLastFollower(m_dragHandler);

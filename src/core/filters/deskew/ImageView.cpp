@@ -20,7 +20,7 @@ const double ImageView::m_maxRotationSin = std::sin(m_maxRotationDeg * constants
 const int ImageView::m_cellSize = 20;
 
 ImageView::ImageView(const QImage& image, const QImage& downscaledImage, const ImageTransformation& xform)
-    : ImageViewBase(image, downscaledImage, ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
+    : ImageViewBase(image, ImagePixmapUnion(downscaledImage), ImagePresentation(xform.transform(), xform.resultingPreCropArea())),
       m_handlePixmap(IconProvider::getInstance().getIcon("aqua-sphere").pixmap(16, 16)),
       m_dragHandler(*this),
       m_zoomHandler(*this),
@@ -44,7 +44,7 @@ ImageView::ImageView(const QImage& image, const QImage& downscaledImage, const I
     makeLastFollower(m_handleInteractors[i]);
   }
 
-  m_zoomHandler.setFocus(ZoomHandler::CENTER);
+  m_zoomHandler.setFocus(ZoomHandler::Focus::CENTER);
 
   rootInteractionHandler().makeLastFollower(*this);
   rootInteractionHandler().makeLastFollower(m_dragHandler);

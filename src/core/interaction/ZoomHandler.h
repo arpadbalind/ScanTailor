@@ -1,11 +1,11 @@
 // Copyright (C) 2019  Joseph Artsimovich <joseph.artsimovich@gmail.com>, 4lex4 <4lex49@zoho.com>
 // Use of this source code is governed by the GNU GPLv3 license that can be found in the LICENSE file.
 
-#ifndef SCANTAILOR_INTERACTION_ZOOMHANDLER_H_
-#define SCANTAILOR_INTERACTION_ZOOMHANDLER_H_
+#pragma once
 
 #include <QCoreApplication>
 #include <QPoint>
+#include <cstdint>
 #include <functional>
 
 #include "InteractionHandler.h"
@@ -17,7 +17,10 @@ class QShortcut;
 class ZoomHandler : public InteractionHandler {
   Q_DECLARE_TR_FUNCTIONS(ZoomHandler)
  public:
-  enum Focus { CENTER, CURSOR };
+  enum class Focus : std::uint8_t{
+    CENTER,
+    CURSOR
+  };
 
   explicit ZoomHandler(ImageViewBase& imageView);
 
@@ -26,7 +29,7 @@ class ZoomHandler : public InteractionHandler {
 
   ~ZoomHandler() override;
 
-  Focus focus() const { return m_focus; }
+  [[nodiscard]] Focus focus() const { return m_focus; }
 
   void setFocus(Focus focus) { m_focus = focus; }
 
@@ -41,11 +44,8 @@ class ZoomHandler : public InteractionHandler {
   ImageViewBase& m_imageView;
   std::function<bool(const InteractionState&)> m_interactionPermitter;
   InteractionState::Captor m_interaction;
-  Focus m_focus;
+  Focus m_focus{ Focus::CURSOR };
   QPointF m_virtualMousePos;
   std::unique_ptr<QShortcut> m_magnifyShortcut;
   std::unique_ptr<QShortcut> m_diminishShortcut;
 };
-
-
-#endif  // ifndef SCANTAILOR_INTERACTION_ZOOMHANDLER_H_

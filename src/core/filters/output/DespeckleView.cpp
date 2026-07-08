@@ -93,7 +93,7 @@ DespeckleView::DespeckleView(const DespeckleState& despeckleState,
 
   if (!visualization.isNull()) {
     // Create the image view.
-    auto widget = std::make_unique<BasicImageView>(visualization.image(), visualization.downscaledImage());
+    auto widget = std::make_unique<BasicImageView>(visualization.image(), ImagePixmapUnion(visualization.downscaledImage()));
     setCurrentIndex(addWidget(widget.release()));
     emit imageViewCreated(dynamic_cast<ImageViewBase*>(widget.get()));
   }
@@ -163,7 +163,7 @@ void DespeckleView::despeckleDone(const DespeckleState& despeckleState,
   removeImageViewWidget();
 
   std::unique_ptr<QWidget> widget
-      = std::make_unique<BasicImageView>(visualization.image(), visualization.downscaledImage(), OutputMargins());
+      = std::make_unique<BasicImageView>(visualization.image(), ImagePixmapUnion(visualization.downscaledImage()), OutputMargins());
 
   if (dbg && !dbg->empty()) {
     auto tabWidget = std::make_unique<TabbedDebugImages>();
