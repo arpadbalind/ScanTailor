@@ -374,7 +374,7 @@ void Settings::Impl::performRelinking(const AbstractRelinker& relinker) {
   Container newItems;
 
   for (const Item& item : m_unorderedItems) {
-    const RelinkablePath oldPath(item.pageId.imageId().filePath(), RelinkablePath::File);
+    const RelinkablePath oldPath(item.pageId.imageId().filePath(), RelinkablePath::RelinkablePathType::File);
     Item newItem(item);
     newItem.pageId.imageId().setFilePath(relinker.substitutionPathFor(oldPath));
     newItems.insert(newItem);

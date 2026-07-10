@@ -41,7 +41,7 @@ class RelinkingDialog : public QDialog {
 
   void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
-  /** \p type is either RelinkablePath::File or RelinkablePath::Dir */
+  /** \p type is either RelinkablePath::RelinkablePathType::File or RelinkablePath::RelinkablePathType::Dir */
   void pathButtonClicked(const QString& prefixPath, const QString& suffixPath, int type);
 
   void undoButtonClicked();

@@ -5,7 +5,7 @@
 
 #include <QStringList>
 
-RelinkablePath::RelinkablePath(const QString& path, Type type) : m_normalizedPath(normalize(path)), m_type(type) {}
+RelinkablePath::RelinkablePath(const QString& path, RelinkablePathType type) : m_normalizedPath(normalize(path)), m_type(type) {}
 
 QString RelinkablePath::normalize(const QString& path) {
   QString frontSlashes(path);

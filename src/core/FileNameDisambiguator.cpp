@@ -203,7 +203,7 @@ void FileNameDisambiguator::Impl::performRelinking(const AbstractRelinker& relin
   Container newItems;
 
   for (const Item& item : m_unorderedItems) {
-    const RelinkablePath oldPath(item.filePath, RelinkablePath::File);
+    const RelinkablePath oldPath(item.filePath, RelinkablePath::RelinkablePathType::File);
     Item newItem(relinker.substitutionPathFor(oldPath), item.label);
     newItems.insert(newItem);
   }

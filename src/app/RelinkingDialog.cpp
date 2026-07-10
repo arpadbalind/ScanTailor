@@ -43,7 +43,7 @@ void RelinkingDialog::selectionChanged(const QItemSelection& selected, [[maybe_u
     const QModelIndex index(selected.front().topLeft());
     const QString path(index.data(m_model.UncommittedPathRole).toString());
     const int type = index.data(m_model.TypeRole).toInt();
-    ui.pathVisualization->setPath(RelinkablePath(path, (RelinkablePath::Type) type), /*clickable=*/true);
+    ui.pathVisualization->setPath(RelinkablePath(path, (RelinkablePath::RelinkablePathType) type), /*clickable=*/true);
     ui.pathVisualization->setVisible(true);
 
     if (ui.errorLabel->isVisible()) {
@@ -62,7 +62,7 @@ void RelinkingDialog::pathButtonClicked(const QString& prefixPath, const QString
 
   QString replacementPath;
 
-  if (type == RelinkablePath::File) {
+  if (type == static_cast<int>(RelinkablePath::RelinkablePathType::File)) {
     const QDir dir(QFileInfo(prefixPath).dir());
     replacementPath = QFileDialog::getOpenFileName(
         this, tr("Substitution File for %1").arg(QDir::toNativeSeparators(prefixPath)),
@@ -91,7 +91,7 @@ void RelinkingDialog::pathButtonClicked(const QString& prefixPath, const QString
   newPath += QChar('/');
   newPath += suffixPath;
 
-  m_model.replacePrefix(prefixPath, replacementPath, (RelinkablePath::Type) type);
+  m_model.replacePrefix(prefixPath, replacementPath, (RelinkablePath::RelinkablePathType) type);
 
   if (m_model.checkForMerges()) {
     ui.errorLabel->setText(tr("This change would merge several files into one."));
@@ -99,7 +99,7 @@ void RelinkingDialog::pathButtonClicked(const QString& prefixPath, const QString
     ui.pathVisualization->clear();
     ui.pathVisualization->setVisible(false);
   } else {
-    ui.pathVisualization->setPath(RelinkablePath(newPath, (RelinkablePath::Type) type), /*clickable=*/false);
+    ui.pathVisualization->setPath(RelinkablePath(newPath, (RelinkablePath::RelinkablePathType) type), /*clickable=*/false);
     ui.pathVisualization->setVisible(true);
   }
 

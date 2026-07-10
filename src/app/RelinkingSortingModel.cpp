@@ -38,7 +38,7 @@ bool RelinkingSortingModel::lessThan(const QModelIndex& left, const QModelIndex&
     const QString leftDir(leftPath.left(leftPath.lastIndexOf(QChar('/'))));
     const QString rightDir(rightPath.left(rightPath.lastIndexOf(QChar('/'))));
     if (leftDir == rightDir) {
-      return leftType == RelinkablePath::Dir;
+      return leftType == static_cast<int>(RelinkablePath::RelinkablePathType::Dir);
     }
   }
 

@@ -108,7 +108,7 @@ QVariant RelinkingModel::data(const QModelIndex& index, int role) const {
 
   switch (role) {
     case TypeRole:
-      return item.type;
+      return static_cast<int>(item.type);
     case UncommittedStatusRole:
       return item.uncommittedStatus;
     case UncommittedPathRole:
@@ -121,7 +121,7 @@ QVariant RelinkingModel::data(const QModelIndex& index, int role) const {
         return QDir::toNativeSeparators(item.uncommittedPath);
       }
     case Qt::DecorationRole:
-      return (item.type == RelinkablePath::Dir) ? m_folderIcon : m_fileIcon;
+      return (item.type == RelinkablePath::RelinkablePathType::Dir) ? m_folderIcon : m_fileIcon;
     case Qt::BackgroundRole:
       return QColor(Qt::transparent);
     default:
@@ -144,7 +144,7 @@ void RelinkingModel::addPath(const RelinkablePath& path) {
   requestStatusUpdate(index(static_cast<int>(m_items.size() - 1)));
 }
 
-void RelinkingModel::replacePrefix(const QString& prefix, const QString& replacement, RelinkablePath::Type type) {
+void RelinkingModel::replacePrefix(const QString& prefix, const QString& replacement, RelinkablePath::RelinkablePathType type) {
   QString slashTerminatedPrefix(prefix);
   ensureEndsWithSlash(slashTerminatedPrefix);
 
@@ -155,13 +155,13 @@ void RelinkingModel::replacePrefix(const QString& prefix, const QString& replace
     ++row;
     bool modified = false;
 
-    if (type == RelinkablePath::File) {
-      if ((item.type == RelinkablePath::File) && (item.uncommittedPath == prefix)) {
+    if (type == RelinkablePath::RelinkablePathType::File) {
+      if ((item.type == RelinkablePath::RelinkablePathType::File) && (item.uncommittedPath == prefix)) {
         item.uncommittedPath = replacement;
         modified = true;
       }
     } else {
-      assert(type == RelinkablePath::Dir);
+      assert(type == RelinkablePath::RelinkablePathType::Dir);
       if (item.uncommittedPath.startsWith(slashTerminatedPrefix)) {
         const qsizetype suffixLen = item.uncommittedPath.length() - slashTerminatedPrefix.length() + 1;
         item.uncommittedPath = replacement + item.uncommittedPath.right(suffixLen);

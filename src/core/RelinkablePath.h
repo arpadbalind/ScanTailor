@@ -5,19 +5,24 @@
 
 #include <QString>
 
+#include <cstdint>
+
 /**
  * \brief Represents a file or directory.
  */
 class RelinkablePath {
   // Member-wise copying is OK.
  public:
-  enum Type { File, Dir };
+  enum class RelinkablePathType : std::uint8_t {
+    File,
+    Dir
+  };
 
-  RelinkablePath(const QString& path, Type type);
+  RelinkablePath(const QString& path, RelinkablePathType type);
 
-  const QString& normalizedPath() const { return m_normalizedPath; }
+  [[nodiscard]] const QString& normalizedPath() const { return m_normalizedPath; }
 
-  Type type() const { return m_type; }
+  [[nodiscard]] RelinkablePathType type() const { return m_type; }
 
   /**
    * Performs the following operations on the path:
@@ -33,5 +38,5 @@ class RelinkablePath {
 
  private:
   QString m_normalizedPath;
-  Type m_type;
+  RelinkablePathType m_type;
 };

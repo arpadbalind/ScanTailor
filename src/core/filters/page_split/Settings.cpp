@@ -23,7 +23,7 @@ void Settings::performRelinking(const AbstractRelinker& relinker) {
   PerPageRecords newRecords;
 
   for (const PerPageRecords::value_type& kv : m_perPageRecords) {
-    const RelinkablePath oldPath(kv.first.filePath(), RelinkablePath::File);
+    const RelinkablePath oldPath(kv.first.filePath(), RelinkablePath::RelinkablePathType::File);
     ImageId newImageId(kv.first);
     newImageId.setFilePath(relinker.substitutionPathFor(oldPath));
     newRecords.insert(PerPageRecords::value_type(newImageId, kv.second));

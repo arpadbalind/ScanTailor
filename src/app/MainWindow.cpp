@@ -800,7 +800,7 @@ void MainWindow::showRelinkingDialog() {
   dialog->setWindowModality(Qt::WindowModal);
 
   m_pages->listRelinkablePaths(dialog->pathCollector());
-  dialog->pathCollector()(RelinkablePath(m_outFileNameGen.outDir(), RelinkablePath::Dir));
+  dialog->pathCollector()(RelinkablePath(m_outFileNameGen.outDir(), RelinkablePath::RelinkablePathType::Dir));
 
   connect(dialog, &QDialog::accepted, [this, dialog]() { this->performRelinking(dialog->relinker()); });
 

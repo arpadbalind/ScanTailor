@@ -20,10 +20,10 @@ struct RelinkablePathVisualization::PathComponent {
   QString label;
   QString prefixPath;         // Including the component itself.
   QString suffixPath;         // Rest of the path.
-  RelinkablePath::Type type;  // File or Dir.
+  RelinkablePath::RelinkablePathType type;  // File or Dir.
   bool exists{ false };
 
-  PathComponent(const QString& pLabel, const QString& pPrefixPath, const QString& pSuffixPath, RelinkablePath::Type t)
+  PathComponent(const QString& pLabel, const QString& pPrefixPath, const QString& pSuffixPath, RelinkablePath::RelinkablePathType t)
       : label(pLabel), prefixPath(pPrefixPath), suffixPath(pSuffixPath), type(t) {}
 };
 
@@ -90,7 +90,7 @@ void RelinkablePathVisualization::setPath(const RelinkablePath& path, bool click
       suffixPath += *it2;
     }
 
-    pathComponents.emplace_back(component, prefixPath, suffixPath, RelinkablePath::Dir);
+    pathComponents.emplace_back(component, prefixPath, suffixPath, RelinkablePath::RelinkablePathType::Dir);
   }
 
   // The last path component is either a file or a dir, while all the previous ones are dirs.
@@ -112,7 +112,7 @@ void RelinkablePathVisualization::setPath(const RelinkablePath& path, bool click
 
     connect(btn, &ComponentButton::clicked, this,
             [this, componentIdx, prefixPath = pathComponent.prefixPath, suffixPath = pathComponent.suffixPath, type = pathComponent.type]() {
-              this->onClicked(componentIdx, prefixPath, suffixPath, type);});
+              this->onClicked(componentIdx, prefixPath, suffixPath, static_cast<int>(type));});
   }
 
   m_layout->addStretch();

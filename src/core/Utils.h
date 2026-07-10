@@ -95,7 +95,8 @@ T Utils::castOrFindChild(QObject* object) {
     return result;
   } else {
     for (QObject* child : object->children()) {
-      if ((result = castOrFindChild<T>(child))) {
+      result = castOrFindChild<T>(child);
+      if (result != nullptr) {
         return result;
       }
     }

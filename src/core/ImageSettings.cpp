@@ -19,7 +19,7 @@ void ImageSettings::performRelinking(const AbstractRelinker& relinker) {
   QMutexLocker locker(&m_mutex);
   PerPageParams newParams;
   for (const auto& kv : m_perPageParams) {
-    const RelinkablePath oldPath(kv.first.imageId().filePath(), RelinkablePath::File);
+    const RelinkablePath oldPath(kv.first.imageId().filePath(), RelinkablePath::RelinkablePathType::File);
     PageId newPageId(kv.first);
     newPageId.imageId().setFilePath(relinker.substitutionPathFor(oldPath));
     newParams.insert(PerPageParams::value_type(newPageId, kv.second));

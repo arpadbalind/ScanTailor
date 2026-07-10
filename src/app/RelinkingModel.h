@@ -50,7 +50,7 @@ class RelinkingModel : public QAbstractListModel, private NonCopyable {
 
   void addPath(const RelinkablePath& path);
 
-  void replacePrefix(const QString& prefix, const QString& replacement, RelinkablePath::Type type);
+  void replacePrefix(const QString& prefix, const QString& replacement, RelinkablePath::RelinkablePathType type);
 
   /**
    * Returns true if we have different original paths remapped to the same one.
@@ -80,7 +80,7 @@ class RelinkingModel : public QAbstractListModel, private NonCopyable {
     QString uncommittedPath;
 
     /**< Same as committedPath when m_haveUncommittedChanges == false. */
-    RelinkablePath::Type type;
+    RelinkablePath::RelinkablePathType type;
     Status committedStatus;
     Status uncommittedStatus;
 

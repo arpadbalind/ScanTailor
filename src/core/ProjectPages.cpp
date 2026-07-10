@@ -128,7 +128,7 @@ void ProjectPages::listRelinkablePaths(const VirtualFunction<void, const Relinka
   }
 
   for (const QString& file : files) {
-    sink(RelinkablePath(file, RelinkablePath::File));
+    sink(RelinkablePath(file, RelinkablePath::RelinkablePathType::File));
   }
 }
 
@@ -136,7 +136,7 @@ void ProjectPages::performRelinking(const AbstractRelinker& relinker) {
   QMutexLocker locker(&m_mutex);
 
   for (ImageDesc& image : m_images) {
-    const RelinkablePath oldPath(image.id.filePath(), RelinkablePath::File);
+    const RelinkablePath oldPath(image.id.filePath(), RelinkablePath::RelinkablePathType::File);
     const QString newPath(relinker.substitutionPathFor(oldPath));
     image.id.setFilePath(newPath);
   }

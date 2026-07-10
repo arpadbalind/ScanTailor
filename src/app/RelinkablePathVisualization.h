@@ -22,7 +22,7 @@ class RelinkablePathVisualization : public QWidget {
 
  signals:
 
-  /** \p type is either RelinkablePath::File or RelinkablePath::Dir */
+  /** \p type is either RelinkablePath::RelinkablePathType::File or RelinkablePath::RelinkablePathType::Dir */
   void clicked(const QString& prefixPath, const QString& suffixPath, int type);
 
  protected:

@@ -34,7 +34,7 @@ void Settings::performRelinking(const AbstractRelinker& relinker) {
   PerPageParams newParams;
 
   for (const PerPageParams::value_type& kv : m_perPageParams) {
-    const RelinkablePath oldPath(kv.first.imageId().filePath(), RelinkablePath::File);
+    const RelinkablePath oldPath(kv.first.imageId().filePath(), RelinkablePath::RelinkablePathType::File);
     PageId newPageId(kv.first);
     newPageId.imageId().setFilePath(relinker.substitutionPathFor(oldPath));
     newParams.insert(PerPageParams::value_type(newPageId, kv.second));

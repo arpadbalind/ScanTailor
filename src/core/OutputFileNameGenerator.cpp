@@ -23,7 +23,7 @@ OutputFileNameGenerator::OutputFileNameGenerator(std::shared_ptr<FileNameDisambi
 
 void OutputFileNameGenerator::performRelinking(const AbstractRelinker& relinker) {
   m_disambiguator->performRelinking(relinker);
-  m_outDir = relinker.substitutionPathFor(RelinkablePath(m_outDir, RelinkablePath::Dir));
+  m_outDir = relinker.substitutionPathFor(RelinkablePath(m_outDir, RelinkablePath::RelinkablePathType::Dir));
 }
 
 QString OutputFileNameGenerator::fileNameFor(const PageId& page) const {
