@@ -23,7 +23,7 @@ class IconProvider : private NonCopyable {
 
   void addIconPack(std::unique_ptr<IconPack> pack);
 
-  QIcon getIcon(const QString& iconKey) const;
+  [[nodiscard]] QIcon getIcon(const QString& iconKey) const;
 
  private:
   std::unique_ptr<IconPack> m_iconPack;

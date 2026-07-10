@@ -19,7 +19,7 @@ class Settings;
 class OptionsWidget : public FilterOptionsWidget {
   Q_OBJECT
  public:
-  OptionsWidget(std::shared_ptr<Settings> settings, const PageSelectionAccessor& pageSelectionAccessor);
+  OptionsWidget(std::shared_ptr<Settings> settings, PageSelectionAccessor pageSelectionAccessor);
 
   ~OptionsWidget() override;
 

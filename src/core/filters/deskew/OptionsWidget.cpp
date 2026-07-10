@@ -3,6 +3,8 @@
 
 #include "OptionsWidget.h"
 
+#include <QWidget>
+
 #include <utility>
 
 #include "ApplyDialog.h"

@@ -137,7 +137,7 @@ void OptionsWidget::layoutTypeButtonToggled(const bool checked) {
   }
 
   LayoutType lt;
-  ProjectPages::LayoutType plt = ProjectPages::ONE_PAGE_LAYOUT;
+  ProjectPages::LayoutType plt = ProjectPages::LayoutType::ONE_PAGE_LAYOUT;
 
   QObject* button = sender();
   if (button == singlePageUncutBtn) {
@@ -147,7 +147,7 @@ void OptionsWidget::layoutTypeButtonToggled(const bool checked) {
   } else {
     assert(button == twoPagesBtn);
     lt = LayoutType::TWO_PAGES;
-    plt = ProjectPages::TWO_PAGE_LAYOUT;
+    plt = ProjectPages::LayoutType::TWO_PAGE_LAYOUT;
   }
 
   Settings::UpdateAction update;

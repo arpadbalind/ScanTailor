@@ -3,11 +3,13 @@
 
 #pragma once
 
+// NOLINTBEGIN(misc-non-private-member-variables-in-classes)
 #include <QMutex>
 #include <QObject>
 #include <QString>
 #include <Qt>
 #include <cstddef>
+#include <cstdint>
 #include <set>
 #include <vector>
 
@@ -32,9 +34,16 @@ class ProjectPages : public QObject, private NonCopyable {
   Q_OBJECT
 
  public:
-  enum Pages { ONE_PAGE, TWO_PAGES, AUTO_PAGES };
+  enum class Pages : std::uint8_t {
+    ONE_PAGE,
+    TWO_PAGES,
+    AUTO_PAGES
+  };
 
-  enum LayoutType { ONE_PAGE_LAYOUT, TWO_PAGE_LAYOUT };
+  enum class LayoutType : std::uint8_t {
+    ONE_PAGE_LAYOUT,
+    TWO_PAGE_LAYOUT
+  };
 
   explicit ProjectPages(Qt::LayoutDirection layoutDirection = Qt::LeftToRight);
 
@@ -73,7 +82,7 @@ class ProjectPages : public QObject, private NonCopyable {
    *
    * The caller has to make sure he is not inserting an image that already
    * exists in this ProjectPages.  Requesting to insert a new image
-   * BEFORE the null one is legal and means inserting it at the end.
+   * Location::BEFORE the null one is legal and means inserting it at the end.
    *
    * \param newImage The image to insert.
    * \param beforeOrAfter Whether to insert before or after another image.
@@ -85,7 +94,7 @@ class ProjectPages : public QObject, private NonCopyable {
    *         at construction time.
    */
   std::vector<PageInfo> insertImage(const ImageInfo& newImage,
-                                    BeforeOrAfter beforeOrAfter,
+                                    Location beforeOrAfter,
                                     const ImageId& existing,
                                     PageView view);
 
@@ -141,7 +150,7 @@ class ProjectPages : public QObject, private NonCopyable {
   void updateImageMetadataImpl(const ImageId& imageId, const ImageMetadata& metadata, bool* modified);
 
   std::vector<PageInfo> insertImageImpl(const ImageInfo& newImage,
-                                        BeforeOrAfter beforeOrAfter,
+                                        Location beforeOrAfter,
                                         const ImageId& existing,
                                         PageView view,
                                         bool& modified);
@@ -152,5 +161,6 @@ class ProjectPages : public QObject, private NonCopyable {
 
   mutable QMutex m_mutex;
   std::vector<ImageDesc> m_images;
-  PageId::SubPage m_subPagesInOrder[2];
+  std::array<PageId::SubPage, 2> m_subPagesInOrder{};
 };
+// NOLINTEND(misc-non-private-member-variables-in-classes)

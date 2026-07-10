@@ -3,20 +3,27 @@
 
 #include "OptionsWidget.h"
 
+#include <QIcon>
+#include <QPushButton>
+
 #include <cassert>
+#include <memory>
+#include <set>
 #include <utility>
 
 #include "ApplyDialog.h"
 #include "core/IconProvider.h"
 #include "Filter.h"
+#include "PageId.h"
 #include "ProjectPages.h"
 #include "Settings.h"
+#include "ui_OptionsWidget.h"
 
 namespace fix_orientation {
-OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, const PageSelectionAccessor& pageSelectionAccessor)
+OptionsWidget::OptionsWidget(std::shared_ptr<Settings> settings, PageSelectionAccessor pageSelectionAccessor)
     : m_settings(std::move(settings)),
-      m_pageSelectionAccessor(pageSelectionAccessor),
-      m_connectionManager(std::bind(&OptionsWidget::setupUiConnections, this)),
+      m_pageSelectionAccessor(std::move(pageSelectionAccessor)),
+      m_connectionManager([this] { setupUiConnections(); }),
       m_ui(std::make_unique<Ui::OptionsWidget>()) {
   m_ui->setupUi(this);
   setupIcons();
@@ -58,10 +65,9 @@ void OptionsWidget::resetRotation() {
 
 void OptionsWidget::showApplyToDialog() {
   auto* dialog = new ApplyDialog(this, m_pageId, m_pageSelectionAccessor);
-  dialog->setAttribute(Qt::WA_DeleteOnClose);
-  connect(dialog, SIGNAL(appliedTo(const std::set<PageId>&)), this, SLOT(appliedTo(const std::set<PageId>&)));
-  connect(dialog, SIGNAL(appliedToAllPages(const std::set<PageId>&)), this,
-          SLOT(appliedToAllPages(const std::set<PageId>&)));
+  dialog->setAttribute(Qt::WA_DeleteOnClose); // NOLINT(misc-include-cleaner)
+  connect(dialog, &ApplyDialog::appliedTo, this, &OptionsWidget::appliedTo);
+  connect(dialog, &ApplyDialog::appliedToAllPages, this, &OptionsWidget::appliedToAllPages);
   dialog->show();
 }
 
@@ -73,17 +79,17 @@ void OptionsWidget::appliedTo(const std::set<PageId>& pages) {
   m_settings->applyRotation(pages, m_rotation);
 
   if (pages.size() > 1) {
-    emit invalidateAllThumbnails();
+    invalidateAllThumbnails();
   } else {
     for (const PageId& pageId : pages) {
-      emit invalidateThumbnail(pageId);
+      invalidateThumbnail(pageId);
     }
   }
 }
 
 void OptionsWidget::appliedToAllPages(const std::set<PageId>& pages) {
   m_settings->applyRotation(pages, m_rotation);
-  emit invalidateAllThumbnails();
+  invalidateAllThumbnails();
 }
 
 void OptionsWidget::setRotation(const OrthogonalRotation& rotation) {
@@ -96,12 +102,13 @@ void OptionsWidget::setRotation(const OrthogonalRotation& rotation) {
 
   m_settings->applyRotation(m_pageId.imageId(), rotation);
 
-  emit rotated(rotation);
-  emit invalidateThumbnail(m_pageId);
+  rotated(rotation);
+  invalidateThumbnail(m_pageId);
 }
 
 void OptionsWidget::setRotationPixmap() {
   QIcon icon;
+  // NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
   switch (m_rotation.toDegrees()) {
     case 0:
       icon = IconProvider::getInstance().getIcon("big-up-arrow");
@@ -119,6 +126,7 @@ void OptionsWidget::setRotationPixmap() {
       assert(!"Unreachable");
   }
   m_ui->rotationIndicator->setPixmap(icon.pixmap(32, 32));
+  // NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
 }
 
 void OptionsWidget::setupUiConnections() {

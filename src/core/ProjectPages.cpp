@@ -93,7 +93,7 @@ PageSequence ProjectPages::toPageSequence(const PageView view) const {
       const ImageDesc& image = m_images[i];
       assert(image.numLogicalPages >= 1 && image.numLogicalPages <= 2);
       for (int j = 0; j < image.numLogicalPages; ++j) {
-        const PageId id(image.id, image.logicalPageToSubPage(j, m_subPagesInOrder));
+        const PageId id(image.id, image.logicalPageToSubPage(j, m_subPagesInOrder.data()));
         pages.append(
             PageInfo(id, image.metadata, image.numLogicalPages, image.leftHalfRemoved, image.rightHalfRemoved));
       }
@@ -211,7 +211,7 @@ int ProjectPages::numImages() const {
 }
 
 std::vector<PageInfo> ProjectPages::insertImage(const ImageInfo& newImage,
-                                                BeforeOrAfter beforeOrAfter,
+                                                Location beforeOrAfter,
                                                 const ImageId& existing,
                                                 const PageView view) {
   bool wasModified = false;
@@ -317,7 +317,7 @@ void ProjectPages::updateMetadataFrom(const std::vector<ImageFileInfo>& files) {
 }
 
 void ProjectPages::setLayoutTypeForImpl(const ImageId& imageId, const LayoutType layout, bool* modified) {
-  const int numPages = (layout == TWO_PAGE_LAYOUT ? 2 : 1);
+  const int numPages = (layout == LayoutType::TWO_PAGE_LAYOUT ? 2 : 1);
   const auto numImages = static_cast<int>(m_images.size());
   for (int i = 0; i < numImages; ++i) {
     ImageDesc& image = m_images[i];
@@ -343,7 +343,7 @@ void ProjectPages::setLayoutTypeForImpl(const ImageId& imageId, const LayoutType
 }
 
 void ProjectPages::setLayoutTypeForAllPagesImpl(const LayoutType layout, bool* modified) {
-  const int numPages = (layout == TWO_PAGE_LAYOUT ? 2 : 1);
+  const int numPages = (layout == LayoutType::TWO_PAGE_LAYOUT ? 2 : 1);
   const auto numImages = static_cast<int>(m_images.size());
   for (int i = 0; i < numImages; ++i) {
     ImageDesc& image = m_images[i];
@@ -405,7 +405,7 @@ void ProjectPages::updateImageMetadataImpl(const ImageId& imageId, const ImageMe
 }
 
 std::vector<PageInfo> ProjectPages::insertImageImpl(const ImageInfo& newImage,
-                                                    BeforeOrAfter beforeOrAfter,
+                                                    Location beforeOrAfter,
                                                     const ImageId& existing,
                                                     const PageView view,
                                                     [[maybe_unused]] bool& modified) {
@@ -418,11 +418,11 @@ std::vector<PageInfo> ProjectPages::insertImageImpl(const ImageInfo& newImage,
   }
   if (it == end) {
     // Existing image not found.
-    if (!((beforeOrAfter == BEFORE) && existing.isNull())) {
+    if (!((beforeOrAfter == Location::BEFORE) && existing.isNull())) {
       return logicalPages;
     }  // Otherwise we can still handle that case.
   }
-  if (beforeOrAfter == AFTER) {
+  if (beforeOrAfter == Location::AFTER) {
     ++it;
   }
 
@@ -542,13 +542,13 @@ ProjectPages::ImageDesc::ImageDesc(const ImageInfo& imageInfo)
 ProjectPages::ImageDesc::ImageDesc(const ImageId& id, const ImageMetadata& metadata, const Pages pages)
     : id(id), metadata(metadata), leftHalfRemoved(false), rightHalfRemoved(false) {
   switch (pages) {
-    case ONE_PAGE:
+    case Pages::ONE_PAGE:
       numLogicalPages = 1;
       break;
-    case TWO_PAGES:
+    case Pages::TWO_PAGES:
       numLogicalPages = 2;
       break;
-    case AUTO_PAGES:
+    case Pages::AUTO_PAGES:
       numLogicalPages = adviseNumberOfLogicalPages(metadata, OrthogonalRotation());
       break;
   }

@@ -964,9 +964,9 @@ void MainWindow::pageContextMenuRequested(const PageInfo& pageInfo_, const QPoin
 
   QAction* action = menu.exec(screenPos);
   if (action == insBefore) {
-    showInsertFileDialog(BEFORE, pageInfo.imageId());
+    showInsertFileDialog(Location::BEFORE, pageInfo.imageId());
   } else if (action == insAfter) {
-    showInsertFileDialog(AFTER, pageInfo.imageId());
+    showInsertFileDialog(Location::AFTER, pageInfo.imageId());
   } else if (action == remove) {
     showRemovePagesDialog(m_thumbSequence->selectedItems());
   }
@@ -981,7 +981,7 @@ void MainWindow::pastLastPageContextMenuRequested(const QPoint& screenPos) {
   menu.addAction(IconProvider::getInstance().getIcon("insert-here"), tr("Insert here ..."));
 
   if (menu.exec(screenPos)) {
-    showInsertFileDialog(BEFORE, ImageId());
+    showInsertFileDialog(Location::BEFORE, ImageId());
   }
 }
 
@@ -1372,7 +1372,7 @@ void MainWindow::newProject() {
 
 
 void MainWindow::newProjectCreated(ProjectCreationContext* context) {
-  auto pages = std::make_shared<ProjectPages>(context->files(), ProjectPages::AUTO_PAGES, context->layoutDirection());
+  auto pages = std::make_shared<ProjectPages>(context->files(), ProjectPages::Pages::AUTO_PAGES, context->layoutDirection());
   switchToNewProject(pages, context->outDir());
 }
 
@@ -1727,9 +1727,9 @@ bool MainWindow::saveProjectWithFeedback(const QString& projectFile) {
 }
 
 /**
- * Note: showInsertFileDialog(BEFORE, ImageId()) is legal and means inserting at the end.
+ * Note: showInsertFileDialog(Location::BEFORE, ImageId()) is legal and means inserting at the end.
  */
-void MainWindow::showInsertFileDialog(BeforeOrAfter beforeOrAfter, const ImageId& existing) {
+void MainWindow::showInsertFileDialog(Location beforeOrAfter, const ImageId& existing) {
   if (isBatchProcessingInProgress() || !isProjectLoaded()) {
     return;
   }
@@ -1868,12 +1868,12 @@ void MainWindow::showRemovePagesDialog(const std::set<PageId>& pages) {
 }
 
 /**
- * Note: insertImage(..., BEFORE, ImageId()) is legal and means inserting at the end.
+ * Note: insertImage(..., Location::BEFORE, ImageId()) is legal and means inserting at the end.
  */
-void MainWindow::insertImage(const ImageInfo& newImage, BeforeOrAfter beforeOrAfter, ImageId existing) {
+void MainWindow::insertImage(const ImageInfo& newImage, Location beforeOrAfter, ImageId existing) {
   std::vector<PageInfo> pages(m_pages->insertImage(newImage, beforeOrAfter, existing, getCurrentView()));
 
-  if (beforeOrAfter == BEFORE) {
+  if (beforeOrAfter == Location::BEFORE) {
     // The second one will be inserted first, then the first
     // one will be inserted BEFORE the second one.
     std::reverse(pages.begin(), pages.end());

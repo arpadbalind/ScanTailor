@@ -203,7 +203,7 @@ class ThumbnailSequence : public QObject, private NonCopyable {
    * be inserted, unless the request is to insert BEFORE a null ImageId(),
    * which would cause insertion at the end.
    */
-  void insert(const PageInfo& newPage, BeforeOrAfter beforeOrAfter, const ImageId& image);
+  void insert(const PageInfo& newPage, Location beforeOrAfter, const ImageId& image);
 
   void removePages(const std::set<PageId>& pages);
 

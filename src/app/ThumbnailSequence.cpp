@@ -114,7 +114,7 @@ class ThumbnailSequence::Impl {
 
   PageInfo lastPage() const;
 
-  void insert(const PageInfo& newPage, BeforeOrAfter beforeOrAfter, const ImageId& image);
+  void insert(const PageInfo& newPage, Location beforeOrAfter, const ImageId& image);
 
   void removePages(const std::set<PageId>& pagesToRemove);
 
@@ -375,7 +375,7 @@ PageInfo ThumbnailSequence::lastPage() const {
   return m_impl->lastPage();
 }
 
-void ThumbnailSequence::insert(const PageInfo& newPage, BeforeOrAfter beforeOrAfter, const ImageId& image) {
+void ThumbnailSequence::insert(const PageInfo& newPage, Location beforeOrAfter, const ImageId& image) {
   m_impl->insert(newPage, beforeOrAfter, image);
 }
 
@@ -875,10 +875,10 @@ PageInfo ThumbnailSequence::Impl::lastPage() const {
   return m_itemsInOrder.back().pageInfo;
 }
 
-void ThumbnailSequence::Impl::insert(const PageInfo& newPage, BeforeOrAfter beforeOrAfter, const ImageId& image) {
+void ThumbnailSequence::Impl::insert(const PageInfo& newPage, Location beforeOrAfter, const ImageId& image) {
   ItemsInOrder::iterator ordIt;
 
-  if ((beforeOrAfter == BEFORE) && image.isNull()) {
+  if ((beforeOrAfter == Location::BEFORE) && image.isNull()) {
     ordIt = m_itemsInOrder.end();
   } else {
     // Note that we have to use lower_bound() rather than find() because
@@ -893,7 +893,7 @@ void ThumbnailSequence::Impl::insert(const PageInfo& newPage, BeforeOrAfter befo
 
     ordIt = m_items.project<ItemsInOrderTag>(idIt);
 
-    if (beforeOrAfter == AFTER) {
+    if (beforeOrAfter == Location::AFTER) {
       ++ordIt;
       if (!m_orderProvider) {
         // Advance past not only the target page, but also its other half, if it follows.
